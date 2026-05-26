@@ -7,8 +7,10 @@ import petHeroImage5 from '../../assets/petHomepage5.jpg';
 import petHomepage6 from '../../assets/petHomepage6.jpg';
 import petHomepage7 from '../../assets/petHomepage7.jpg';
 import petHomepage9 from '../../assets/petHomepage9.jpg';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../Homepage/Homepage.css'
+import AppHeader from '../../components/AppHeader/AppHeader'
+import { useAuth } from '../../context/AuthContext'
 
 const topPickProducts = Array.from({ length: 8 }, (_, index) => ({
   id: `top-${index + 1}`,
@@ -41,19 +43,35 @@ function ProductCard({ item }) {
 }
 
 function Homepage() {
+  const { logout, user } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
   return (
     <main className="homepage">
-      <header className="top-header">
-        <div className="brand">K-LAB</div>
-        <nav>
-          <Link to="/pet-profile">Pet Profile</Link>
-          <a href="#">Pet Health Record</a>
-          <a href="#">Pet Life Manager</a>
-          <a href="#">Grooming Booking</a>
-          <a href="#">Tele-vet</a>
-          <a href="#">Pet Sitter</a>
-        </nav>
-      </header>
+      <AppHeader
+        leftText="About"
+        nav={[
+          { label: 'Pet Profile', to: '/pet-profile' },
+          { label: 'Pet Health Record', to: '/health-record' },
+          { label: 'Pet Life Manager', href: '#' },
+          { label: 'Grooming Booking', to: '/grooming' },
+          { label: 'Tele-vet', href: '#' },
+          { label: 'Pet Sitter', href: '#' },
+        ]}
+        cartCount={0}
+      />
+
+      <div className="user-info-bar">
+        <span>Xin chào, {user?.fullName || 'Bạn'}!</span>
+        <button onClick={handleLogout} className="logout-btn">
+          Đăng xuất
+        </button>
+      </div>
 
       <section className="hero-section">
         <div className="hero-copy">
@@ -162,7 +180,9 @@ function Homepage() {
       </section>
 
       <footer className="footer">
-        <div className="logo-block">K-LAB</div>
+        <Link to="/" className="logo-block">
+          K-LABT
+        </Link>
         <div className="footer-links">
           <div>
             <h4>Shop</h4>

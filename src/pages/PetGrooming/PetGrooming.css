@@ -1,0 +1,474 @@
+.pet-grooming {
+  max-width: 100%;
+  margin: 0 auto;
+  background: #fff;
+  color: #333;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Hero Section - Full Width */
+.grooming-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 150px);
+  max-height: 700px;
+  background: linear-gradient(135deg, #e8d5f0 0%, #d4e8f0 50%, #f0e8d4 100%);
+  overflow: hidden;
+}
+
+.hero-image-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 30px 40px 30px 60px;
+}
+
+.hero-dog-image {
+  width: 100%;
+  max-width: 450px;
+  height: 380px;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.hero-content {
+  flex: 0 0 45%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 60px 60px 40px;
+}
+
+.hero-subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #7c5cbf;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0 0 15px;
+}
+
+.hero-title {
+  font-size: 64px;
+  margin: 0 0 35px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.1;
+}
+
+.hero-btn {
+  padding: 18px 50px;
+  background: linear-gradient(135deg, #7c5cbf 0%, #5b8fc4 100%);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(124, 92, 191, 0.4);
+}
+
+.hero-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(124, 92, 191, 0.5);
+}
+
+/* Feature Icons Section */
+.feature-icons {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  padding: 50px 20px;
+  background: #fafafa;
+}
+
+.feature-icon-item {
+  text-align: center;
+}
+
+.feature-circle {
+  width: 80px;
+  height: 80px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.feature-emoji {
+  font-size: 36px;
+}
+
+.feature-icon-item p {
+  margin: 0;
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+}
+
+/* Services Section */
+.services-section {
+  padding: 60px 40px;
+  background: white;
+}
+
+.services-header {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+}
+
+.services-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.services-section h2 {
+  font-size: 36px;
+  margin: 0;
+  color: #333;
+}
+
+.price-tag {
+  background: linear-gradient(135deg, #7c5cbf 0%, #5b8fc4 100%);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.service-card {
+  background: #f9f9f9;
+  padding: 40px 30px;
+  border-radius: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.service-card:hover {
+  border-color: #7c5cbf;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.service-icon {
+  font-size: 50px;
+  margin-bottom: 20px;
+}
+
+.service-card h3 {
+  font-size: 22px;
+  margin: 0 0 12px;
+  color: #333;
+}
+
+.service-card p {
+  color: #666;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Booking Section */
+.booking-section {
+  padding: 60px 40px;
+  background: linear-gradient(180deg, #fafafa 0%, #f0f4f8 100%);
+}
+
+.booking-title {
+  font-size: 32px;
+  text-align: center;
+  margin: 0 0 40px;
+  color: #333;
+}
+
+.booking-form {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.form-group input,
+.form-group select {
+  padding: 16px 18px;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #7c5cbf;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(124, 92, 191, 0.1);
+}
+
+.confirm-btn {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #7c5cbf 0%, #5b8fc4 100%);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  box-shadow: 0 8px 25px rgba(124, 92, 191, 0.3);
+}
+
+.confirm-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(124, 92, 191, 0.4);
+}
+
+/* Testimonials Section */
+.testimonials-section {
+  padding: 60px 40px;
+  background: white;
+}
+
+.testimonials-section h2 {
+  font-size: 32px;
+  text-align: center;
+  margin: 0 0 40px;
+  color: #333;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  background: linear-gradient(135deg, #fef9f0 0%, #f0f7ff 100%);
+  padding: 35px 30px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.stars {
+  color: #ffc107;
+  font-size: 24px;
+  margin-bottom: 15px;
+  letter-spacing: 3px;
+}
+
+.testimonial-text {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0 0 15px;
+  font-style: italic;
+}
+
+.testimonial-author {
+  color: #7c5cbf;
+  font-weight: 600;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Footer */
+.footer {
+  background: #e8e5e5;
+  padding: 25px 25px 40px;
+}
+
+.logo-block {
+  display: block;
+  font-size: 96px;
+  font-weight: 700;
+  text-align: center;
+  color: #8eaed8;
+  margin-bottom: 18px;
+  text-decoration: none;
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.footer-links h4 {
+  margin: 0 0 10px;
+  color: #222;
+}
+
+.footer-links a {
+  display: block;
+  margin-bottom: 6px;
+  color: #2f2f2f;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin: 30px auto;
+  max-width: 600px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.nav-tab {
+  flex: 1;
+  padding: 15px 20px;
+  text-align: center;
+  text-decoration: none;
+  color: #666;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.nav-tab:hover {
+  color: #667eea;
+  background: white;
+}
+
+.nav-tab.active {
+  background: linear-gradient(135deg, #7c5cbf 0%, #5b8fc4 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(124, 92, 191, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .grooming-hero {
+    flex-direction: column;
+    min-height: auto;
+    max-height: none;
+    padding: 30px 20px;
+  }
+
+  .hero-image-wrapper {
+    padding: 0;
+    justify-content: center;
+  }
+
+  .hero-dog-image {
+    max-width: 100%;
+    height: 280px;
+  }
+
+  .hero-content {
+    flex: none;
+    padding: 30px 0 0;
+    text-align: center;
+    align-items: center;
+  }
+
+  .hero-title {
+    font-size: 42px;
+    margin: 0 0 25px;
+  }
+
+  .feature-icons {
+    gap: 40px;
+    padding: 40px 20px;
+  }
+
+  .feature-circle {
+    width: 60px;
+    height: 60px;
+  }
+
+  .feature-emoji {
+    font-size: 28px;
+  }
+
+  .services-section,
+  .booking-section,
+  .testimonials-section {
+    padding: 40px 20px;
+  }
+
+  .services-title-row {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .services-grid,
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-links {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .logo-block {
+    font-size: 64px;
+  }
+
+  .bottom-nav {
+    flex-direction: column;
+    margin: 20px 20px;
+    max-width: none;
+  }
+}

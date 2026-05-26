@@ -1,161 +1,271 @@
-import { Link } from 'react-router-dom'
-import topImage from '../../assets/petHomepage1.jpg'
-import bottomImage from '../../assets/petHomepage6.jpg'
+import petAvatar from '../../assets/petHomepage1.jpg';
+import { Link } from 'react-router-dom';
+import AppHeader from '../../components/AppHeader/AppHeader'
+import { useState } from 'react'
 import './PetProfile.css'
 
+const meetingNotes = [
+  {
+    date: 'Oct 12, 2023',
+    type: 'Checkup',
+    summary: 'Healthy weight, diet plan adjusted for winter.',
+    action: 'Details'
+  },
+  {
+    date: 'Aug 05, 2023',
+    type: 'Emergency',
+    summary: 'Minor paw injury treated with topical antibiotic.',
+    action: 'Details'
+  },
+  {
+    date: 'May 21, 2023',
+    type: 'Routine',
+    summary: 'Standard bloodwork clear. Heartworm preventative refilled.',
+    action: 'Details'
+  },
+];
+
+const vaccines = [
+  { name: 'Rabies 1-Year', status: 'Active', clinic: 'South Hill Veterinary Clinic' },
+  { name: 'DHPP', status: 'Active', clinic: 'South Hill Veterinary Clinic' },
+];
+
 function PetProfile() {
+  const [countdown, setCountdown] = useState({
+    days: 3,
+    hours: 12,
+    minutes: 45,
+    seconds: 30
+  });
+
   return (
     <main className="pet-profile-page">
-      <header className="pet-header">
-        <div className="pet-header-top">
-          <span>About</span>
-          <h1>K-LABT</h1>
-          <span>Search | User</span>
+      <AppHeader
+        leftText="About"
+        nav={[
+          { label: 'Pet Profile', to: '/pet-profile' },
+          { label: 'Pet Health Record', to: '/health-record' },
+          { label: 'Grooming Booking', to: '/grooming' },
+        ]}
+        promoText="20% discount on healthcare and medical services is about to expire!"
+        cartCount={0}
+      />
+
+      {/* Discount Banner with Countdown */}
+      <section className="discount-banner">
+        <div className="banner-content">
+          <span className="banner-icon">🎉</span>
+          <span className="banner-text">20% discount on healthcare and medical services is about to expire!</span>
         </div>
-        <nav className="pet-header-nav">
-          <Link to="/pet-profile" className="active">
-            Pet Profile
-          </Link>
-          <a href="#">Tele-vet</a>
-          <a href="#">Grooming Booking</a>
-        </nav>
-        <div className="discount-bar">
-          20% discount on healthcare and medical services is about to expire!
+        <div className="countdown">
+          <div className="countdown-item">
+            <span className="countdown-number">{countdown.days}</span>
+            <span className="countdown-label">Days</span>
+          </div>
+          <span className="countdown-sep">:</span>
+          <div className="countdown-item">
+            <span className="countdown-number">{countdown.hours.toString().padStart(2, '0')}</span>
+            <span className="countdown-label">Hours</span>
+          </div>
+          <span className="countdown-sep">:</span>
+          <div className="countdown-item">
+            <span className="countdown-number">{countdown.minutes.toString().padStart(2, '0')}</span>
+            <span className="countdown-label">Min</span>
+          </div>
+          <span className="countdown-sep">:</span>
+          <div className="countdown-item">
+            <span className="countdown-number">{countdown.seconds.toString().padStart(2, '0')}</span>
+            <span className="countdown-label">Sec</span>
+          </div>
         </div>
-      </header>
+      </section>
 
-      <section className="hero-dashboard">
-        <h2>Welcome back, Sarah</h2>
-        <p>You have 3 tasks to complete for your pets today</p>
+      {/* Welcome Section */}
+      <section className="welcome-section">
+        <h1>Welcome back, Sarah</h1>
+        <p>You have <strong>3 tasks</strong> to complete for your pets today</p>
+      </section>
 
-        <div className="dashboard-grid">
-          <aside className="profile-panel card">
-            <img src={topImage} alt="Buddy" className="avatar" />
-            <h3>Buddy</h3>
-            <p className="muted">Golden Retriever · 3 Years</p>
-            <button type="button">Edit Profile</button>
-
-            <div className="tag-list">
-              <span>Sound of Thunder</span>
-              <span>Loves Swimming</span>
-              <span>Food Routine</span>
-              <span>Park Explorer</span>
+      {/* Digital Pet ID Card */}
+      <section className="id-card-section">
+        <div className="section-header">
+          <h2>Digital Pet ID Card</h2>
+          <button className="manage-pets-btn">Manage all pets</button>
+        </div>
+        
+        <div className="id-card">
+          <div className="id-card-left">
+            <div className="pet-basic-info">
+              <div className="info-row">
+                <span className="info-label">Name</span>
+                <span className="info-value">Buddy</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Breed</span>
+                <span className="info-value">Golden Retriever</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Age</span>
+                <span className="info-value">3 years old • Male</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Weight</span>
+                <span className="info-value">32 kg</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">ID Number</span>
+                <span className="info-value">365 112 345 678</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Weight</span>
+                <span className="info-value">32.5 kg</span>
+              </div>
             </div>
-          </aside>
-
-          <div className="card personality-card">
-            <h3>Personality Matrix</h3>
-            <p className="muted">One look into Buddy&apos;s behavior pattern</p>
-
-            <div className="metric">
-              <div className="metric-top">
-                <span>Energy Level</span>
-                <strong>88%</strong>
-              </div>
-              <div className="bar orange">
-                <div style={{ width: '88%' }} />
-              </div>
-            </div>
-
-            <div className="metric">
-              <div className="metric-top">
-                <span>Adaptability</span>
-                <strong>72%</strong>
-              </div>
-              <div className="bar blue">
-                <div style={{ width: '72%' }} />
-              </div>
-            </div>
-
-            <div className="metric">
-              <div className="metric-top">
-                <span>Trainability</span>
-                <strong>95%</strong>
-              </div>
-              <div className="bar green">
-                <div style={{ width: '95%' }} />
-              </div>
+            
+            <div className="id-card-buttons">
+              <button className="more-info-btn">More Information</button>
+              <button className="update-info-btn">Update Info</button>
             </div>
           </div>
-
-          <div className="card appointment-card">
-            <div>
-              <h4>Dec 14th, 2023</h4>
-              <p>at 2:30 PM</p>
-            </div>
-            <small>Next vet visit reminder and health session at Downtown Pet Vet</small>
-            <button type="button">Manage Appointment</button>
-          </div>
-
-          <div className="card summary-row">
-            <div className="circle-meter">
-              <div>
-                <strong>80%</strong>
-                <span>happy score</span>
+          
+          <div className="id-card-right">
+            <div className="pet-image-wrapper">
+              <img src={petAvatar} alt="Buddy" className="pet-photo" />
+              <div className="verified-badge">
+                <span className="check-icon">✓</span>
+                VERIFIED PET
               </div>
-            </div>
-            <div className="activity-box">
-              <h4>Activity Summary</h4>
-              <p>Morning walk - done</p>
-              <p>Training session - pending</p>
-              <p>Socializing - 60 min</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="journey-section">
-        <h3>Pet Life Journey</h3>
-        <p className="muted">A complete record of memories and medical history for Buddy</p>
+      {/* Quick Actions Icons */}
+      <section className="quick-actions">
+        <button className="action-icon">
+          <span className="action-emoji">💉</span>
+          <span className="action-label">Vaccines</span>
+        </button>
+        <button className="action-icon">
+          <span className="action-emoji">🏥</span>
+          <span className="action-label">Vet Visits</span>
+        </button>
+        <button className="action-icon">
+          <span className="action-emoji">🥗</span>
+          <span className="action-label">Nutrition</span>
+        </button>
+        <button className="action-icon">
+          <span className="action-emoji">📋</span>
+          <span className="action-label">Logs</span>
+        </button>
+      </section>
 
-        <article className="journey-item">
-          <div className="journey-text">
-            <h4>Annual Vaccination</h4>
-            <p>June 10, 2023 - South Hill Veterinary Clinic</p>
-          </div>
-          <span className="chip">MEDICAL</span>
-        </article>
-
-        <article className="journey-item">
-          <div className="journey-text">
-            <h4>Beach Day Outing</h4>
-            <p>Sep 18, 2023 - Santa Monica Pier - 3 photos added</p>
-          </div>
-          <span className="chip orange">MEMORY</span>
-        </article>
-
-        <div className="journey-images">
-          <img src={bottomImage} alt="Journey memory 1" />
-          <img src={topImage} alt="Journey memory 2" />
-          <img src={bottomImage} alt="Journey memory 3" />
+      {/* Meeting Notes Table */}
+      <section className="meeting-notes-section">
+        <div className="section-header">
+          <h2>Auto-generated Meeting Notes</h2>
+          <a href="#" className="view-all-link">View All</a>
+        </div>
+        
+        <div className="table-wrapper">
+          <table className="meeting-table">
+            <thead>
+              <tr>
+                <th>DATE</th>
+                <th>TYPE</th>
+                <th>SUMMARY</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              {meetingNotes.map((note, index) => (
+                <tr key={index}>
+                  <td>{note.date}</td>
+                  <td>
+                    <span className={`type-badge ${note.type.toLowerCase()}`}>{note.type}</span>
+                  </td>
+                  <td className="summary-cell">{note.summary}</td>
+                  <td>
+                    <button className="details-btn">{note.action}</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <section className="notes-section">
-        <h3>Summary of Medical Notes</h3>
-        <div className="notes-grid">
-          <article className="note-card">
-            <small>LAST EXAM</small>
-            <strong>October 12, 2023</strong>
-            <p>Perfectly healthy weight at 28.6kg</p>
-          </article>
-          <article className="note-card">
-            <small>MEDICATION</small>
-            <strong>Heartworm Preventive</strong>
-            <p>Administered on the 1st of every month</p>
-          </article>
-          <article className="note-card">
-            <small>ALLERGIES</small>
-            <strong>Chicken (Mild)</strong>
-            <p>Avoid poultry-based kibble</p>
-          </article>
-          <article className="note-card">
-            <small>UPCOMING</small>
-            <strong>Grooming Session</strong>
-            <p>Scheduled for November 5th</p>
-          </article>
+      {/* Vaccination History */}
+      <section className="vaccination-section">
+        <div className="section-header">
+          <h2>Vaccination History</h2>
+        </div>
+        
+        <div className="vaccine-cards">
+          {vaccines.map((vaccine, index) => (
+            <div key={index} className="vaccine-card">
+              <div className="vaccine-icon">💉</div>
+              <div className="vaccine-info">
+                <h4>{vaccine.name}</h4>
+                <p className="vaccine-status">{vaccine.status}</p>
+                <p className="vaccine-clinic">{vaccine.clinic}</p>
+              </div>
+              <div className="vaccine-status-badge">
+                <span className="status-dot"></span>
+                {vaccine.status}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
+
+      {/* Bottom Navigation Tabs */}
+      <div className="bottom-nav">
+        <Link to="/pet-profile" className="nav-tab active">
+          Pet Profile
+        </Link>
+        <Link to="/health-record" className="nav-tab">
+          Pet Health Record
+        </Link>
+        <Link to="/grooming" className="nav-tab">
+          Grooming Booking
+        </Link>
+      </div>
+
+      {/* Footer */}
+      <footer className="footer">
+        <Link to="/" className="logo-block">
+          K-LABT
+        </Link>
+        <div className="footer-links">
+          <div>
+            <h4>Shop</h4>
+            <a href="#">Walk</a>
+            <a href="#">Carry</a>
+            <a href="#">Play</a>
+            <a href="#">Shop All</a>
+          </div>
+          <div>
+            <h4>Info</h4>
+            <a href="#">About</a>
+            <a href="#">Blog</a>
+            <a href="#">Reviews</a>
+            <a href="#">Wholesale</a>
+          </div>
+          <div>
+            <h4>Help</h4>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+            <a href="#">Shipping & Returns</a>
+            <a href="#">Account</a>
+          </div>
+          <div>
+            <h4>Join the Pack!</h4>
+            <a href="#">Facebook</a>
+            <a href="#">Instagram</a>
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }
