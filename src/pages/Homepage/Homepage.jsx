@@ -11,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../Homepage/Homepage.css'
 import AppHeader from '../../components/AppHeader/AppHeader'
 import { useAuth } from '../../context/AuthContext'
+import { useState, useEffect } from 'react'
 
 const topPickProducts = Array.from({ length: 8 }, (_, index) => ({
   id: `top-${index + 1}`,
@@ -45,6 +46,22 @@ function ProductCard({ item }) {
 function Homepage() {
   const { logout, user } = useAuth()
   const navigate = useNavigate()
+  const [showWelcome, setShowWelcome] = useState(false)
+  const [justLoggedIn, setJustLoggedIn] = useState(false)
+
+  useEffect(() => {
+    // Check if just logged in (session storage)
+    const loggedIn = sessionStorage.getItem('justLoggedIn')
+    if (loggedIn === 'true' && user?.fullName) {
+      setJustLoggedIn(true)
+      setShowWelcome(true)
+      sessionStorage.removeItem('justLoggedIn')
+      // Hide after 5 seconds
+      setTimeout(() => {
+        setShowWelcome(false)
+      }, 5000)
+    }
+  }, [user])
 
   const handleLogout = () => {
     logout()
@@ -66,12 +83,12 @@ function Homepage() {
         cartCount={0}
       />
 
-      <div className="user-info-bar">
-        <span>Xin chào, {user?.fullName || 'Bạn'}!</span>
-        <button onClick={handleLogout} className="logout-btn">
-          Đăng xuất
-        </button>
-      </div>
+      {/* Welcome Banner */}
+      {showWelcome && (
+        <div className="welcome-banner">
+          <span>🎉 Chào mừng {user?.fullName} đã quay trở lại!</span>
+        </div>
+      )}
 
       <section className="hero-section">
         <div className="hero-copy">

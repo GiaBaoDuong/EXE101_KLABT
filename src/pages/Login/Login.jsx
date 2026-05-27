@@ -33,6 +33,7 @@ function Login() {
       if (response.ok) {
         const data = await response.json()
         login(data.user, data.token)
+        sessionStorage.setItem('justLoggedIn', 'true')
         navigate('/')
       } else {
         const errorData = await response.json()

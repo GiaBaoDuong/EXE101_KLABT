@@ -6,6 +6,28 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Welcome Banner */
+.welcome-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 14px 20px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .hero-section {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext()
 
@@ -6,13 +6,12 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(null)
+  const [isLoading, setIsLoading] = useState(true) // Track initial loading
 
   const login = (userData, authToken) => {
-    // Lưu thông tin user
     setUser(userData)
     setToken(authToken)
     setIsAuthenticated(true)
-    // Lưu vào localStorage để persist qua page reload
     localStorage.setItem('isAuthenticated', 'true')
     localStorage.setItem('user', JSON.stringify(userData))
     localStorage.setItem('token', authToken)
@@ -28,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   // Khôi phục trạng thái từ localStorage khi app load
-  React.useEffect(() => {
+  useEffect(() => {
     const savedAuth = localStorage.getItem('isAuthenticated')
     const savedUser = localStorage.getItem('user')
     const savedToken = localStorage.getItem('token')
@@ -37,10 +36,11 @@ export const AuthProvider = ({ children }) => {
       setToken(savedToken)
       setIsAuthenticated(true)
     }
+    setIsLoading(false) // Done loading
   }, [])
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   )
