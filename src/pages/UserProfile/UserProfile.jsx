@@ -172,7 +172,7 @@ function UserProfile() {
     <main className="user-profile-page">
       {/* Header */}
       <header className="profile-header">
-        <Link to="/" className="back-btn">
+        <Link to="/home" className="back-btn">
           <span className="back-icon">←</span>
           Quay lại
         </Link>

@@ -34,7 +34,22 @@ function Login() {
         const data = await response.json()
         login(data.user, data.token)
         sessionStorage.setItem('justLoggedIn', 'true')
-        navigate('/')
+        
+        // Check role and redirect accordingly
+        // Admin = 1 -> Admin Dashboard
+        // Staff = 2 -> Staff Dashboard  
+        // Doctor = 3, Customer = 4 -> Homepage
+        if (data.user?.role === 'Admin') {
+          sessionStorage.setItem('adminToken', data.token)
+          sessionStorage.setItem('adminUser', JSON.stringify(data.user))
+          navigate('/admin')
+        } else if (data.user?.role === 'Staff') {
+          sessionStorage.setItem('staffToken', data.token)
+          sessionStorage.setItem('staffUser', JSON.stringify(data.user))
+          navigate('/staff')
+        } else {
+          navigate('/home')
+        }
       } else {
         const errorData = await response.json()
         setError(errorData.message || 'Email hoặc mật khẩu không đúng')

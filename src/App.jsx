@@ -1,5 +1,8 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import Homepage from './pages/Homepage/Homepage'
+import Products from './pages/Products/Products'
+import ProductDetail from './pages/ProductDetail/ProductDetail'
+import Services from './pages/Services/Services'
 import PetProfile from './pages/PetProfile/PetProfile'
 import PetHealthRecord from './pages/PetHealthRecord/PetHealthRecord'
 import Purchases from './pages/Purchases/Purchases'
@@ -7,6 +10,9 @@ import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
 import PetGrooming from './pages/PetGrooming/PetGrooming'
 import UserProfile from './pages/UserProfile/UserProfile'
+import AdminDashboard from './pages/AdminDashboard/AdminDashboard'
+import Staff from './pages/Staff/Staff'
+import Notifications from './pages/Notifications/Notifications'
 import { useAuth } from './context/AuthContext'
 import './App.css'
 
@@ -37,7 +43,7 @@ function LoadingScreen() {
 }
 
 function App() {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, user } = useAuth()
 
   // Show loading screen while checking auth state
   if (isLoading) {
@@ -47,9 +53,15 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Nếu chưa đăng nhập, chuyển hướng tới login */}
+        {/* Default - Login Page */}
+        <Route path="/" element={<Login />} />
+        {/* Products - Public */}
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/services" element={<Services />} />
+        {/* Auth Required */}
         <Route
-          path="/"
+          path="/home"
           element={isAuthenticated ? <Homepage /> : <Navigate to="/login" />}
         />
         <Route
@@ -72,7 +84,29 @@ function App() {
           path="/user-profile"
           element={isAuthenticated ? <UserProfile /> : <Navigate to="/login" />}
         />
-        {/* Trang login/register - có thể truy cập bất kỳ khi nào */}
+        {/* Admin Dashboard - cho Admin & Staff */}
+        <Route
+          path="/admin"
+          element={
+            isAuthenticated
+              ? <AdminDashboard />
+              : <Navigate to="/login" />
+          }
+        />
+        {/* Staff Dashboard */}
+        <Route
+          path="/staff"
+          element={
+            isAuthenticated
+              ? <Staff />
+              : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/notifications"
+          element={isAuthenticated ? <Notifications /> : <Navigate to="/login" />}
+        />
+        {/* Login/Register - công khai */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

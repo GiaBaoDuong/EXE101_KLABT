@@ -13,32 +13,19 @@ import AppHeader from '../../components/AppHeader/AppHeader'
 import { useAuth } from '../../context/AuthContext'
 import { useState, useEffect } from 'react'
 
-const topPickProducts = Array.from({ length: 8 }, (_, index) => ({
-  id: `top-${index + 1}`,
-  name: `Top Pick ${index + 1}`,
-  price: '$39.00',
-}))
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
-const mostLovedProducts = Array.from({ length: 4 }, (_, index) => ({
-  id: `love-${index + 1}`,
-  name: `Most Loved ${index + 1}`,
-  price: '$29.00',
-}))
-
-const allDayPlayProducts = Array.from({ length: 4 }, (_, index) => ({
-  id: `play-${index + 1}`,
-  name: `All Day Play ${index + 1}`,
-  price: '$19.00',
-}))
-
-function ProductCard({ item }) {
+function ProductCard({ product }) {
   return (
     <article className="product-card">
       <div className="img-slot">
-        <img src={heroPlaceholder} alt={item.name} />
+        {product.thumbnailUrl || product.images?.[0] ? (
+          <img src={product.thumbnailUrl || product.images[0]} alt={product.name} />
+        ) : (
+          <img src={heroPlaceholder} alt={product.name} />
+        )}
       </div>
-      <h4>{item.name}</h4>
-      <p>{item.price}</p>
+      <h4>{product.name}</h4>
     </article>
   )
 }
@@ -48,25 +35,39 @@ function Homepage() {
   const navigate = useNavigate()
   const [showWelcome, setShowWelcome] = useState(false)
   const [justLoggedIn, setJustLoggedIn] = useState(false)
+  const [products, setProducts] = useState([])
 
   useEffect(() => {
-    // Check if just logged in (session storage)
     const loggedIn = sessionStorage.getItem('justLoggedIn')
     if (loggedIn === 'true' && user?.fullName) {
       setJustLoggedIn(true)
       setShowWelcome(true)
       sessionStorage.removeItem('justLoggedIn')
-      // Hide after 5 seconds
       setTimeout(() => {
         setShowWelcome(false)
       }, 5000)
     }
+    fetchProducts()
   }, [user])
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/Product`)
+      if (res.ok) {
+        const data = await res.json()
+        setProducts(data)
+      }
+    } catch (e) {
+      console.log('Failed to fetch products')
+    }
+  }
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
+
+  const topPickProducts = products.slice(0, 8)
 
   return (
     <main className="homepage">
@@ -74,16 +75,14 @@ function Homepage() {
         leftText="About"
         nav={[
           { label: 'Pet Profile', to: '/pet-profile' },
-          { label: 'Pet Health Record', to: '/health-record' },
-          { label: 'Pet Life Manager', href: '#' },
+          { label: 'Product', to: '/products' },
+          { label: 'Service', to: '/services' },
           { label: 'Grooming Booking', to: '/grooming' },
-          { label: 'Tele-vet', href: '#' },
-          { label: 'Pet Sitter', href: '#' },
+          { label: 'Purchases', to: '/purchases' },
         ]}
         cartCount={0}
       />
 
-      {/* Welcome Banner */}
       {showWelcome && (
         <div className="welcome-banner">
           <span>🎉 Chào mừng {user?.fullName} đã quay trở lại!</span>
@@ -134,70 +133,54 @@ function Homepage() {
       </section>
 
       <section className="product-section">
-        <h3>topt pick</h3>
+        <div className="section-header">
+          <h3>Top Pick</h3>
+          <Link to="/products" className="view-all-link">Xem tất cả →</Link>
+        </div>
         <div className="product-grid four-col">
-          {topPickProducts.map((item) => (
-            <ProductCard key={item.id} item={item} />
+          {topPickProducts.slice(0, 4).map((product) => (
+            <ProductCard key={product.productId} product={product} />
           ))}
         </div>
       </section>
 
       <section className="split-banner">
         <div className="copy-box pink">
-          <h3>NEW! Lighter, Brighter & Only at Walmart</h3>
-          <p>Placeholder text, replace with your final marketing message.</p>
-          <button>Explore Collection</button>
+          <h3>NEW! Sản phẩm mới</h3>
+          <p>Khám phá các sản phẩm mới nhất cho thú cưng của bạn</p>
+          <Link to="/products"><button>Khám phá ngay</button></Link>
         </div>
         <div className="img-slot">
-          <img src={petHomepage6} alt="Walmart campaign placeholder" />
-        </div>
-      </section>
-
-      <section className="product-section">
-        <h3>Most Loved Kits</h3>
-        <div className="product-grid four-col">
-          {mostLovedProducts.map((item) => (
-            <ProductCard key={item.id} item={item} />
-          ))}
+          <img src={petHomepage6} alt="New products" />
         </div>
       </section>
 
       <section className="split-banner">
         <div className="copy-box yellow">
-          <h3>Shop Wild One IRL</h3>
-          <p>Get your favorite products at a store near you.</p>
-          <button>Find Your Store</button>
+          <h3>Dịch vụ chăm sóc</h3>
+          <p>Đặt lịch grooming cho thú cưng của bạn ngay hôm nay</p>
+          <Link to="/grooming"><button>Đặt lịch ngay</button></Link>
         </div>
         <div className="img-slot">
-          <img src={petHomepage7} alt="Store section placeholder" />
-        </div>
-      </section>
-
-      <section className="product-section">
-        <h3>All Day Play</h3>
-        <div className="product-grid four-col">
-          {allDayPlayProducts.map((item) => (
-            <ProductCard key={item.id} item={item} />
-          ))}
+          <img src={petHomepage7} alt="Services" />
         </div>
       </section>
 
       <section className="give-back">
         <div className="img-slot">
-          <img src={petHomepage9} alt="Give back art placeholder" />
+          <img src={petHomepage9} alt="Pet care" />
         </div>
         <div className="copy-box lime">
-          <h3>Give Back</h3>
+          <h3>Chăm sóc thú cưng</h3>
           <p>
-            We support organizations that help dogs find forever families.
-            Replace this with your final content.
+            Chúng tôi luôn đồng hành cùng bạn trong việc chăm sóc và bảo vệ thú cưng yêu quý.
           </p>
-          <button>Learn More</button>
+          <Link to="/pet-profile"><button>Tìm hiểu thêm</button></Link>
         </div>
       </section>
 
       <footer className="footer">
-        <Link to="/" className="logo-block">
+        <Link to="/home" className="logo-block">
           K-LABT
         </Link>
         <div className="footer-links">

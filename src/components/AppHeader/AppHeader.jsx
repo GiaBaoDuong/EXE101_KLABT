@@ -1,7 +1,18 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useNotification } from '../../context/NotificationContext'
 import './AppHeader.css'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
+
+const BOOKING_STATUSES = {
+  1: { label: 'Chờ xử lý', color: '#f59e0b' },
+  2: { label: 'Đã xác nhận', color: '#3b82f6' },
+  3: { label: 'Đang thực hiện', color: '#8b5cf6' },
+  4: { label: 'Đã hoàn thành', color: '#22c55e' },
+  5: { label: 'Đã hủy', color: '#ef4444' },
+}
 
 function IconSearch(props) {
   return (
@@ -51,6 +62,52 @@ function IconUser(props) {
   )
 }
 
+function IconBell(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9m-4.27 15a2.5 2.5 0 0 1-4.46 0H4.27Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+function IconCalendar(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM7 12h2v5H7zm4-3h2v8h-2zm4-3h2v11h-2z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+function IconCheck(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor" />
+    </svg>
+  )
+}
+
+function IconX(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor" />
+    </svg>
+  )
+}
+
+function IconClock(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor" />
+    </svg>
+  )
+}
+
 export default function AppHeader({
   leftText = 'About',
   nav = [],
@@ -60,12 +117,82 @@ export default function AppHeader({
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const [showDropdown, setShowDropdown] = useState(false)
-  const dropdownRef = useRef(null)
+  const { notifications, unreadCount, markAsRead, markAllAsRead, addNotification } = useNotification()
+  const [showNotifPanel, setShowNotifPanel] = useState(false)
+  const [showUserDropdown, setShowUserDropdown] = useState(false)
+  const [userBookings, setUserBookings] = useState([])
+  const notifRef = useRef(null)
+  const userRef = useRef(null)
 
-  const getInitials = (name) => {
-    if (!name) return 'U'
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  useEffect(() => {
+    if (showUserDropdown) {
+      fetchUserBookings()
+    }
+  }, [showUserDropdown])
+
+  // Polling: check booking status changes every 10s
+  useEffect(() => {
+    if (!user) return
+
+    const knownBookings = new Map() // bookingId -> status
+
+    const poll = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const res = await fetch(`${API_BASE_URL}/api/Booking`, {
+          headers: { 'Authorization': token ? `Bearer ${token}` : '' },
+        })
+        if (res.ok) {
+          const data = await res.json()
+          const bookings = Array.isArray(data) ? data : []
+          bookings.forEach(b => {
+            if (knownBookings.has(b.bookingId)) {
+              const prevStatus = knownBookings.get(b.bookingId)
+              if (prevStatus !== b.status) {
+                if (b.status === 2) {
+                  addNotification({
+                    type: 'booking_confirmed',
+                    title: 'Lịch hẹn đã được xác nhận!',
+                    message: `Mã lịch hẹn #${b.bookingCode || b.bookingId} đã được xác nhận.`,
+                    link: '/grooming',
+                  })
+                } else if (b.status === 5) {
+                  addNotification({
+                    type: 'booking_rejected',
+                    title: 'Lịch hẹn đã bị từ chối',
+                    message: `Mã lịch hẹn #${b.bookingCode || b.bookingId} đã bị từ chối.`,
+                    link: '/grooming',
+                  })
+                }
+              }
+            }
+            knownBookings.set(b.bookingId, b.status)
+          })
+        }
+      } catch (e) {
+        // silent fail
+      }
+    }
+
+    // Initial fetch
+    poll()
+    const interval = setInterval(poll, 10000)
+    return () => clearInterval(interval)
+  }, [user])
+
+  const fetchUserBookings = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const res = await fetch(`${API_BASE_URL}/api/Booking`, {
+        headers: { 'Authorization': token ? `Bearer ${token}` : '' },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setUserBookings(Array.isArray(data) ? data.slice(0, 5) : [])
+      }
+    } catch (e) {
+      console.log('Failed to fetch bookings')
+    }
   }
 
   const handleLogout = () => {
@@ -74,15 +201,54 @@ export default function AppHeader({
   }
 
   const handleEditProfile = () => {
-    setShowDropdown(false)
+    setShowUserDropdown(false)
     navigate('/user-profile')
   }
 
-  // Close dropdown when clicking outside
+  const handleBookings = () => {
+    setShowUserDropdown(false)
+    navigate('/grooming')
+  }
+
+  const getNotifIcon = (type) => {
+    switch (type) {
+      case 'booking_pending':
+        return <IconCalendar className="notif-icon" />
+      case 'booking_confirmed':
+        return <IconCheck className="notif-icon success" />
+      case 'booking_rejected':
+        return <IconX className="notif-icon error" />
+      default:
+        return <IconBell className="notif-icon" />
+    }
+  }
+
+  const formatNotifTime = (timestamp) => {
+    const diff = Date.now() - new Date(timestamp).getTime()
+    const mins = Math.floor(diff / 60000)
+    if (mins < 1) return 'Vừa xong'
+    if (mins < 60) return `${mins} phút trước`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `${hrs} giờ trước`
+    return `${Math.floor(hrs / 24)} ngày trước`
+  }
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-'
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return '-'
+    return d.toLocaleDateString('vi-VN', {
+      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+    })
+  }
+
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false)
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotifPanel(false)
+      }
+      if (userRef.current && !userRef.current.contains(event.target)) {
+        setShowUserDropdown(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -94,7 +260,7 @@ export default function AppHeader({
       <div className="app-header-top">
         <span className="app-header-left">{leftText}</span>
 
-        <Link to="/" className="app-logo" aria-label="Go to homepage">
+        <Link to="/home" className="app-logo" aria-label="Go to homepage">
           K-LABT
         </Link>
 
@@ -103,22 +269,82 @@ export default function AppHeader({
             <IconSearch className="icon" />
           </button>
 
-          {/* User Dropdown */}
-          <div className="user-dropdown" ref={dropdownRef}>
-            <button 
-              type="button" 
-              className="icon-btn user-profile-btn" 
-              aria-label="User Menu"
-              onClick={() => setShowDropdown(!showDropdown)}
+          {/* Notification Bell */}
+          <div className="notif-container" ref={notifRef}>
+            <button
+              type="button"
+              className="icon-btn notif-btn"
+              aria-label="Notifications"
+              onClick={() => setShowNotifPanel(!showNotifPanel)}
             >
-              {user?.avatarUrl ? (
-                <img src={user.avatarUrl} alt={user.fullName} className="user-avatar-small" />
-              ) : (
-                <div className="user-avatar-placeholder">{getInitials(user?.fullName)}</div>
+              <IconBell className="icon" />
+              {unreadCount > 0 && (
+                <span className="notif-badge">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
               )}
             </button>
 
-            {showDropdown && (
+            {showNotifPanel && (
+              <div className="notif-panel">
+                <div className="notif-header">
+                  <h3>Thông báo</h3>
+                  {unreadCount > 0 && (
+                    <button className="notif-mark-read" onClick={markAllAsRead}>
+                      Đánh dấu đã đọc
+                    </button>
+                  )}
+                </div>
+                <div className="notif-list">
+                  {notifications.length === 0 ? (
+                    <div className="notif-empty">
+                      <IconBell className="notif-empty-icon" />
+                      <p>Chưa có thông báo nào</p>
+                    </div>
+                  ) : (
+                    notifications.map(notif => (
+                      <div
+                        key={notif.id}
+                        className={`notif-item ${notif.read ? 'read' : 'unread'}`}
+                        onClick={() => {
+                          markAsRead(notif.id)
+                          if (notif.link) navigate(notif.link)
+                        }}
+                      >
+                        <div className="notif-item-icon">
+                          {getNotifIcon(notif.type)}
+                        </div>
+                        <div className="notif-item-content">
+                          <p className="notif-item-title">{notif.title}</p>
+                          <p className="notif-item-body">{notif.message}</p>
+                          <span className="notif-item-time">{formatNotifTime(notif.timestamp)}</span>
+                        </div>
+                        {!notif.read && <span className="notif-dot"></span>}
+                      </div>
+                    ))
+                  )}
+                  <div className="notif-footer">
+                    <button className="notif-view-all" onClick={() => { setShowNotifPanel(false); navigate('/notifications') }}>
+                      Xem tất cả thông báo
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* User Dropdown */}
+          <div className="user-dropdown" ref={userRef}>
+            <button
+              type="button"
+              className="icon-btn user-profile-btn"
+              aria-label="User Menu"
+              onClick={() => setShowUserDropdown(!showUserDropdown)}
+            >
+              <IconUser className="icon user-icon" />
+            </button>
+
+            {showUserDropdown && (
               <div className="dropdown-menu">
                 <div className="dropdown-header">
                   <div className="dropdown-user-info">
@@ -127,8 +353,49 @@ export default function AppHeader({
                   </div>
                 </div>
                 <div className="dropdown-divider"></div>
+
+                {/* Booking History */}
+                <div className="dropdown-booking-section">
+                  <div className="dropdown-section-title">
+                    <span className="dropdown-section-icon"><IconCalendar className="section-icon" /></span>
+                    Lịch sử đặt lịch
+                  </div>
+                  {userBookings.length === 0 ? (
+                    <div className="dropdown-booking-empty">
+                      <p>Chưa có lịch hẹn nào</p>
+                    </div>
+                  ) : (
+                    <div className="dropdown-booking-list">
+                      {userBookings.map(b => {
+                        const status = BOOKING_STATUSES[b.status] || BOOKING_STATUSES[0]
+                        return (
+                          <div key={b.bookingId} className="dropdown-booking-item">
+                            <div className="booking-item-left">
+                              <span className="booking-service-name">{b.serviceName || 'Dịch vụ'}</span>
+                              <span className="booking-date-time">
+                                <IconClock className="clock-icon" />
+                                {formatDate(b.bookingDate || b.date)}
+                              </span>
+                            </div>
+                            <span
+                              className="booking-status-chip"
+                              style={{ color: status.color }}
+                            >
+                              {status.label}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                  <button className="dropdown-booking-more" onClick={handleBookings}>
+                    Đặt lịch mới →
+                  </button>
+                </div>
+
+                <div className="dropdown-divider"></div>
                 <button className="dropdown-item" onClick={handleEditProfile}>
-                  <span className="dropdown-icon">✏️</span>
+                  <span className="dropdown-icon">&#9998;</span>
                   Chỉnh sửa thông tin
                 </button>
                 <button className="dropdown-item logout-item" onClick={handleLogout}>
