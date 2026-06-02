@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import AppHeader from '../../components/AppHeader/AppHeader'
+import ImageCropper from '../../components/ImageCropper/ImageCropper'
 import './PetProfile.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
@@ -20,14 +21,7 @@ function PetProfile() {
   const [isSaving, setIsSaving] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [cropModal, setCropModal] = useState({ open: false, file: null, preview: null })
-  const [cropArea, setCropArea] = useState({ x: 0, y: 0, size: 100 })
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragType, setDragType] = useState(null) // 'move' | 'tl' | 'tr' | 'bl' | 'br'
-  const dragStartRef = useRef(null)
-  const cropStartRef = useRef(null)
-  const cropContainerRef = useRef(null)
-  const imgRef = useRef(null)
-  
+
   const [editForm, setEditForm] = useState({
     name: '',
     species: '',
@@ -40,7 +34,7 @@ function PetProfile() {
     avatarUrl: '',
     isNeutered: false
   })
-  
+
   const [createForm, setCreateForm] = useState({
     name: '',
     species: '',
@@ -111,141 +105,17 @@ function PetProfile() {
     reader.readAsDataURL(file)
   }
 
-  const getCroppedBlob = () => {
-    const img = imgRef.current
-    if (!img) return null
-    const { x, y, size } = cropArea
-    const canvas = document.createElement('canvas')
-    canvas.width = size
-    canvas.height = size
-    const ctx = canvas.getContext('2d')
-    ctx.drawImage(img, x, y, size, size, 0, 0, size, size)
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.92)
-    })
-  }
-
-  const handleCropConfirm = async () => {
-    const blob = await getCroppedBlob()
-    if (!blob) return
+  const handleCropConfirm = (blob) => {
     const previewUrl = URL.createObjectURL(blob)
     const setter = showEditModal ? setEditForm : setCreateForm
     setter(prev => ({ ...prev, avatarUrl: previewUrl }))
     setCropModal({ open: false, file: blob, preview: null })
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const handleCropCancel = () => {
-    if (imgRef.current) imgRef.current.src = ''
     setCropModal({ open: false, file: null, preview: null })
     if (fileInputRef.current) fileInputRef.current.value = ''
-    setCropArea({ x: 0, y: 0, size: 100 })
-  }
-
-  const handleImageLoad = (e) => {
-    const img = e.target
-    const naturalW = img.naturalWidth
-    const naturalH = img.naturalHeight
-    const size = Math.min(naturalW, naturalH) * 0.6
-    const cx = (naturalW - size) / 2
-    const cy = (naturalH - size) / 2
-    setCropArea({ x: cx, y: cy, size })
-  }
-
-  const getNaturalPos = (clientX, clientY) => {
-    const img = imgRef.current
-    if (!img) return { x: 0, y: 0 }
-    const rect = img.getBoundingClientRect()
-    return {
-      x: (clientX - rect.left) * (img.naturalWidth / rect.width),
-      y: (clientY - rect.top) * (img.naturalHeight / rect.height),
-    }
-  }
-
-  const getCropStyle = () => {
-    const img = imgRef.current
-    if (!img) return {}
-    const { x, y, size } = cropArea
-    const rect = img.getBoundingClientRect()
-    return {
-      left: (x / img.naturalWidth) * rect.width,
-      top: (y / img.naturalHeight) * rect.height,
-      width: (size / img.naturalWidth) * rect.width,
-      height: (size / img.naturalHeight) * rect.height,
-    }
-  }
-
-  const getOverlayContainerStyle = () => {
-    const img = imgRef.current
-    if (!img) return { width: '100%', height: '100%' }
-    const rect = img.getBoundingClientRect()
-    return { width: rect.width, height: rect.height }
-  }
-
-  const handleOverlayMouseDown = (e) => {
-    e.stopPropagation()
-    const { x, y } = getNaturalPos(e.clientX, e.clientY)
-    dragStartRef.current = { x, y }
-    cropStartRef.current = { ...cropArea }
-    setDragType('move')
-    setIsDragging(true)
-  }
-
-  const handleCornerMouseDown = (e, corner) => {
-    e.stopPropagation()
-    e.preventDefault()
-    const { x, y } = getNaturalPos(e.clientX, e.clientY)
-    dragStartRef.current = { x, y }
-    cropStartRef.current = { ...cropArea }
-    setDragType(corner)
-    setIsDragging(true)
-  }
-
-  const handleOverlayMouseMove = (e) => {
-    if (!isDragging || !dragStartRef.current || !cropStartRef.current) return
-    const img = imgRef.current
-    if (!img) return
-    const { x, y } = getNaturalPos(e.clientX, e.clientY)
-    const start = dragStartRef.current
-    const orig = cropStartRef.current
-    const minSize = 40
-    const dx = x - start.x
-    const dy = y - start.y
-
-    if (dragType === 'move') {
-      setCropArea({
-        ...orig,
-        x: Math.max(0, Math.min(orig.x + dx, img.naturalWidth - orig.size)),
-        y: Math.max(0, Math.min(orig.y + dy, img.naturalHeight - orig.size)),
-      })
-    } else if (dragType === 'br') {
-      const newSize = Math.max(minSize, Math.min(orig.size + dx, img.naturalWidth - orig.x, img.naturalHeight - orig.y))
-      setCropArea({ ...orig, size: newSize })
-    } else if (dragType === 'bl') {
-      const maxShrink = orig.size - minSize
-      const maxLeft = orig.x
-      const availW = orig.size + orig.x
-      const newX = Math.max(0, orig.x + dx)
-      const deltaX = orig.x - newX
-      const newSize = Math.max(minSize, Math.min(orig.size - deltaX, availW))
-      setCropArea({ x: Math.max(0, orig.x - (orig.size - newSize)), y: orig.y, size: newSize })
-    } else if (dragType === 'tr') {
-      const newY = Math.max(0, orig.y + dy)
-      const deltaY = orig.y - newY
-      const newSize = Math.max(minSize, Math.min(orig.size - deltaY, img.naturalHeight - newY, orig.size + orig.x))
-      setCropArea({ x: orig.x, y: newY, size: newSize })
-    } else if (dragType === 'tl') {
-      const newX = Math.max(0, orig.x + dx)
-      const newY = Math.max(0, orig.y + dy)
-      const newSize = Math.max(minSize, Math.min(orig.size - dx, orig.size - dy, img.naturalWidth - newX, img.naturalHeight - newY))
-      setCropArea({ x: orig.x + orig.size - newSize, y: orig.y + orig.size - newSize, size: newSize })
-    }
-  }
-
-  const handleOverlayMouseUp = () => {
-    setIsDragging(false)
-    setDragType(null)
-    dragStartRef.current = null
-    cropStartRef.current = null
   }
 
   const handleFormChange = (e, setter) => {
@@ -366,7 +236,7 @@ function PetProfile() {
   const handleDeletePet = async () => {
     const petToDelete = selectedPet
     setShowDeleteModal(false)
-    
+
     // Update UI immediately
     const remainingPets = pets.filter(p => p.petId !== petToDelete.petId)
     setPets(remainingPets)
@@ -516,7 +386,7 @@ function PetProfile() {
               <span>+</span>
             </button>
           </div>
-          
+
           <div className="id-card">
             <div className="id-card-left">
               <div className="pet-basic-info">
@@ -555,7 +425,7 @@ function PetProfile() {
                   <span className="info-value">{selectedPet.isNeutered ? 'Yes ✓' : 'No'}</span>
                 </div>
               </div>
-              
+
               <div className="id-card-buttons">
                 <button className="action-btn more-info-btn" onClick={() => {}}>
                   📋 More Info
@@ -568,7 +438,7 @@ function PetProfile() {
                 </button>
               </div>
             </div>
-            
+
             <div className="id-card-right">
               <div className="pet-image-wrapper">
                 {selectedPet.avatarUrl ? (
@@ -633,7 +503,7 @@ function PetProfile() {
               </div>
               <button className="close-modal" onClick={() => { setShowCreateModal(false); setShowEditModal(false); }}>×</button>
             </div>
-            
+
             <form onSubmit={showEditModal ? handleEditPet : handleCreatePet} className="pet-form">
               <div className="avatar-upload-section">
                 <input type="file" ref={fileInputRef} onChange={handleAvatarChange} accept="image/*" style={{ display: 'none' }} />
@@ -759,72 +629,13 @@ function PetProfile() {
         </div>
       )}
 
-      {/* Crop Modal */}
       {cropModal.open && (
-        <div className="crop-modal-overlay" onClick={(e) => e.target === e.currentTarget && handleCropCancel()}>
-          <div className="crop-modal">
-            <div className="crop-modal-header">
-              <h3>Cắt ảnh đại diện</h3>
-              <button className="crop-close-btn" onClick={handleCropCancel}>×</button>
-            </div>
-            <div
-              className="crop-canvas-wrapper"
-            >
-              <div className="crop-image-container" ref={cropContainerRef}>
-                <img
-                  ref={imgRef}
-                  src={cropModal.preview}
-                  alt="Crop preview"
-                  className="crop-image"
-                  onLoad={handleImageLoad}
-                  draggable={false}
-                />
-                {/* Dark overlay - split into 4 regions around crop area */}
-                {cropArea.size > 0 && (() => {
-                  const s = getCropStyle()
-                  return (
-                  <div
-                    className="crop-overlay"
-                    style={getOverlayContainerStyle()}
-                    onMouseMove={handleOverlayMouseMove}
-                    onMouseUp={handleOverlayMouseUp}
-                    onMouseLeave={handleOverlayMouseUp}
-                  >
-                    {/* Top */}
-                    <div className="crop-overlay-top" style={{ height: s.top }} />
-                    {/* Bottom */}
-                    <div className="crop-overlay-bottom" style={{ height: `calc(100% - ${s.top + s.height}px)`, top: s.top + s.height }} />
-                    {/* Left */}
-                    <div className="crop-overlay-left" style={{ top: s.top, height: s.height, width: s.left }} />
-                    {/* Right */}
-                    <div className="crop-overlay-right" style={{ top: s.top, height: s.height, left: s.left + s.width, width: `calc(100% - ${s.left + s.width}px)` }} />
-                    {/* Grid lines inside crop area */}
-                    <div className="crop-grid" style={{ ...s }}>
-                      {[...Array(7)].map((_, i) => (
-                        <div key={`v${i}`} className="crop-grid-line crop-grid-v" style={{ left: `${((i + 1) / 8) * 100}%` }} />
-                      ))}
-                      {[...Array(7)].map((_, i) => (
-                        <div key={`h${i}`} className="crop-grid-line crop-grid-h" style={{ top: `${((i + 1) / 8) * 100}%` }} />
-                      ))}
-                    </div>
-                    {/* Border - draggable */}
-                    <div className="crop-border" style={s} onMouseDown={handleOverlayMouseDown} />
-                    {/* Corner handles */}
-                    <div className="crop-corner crop-corner-tl" style={{ left: s.left - 7, top: s.top - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'tl')} />
-                    <div className="crop-corner crop-corner-tr" style={{ left: s.left + s.width - 7, top: s.top - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'tr')} />
-                    <div className="crop-corner crop-corner-bl" style={{ left: s.left - 7, top: s.top + s.height - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'bl')} />
-                    <div className="crop-corner crop-corner-br" style={{ left: s.left + s.width - 7, top: s.top + s.height - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'br')} />
-                  </div>
-                  )
-                })()}
-              </div>
-            </div>
-            <div className="crop-modal-footer">
-              <button className="crop-btn crop-btn-cancel" onClick={handleCropCancel}>Hủy</button>
-              <button className="crop-btn crop-btn-ok" onClick={handleCropConfirm}>OK</button>
-            </div>
-          </div>
-        </div>
+        <ImageCropper
+          preview={cropModal.preview}
+          title="Cắt ảnh đại diện"
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
       )}
     </main>
   )
