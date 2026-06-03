@@ -12,6 +12,7 @@ import PetGrooming from './pages/PetGrooming/PetGrooming'
 import UserProfile from './pages/UserProfile/UserProfile'
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard'
 import Staff from './pages/Staff/Staff'
+import Doctor from './pages/Doctor/Doctor'
 import Notifications from './pages/Notifications/Notifications'
 import { useAuth } from './context/AuthContext'
 import './App.css'
@@ -99,6 +100,15 @@ function App() {
           element={
             isAuthenticated
               ? <Staff />
+              : <Navigate to="/login" />
+          }
+        />
+        {/* Doctor Dashboard */}
+        <Route
+          path="/doctor"
+          element={
+            isAuthenticated
+              ? <Doctor />
               : <Navigate to="/login" />
           }
         />

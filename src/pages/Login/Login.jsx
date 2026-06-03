@@ -47,6 +47,8 @@ function Login() {
           sessionStorage.setItem('staffToken', data.token)
           sessionStorage.setItem('staffUser', JSON.stringify(data.user))
           navigate('/staff')
+        } else if (data.user?.role === 'Doctor') {
+          navigate('/doctor')
         } else {
           navigate('/home')
         }

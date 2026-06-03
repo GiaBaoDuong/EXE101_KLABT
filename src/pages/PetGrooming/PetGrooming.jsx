@@ -6,7 +6,7 @@ import '../PetGrooming/PetGrooming.css'
 import AppHeader from '../../components/AppHeader/AppHeader'
 import { useAuth } from '../../context/AuthContext'
 import { useNotification } from '../../context/NotificationContext'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
@@ -46,6 +46,9 @@ function PetGrooming() {
   const [isLoadingDetail, setIsLoadingDetail] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('book') // 'book' | 'history'
+  const notifiedBookingsRef = useRef(new Set(
+    JSON.parse(localStorage.getItem('notified_bookings') || '[]')
+  ))
 
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
@@ -58,6 +61,7 @@ function PetGrooming() {
   useEffect(() => {
     fetchPets()
     fetchServices()
+    fetchBookings()
   }, [user, token])
 
   const fetchPets = async () => {
@@ -104,7 +108,31 @@ function PetGrooming() {
       })
       if (res.ok) {
         const data = await res.json()
-        setBookings(Array.isArray(data) ? data : [])
+        const newBookings = Array.isArray(data) ? data : []
+        // Check and notify for confirmed/rejected bookings
+        newBookings.forEach(b => {
+          const key = `${b.bookingId}`
+          if (b.status === 2 && !notifiedBookingsRef.current.has(`${key}_2`)) {
+            notifiedBookingsRef.current.add(`${key}_2`)
+            localStorage.setItem('notified_bookings', JSON.stringify([...notifiedBookingsRef.current]))
+            addNotification({
+              type: 'booking_confirmed',
+              title: 'Lịch hẹn đã được xác nhận!',
+              message: `Mã lịch hẹn #${b.bookingCode || b.bookingId} đã được xác nhận.`,
+              link: '/grooming',
+            })
+          } else if (b.status === 5 && !notifiedBookingsRef.current.has(`${key}_5`)) {
+            notifiedBookingsRef.current.add(`${key}_5`)
+            localStorage.setItem('notified_bookings', JSON.stringify([...notifiedBookingsRef.current]))
+            addNotification({
+              type: 'booking_rejected',
+              title: 'Lịch hẹn đã bị từ chối',
+              message: `Mã lịch hẹn #${b.bookingCode || b.bookingId} đã bị từ chối.`,
+              link: '/grooming',
+            })
+          }
+        })
+        setBookings(newBookings)
       }
     } catch (e) {
       console.log('Failed to fetch bookings')

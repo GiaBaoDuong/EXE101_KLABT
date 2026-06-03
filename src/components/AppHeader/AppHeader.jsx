@@ -117,7 +117,7 @@ export default function AppHeader({
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const { notifications, unreadCount, markAsRead, markAllAsRead, addNotification } = useNotification()
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotification()
   const [showNotifPanel, setShowNotifPanel] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [userBookings, setUserBookings] = useState([])
@@ -130,54 +130,9 @@ export default function AppHeader({
     }
   }, [showUserDropdown])
 
-  // Polling: check booking status changes every 10s
+  // Manual refresh: user clicks refresh button to check booking status
   useEffect(() => {
-    if (!user) return
-
-    const knownBookings = new Map() // bookingId -> status
-
-    const poll = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        const res = await fetch(`${API_BASE_URL}/api/Booking`, {
-          headers: { 'Authorization': token ? `Bearer ${token}` : '' },
-        })
-        if (res.ok) {
-          const data = await res.json()
-          const bookings = Array.isArray(data) ? data : []
-          bookings.forEach(b => {
-            if (knownBookings.has(b.bookingId)) {
-              const prevStatus = knownBookings.get(b.bookingId)
-              if (prevStatus !== b.status) {
-                if (b.status === 2) {
-                  addNotification({
-                    type: 'booking_confirmed',
-                    title: 'Lịch hẹn đã được xác nhận!',
-                    message: `Mã lịch hẹn #${b.bookingCode || b.bookingId} đã được xác nhận.`,
-                    link: '/grooming',
-                  })
-                } else if (b.status === 5) {
-                  addNotification({
-                    type: 'booking_rejected',
-                    title: 'Lịch hẹn đã bị từ chối',
-                    message: `Mã lịch hẹn #${b.bookingCode || b.bookingId} đã bị từ chối.`,
-                    link: '/grooming',
-                  })
-                }
-              }
-            }
-            knownBookings.set(b.bookingId, b.status)
-          })
-        }
-      } catch (e) {
-        // silent fail
-      }
-    }
-
-    // Initial fetch
-    poll()
-    const interval = setInterval(poll, 10000)
-    return () => clearInterval(interval)
+    // No auto polling - user manually refreshes via button
   }, [user])
 
   const fetchUserBookings = async () => {
