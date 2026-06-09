@@ -54,12 +54,16 @@ function Products() {
     setIsLoading(true)
     try {
       const res = await fetch(`${API_BASE_URL}/api/Product`)
+      console.log('Products API status:', res.status)
       if (res.ok) {
         const data = await res.json()
+        console.log('Products API data:', data)
         setProducts(data)
+      } else {
+        console.error('Products API error:', res.status)
       }
     } catch (e) {
-      console.log('Failed to fetch products')
+      console.error('Failed to fetch products:', e)
     }
     setIsLoading(false)
   }
@@ -145,6 +149,8 @@ function Products() {
           </span>
           <input
             type="text"
+            id="product-search"
+            name="product-search"
             placeholder="Search products..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
@@ -230,61 +236,6 @@ function Products() {
         )}
       </div>
 
-      {/* Footer */}
-      <footer className="products-footer">
-        <div className="products-footer__inner">
-          <div className="products-footer__grid">
-            <div className="products-footer__brand">
-              <Link to="/home" className="products-footer__logo">K-LABT</Link>
-              <p className="products-footer__tagline">
-                Premium care products for your beloved pets. Quality you can trust.
-              </p>
-            </div>
-            <div>
-              <h4 className="products-footer__col-title">Shop</h4>
-              <ul className="products-footer__links">
-                <li><Link to="/products">All Products</Link></li>
-                <li><Link to="/products?cat=1">Food</Link></li>
-                <li><Link to="/products?cat=2">Toys</Link></li>
-                <li><Link to="/products?cat=3">Grooming</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="products-footer__col-title">Services</h4>
-              <ul className="products-footer__links">
-                <li><Link to="/services">All Services</Link></li>
-                <li><Link to="/grooming">Grooming</Link></li>
-                <li><Link to="/doctor">Pet Doctor</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="products-footer__col-title">Pet Care</h4>
-              <ul className="products-footer__links">
-                <li><Link to="/pet-profile">Pet Profile</Link></li>
-                <li><Link to="/health-record">Health Record</Link></li>
-                <li><Link to="/purchases">Purchases</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="products-footer__col-title">Help</h4>
-              <ul className="products-footer__links">
-                <li><a href="#">Contact Us</a></li>
-                <li><a href="#">FAQ</a></li>
-                <li><a href="#">Shipping</a></li>
-                <li><a href="#">Returns</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="products-footer__bottom">
-            <p className="products-footer__copyright">© 2026 K-LABT. All rights reserved.</p>
-            <div className="products-footer__legal">
-              <a href="#">Privacy</a>
-              <a href="#">Terms</a>
-              <a href="#">Cookies</a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </main>
   )
 }

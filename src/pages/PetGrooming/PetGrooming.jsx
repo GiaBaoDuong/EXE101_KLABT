@@ -93,9 +93,28 @@ function PetGrooming() {
   })
 
   useEffect(() => {
+    if (sessionStorage.getItem('scrollToBooking') === '1') {
+      sessionStorage.removeItem('scrollToBooking')
+      setTimeout(() => {
+        const el = document.getElementById('booking')
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
+    }
     fetchPets()
     fetchServices()
     fetchBookings()
+
+    // Prevent browser's auto-scroll-on-focus animation — use scrollIntoViewIfNeeded(false)
+    // so it only scrolls if the field is truly out of view, without animation jump
+    const bookingSection = document.querySelector('.booking-form-wrap')
+    if (bookingSection) {
+      bookingSection.addEventListener('focusin', (e) => {
+        const target = e.target
+        if (target && typeof target.scrollIntoViewIfNeeded === 'function') {
+          target.scrollIntoViewIfNeeded(false)
+        }
+      }, true)
+    }
   }, [user, token])
 
   const fetchPets = async () => {
@@ -387,92 +406,138 @@ function PetGrooming() {
 
       {/* BOOKING FORM SECTION */}
       {activeSection === 'book' && (
-      <>
-      {/* Booking Section */}
       <section id="booking" className="booking-section">
-        <h2 className="booking-title">Book a Grooming Session</h2>
+        {/* Left — Editorial Visual */}
+        <div className="booking-editorial">
+          <div className="booking-editorial__image-wrap">
+            <img src={petHeroImage2} alt="Pet grooming" />
+          </div>
+          <div className="booking-editorial__overlay" />
+          <div className="booking-editorial__content">
+            <p className="booking-editorial__eyebrow">Grooming Session</p>
+            <h2 className="booking-editorial__title">
+              Your Pet<br />Deserves<br />The Best
+            </h2>
+            <p className="booking-editorial__sub">
+              Premium care tailored to your pet's unique needs.
+            </p>
+          </div>
+        </div>
 
-        <form onSubmit={handleSubmit} className="booking-form">
-          {/* Pet & Service Row */}
-          <div className="form-row">
-            <div className="form-group">
-              <label>Select Pet</label>
-              {isLoadingPets ? (
-                <select disabled><option>Loading...</option></select>
-              ) : (
-                <select
-                  name="petId"
-                  value={formData.petId}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">-- Select Pet --</option>
-                  {pets.map(p => (
-                    <option key={p.petId} value={p.petId}>{p.name}</option>
-                  ))}
-                </select>
-              )}
-            </div>
-            <div className="form-group">
-              <label>Select Service</label>
-              {isLoadingServices ? (
-                <select disabled><option>Loading...</option></select>
-              ) : (
-                <select
-                  name="serviceId"
-                  value={formData.serviceId}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">-- Select Service --</option>
-                  {services.map(s => (
-                    <option key={s.serviceId} value={s.serviceId}>{s.name} - {formatPrice(s.price)}</option>
-                  ))}
-                </select>
-              )}
-            </div>
-            <div className="form-group">
-              <label>Booking Date</label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={e => setSelectedDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-                required
-              />
-            </div>
+        {/* Right — Booking Form */}
+        <div className="booking-form-wrap">
+          <div className="booking-form-header">
+            <p className="booking-form-header__eyebrow">Step 1 of 1</p>
+            <h2 className="booking-form-header__title">Book Appointment</h2>
           </div>
 
-          {/* Time & Note Row */}
-          <div className="form-row schedule-row">
-            <div className="form-group">
-              <label>Time</label>
-              <input
-                type="time"
-                value={selectedTime}
-                onChange={e => setSelectedTime(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group" style={{ gridColumn: '2 / -1' }}>
-              <label>Note</label>
-              <input
-                type="text"
-                name="note"
-                value={formData.note}
-                onChange={handleInputChange}
-                placeholder="Special requests..."
-              />
-            </div>
-          </div>
+          <form onSubmit={handleSubmit} className="booking-form">
+            <div className="booking-form__grid">
+              {/* Pet */}
+              <div className="booking-field">
+                <label className="booking-field__label">Pet</label>
+                {isLoadingPets ? (
+                  <div className="booking-field__skeleton" />
+                ) : (
+                  <div className="booking-field__select-wrap">
+                    <select
+                      name="petId"
+                      value={formData.petId}
+                      onChange={handleInputChange}
+                      required
+                      className="booking-field__select"
+                    >
+                      <option value="">Select pet</option>
+                      {pets.map(p => (
+                        <option key={p.petId} value={p.petId}>{p.name}</option>
+                      ))}
+                    </select>
+                    <span className="booking-field__select-arrow">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2.5 4.5l3.5 3.5 3.5-3.5" />
+                      </svg>
+                    </span>
+                  </div>
+                )}
+              </div>
 
-          {/* Submit Button */}
-          <button type="submit" className="confirm-btn" disabled={isSubmitting}>
-            {isSubmitting ? 'Submitting...' : 'Book Appointment'}
-          </button>
-        </form>
+              {/* Service */}
+              <div className="booking-field">
+                <label className="booking-field__label">Service</label>
+                {isLoadingServices ? (
+                  <div className="booking-field__skeleton" />
+                ) : (
+                  <div className="booking-field__select-wrap">
+                    <select
+                      name="serviceId"
+                      value={formData.serviceId}
+                      onChange={handleInputChange}
+                      required
+                      className="booking-field__select"
+                    >
+                      <option value="">Select service</option>
+                      {services.map(s => (
+                        <option key={s.serviceId} value={s.serviceId}>{s.name}</option>
+                      ))}
+                    </select>
+                    <span className="booking-field__select-arrow">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2.5 4.5l3.5 3.5 3.5-3.5" />
+                      </svg>
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Date */}
+              <div className="booking-field">
+                <label className="booking-field__label">Date</label>
+                <div className="booking-field__select-wrap">
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={e => setSelectedDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    required
+                    className="booking-field__input booking-field__input--date"
+                  />
+                </div>
+              </div>
+
+              {/* Time */}
+              <div className="booking-field">
+                <label className="booking-field__label">Time</label>
+                <div className="booking-field__select-wrap">
+                  <input
+                    type="time"
+                    value={selectedTime}
+                    onChange={e => setSelectedTime(e.target.value)}
+                    required
+                    className="booking-field__input booking-field__input--time"
+                  />
+                </div>
+              </div>
+
+              {/* Note — full width */}
+              <div className="booking-field booking-field--full">
+                <label className="booking-field__label">Note <span className="booking-field__optional">(optional)</span></label>
+                <input
+                  type="text"
+                  name="note"
+                  value={formData.note}
+                  onChange={handleInputChange}
+                  placeholder="Special requests or instructions..."
+                  className="booking-field__input booking-field__input--note"
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="booking-submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Booking...' : 'Confirm Booking'}
+            </button>
+          </form>
+        </div>
       </section>
-      </>
       )}
 
       {/* BOOKING HISTORY SECTION */}
@@ -717,7 +782,7 @@ function PetGrooming() {
 
       {/* Testimonials Section */}
       <section className="testimonials-section">
-        <h2>What Pet Parents Say</h2>
+        <h2 className="reveal-header">What Pet Parents Say</h2>
         <div className="testimonials-grid">
           {testimonials.map((item, index) => (
             <div key={index} className="testimonial-card">
@@ -744,40 +809,6 @@ function PetGrooming() {
         </Link>
       </div>
 
-      {/* Footer */}
-      <footer className="footer">
-        <Link to="/home" className="logo-block">
-          K-LABT
-        </Link>
-        <div className="footer-links">
-          <div>
-            <h4>Shop</h4>
-            <a href="#">Walk</a>
-            <a href="#">Carry</a>
-            <a href="#">Play</a>
-            <a href="#">Shop All</a>
-          </div>
-          <div>
-            <h4>Info</h4>
-            <a href="#">About</a>
-            <a href="#">Blog</a>
-            <a href="#">Reviews</a>
-            <a href="#">Wholesale</a>
-          </div>
-          <div>
-            <h4>Help</h4>
-            <a href="#">Contact</a>
-            <a href="#">FAQ</a>
-            <a href="#">Shipping & Returns</a>
-            <a href="#">Account</a>
-          </div>
-          <div>
-            <h4>Join the Pack!</h4>
-            <a href="#">Facebook</a>
-            <a href="#">Instagram</a>
-          </div>
-        </div>
-      </footer>
     </main>
   )
 }

@@ -651,3 +651,57 @@
     display: none;
   }
 }
+
+/* ========================================
+   ANIMATIONS — Scroll Reveal + Entrance
+   ======================================== */
+
+/* --- Hero: Page-load zoom + fade slide up --- */
+.services-hero__bg {
+  animation: heroZoomIn 1s ease-out forwards;
+}
+
+.services-hero__eyebrow,
+.services-hero__title,
+.services-hero__sub,
+.services-hero__cta {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeSlideUp 0.6s ease-out forwards;
+}
+
+.services-hero__eyebrow { animation-delay: 0.1s; }
+.services-hero__title   { animation-delay: 0.25s; }
+.services-hero__sub     { animation-delay: 0.4s; }
+.services-hero__cta     { animation-delay: 0.55s; }
+
+@keyframes heroZoomIn {
+  from { transform: scale(1.04); }
+  to   { transform: scale(1); }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Service Cards — Animated on load --- */
+.pp-card.service-card {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: cardFadeSlideUp 0.55s ease-out forwards;
+}
+
+.pp-card.service-card:nth-child(1)  { animation-delay: 0.05s; }
+.pp-card.service-card:nth-child(2)  { animation-delay: 0.10s; }
+.pp-card.service-card:nth-child(3)  { animation-delay: 0.15s; }
+.pp-card.service-card:nth-child(4)  { animation-delay: 0.20s; }
+.pp-card.service-card:nth-child(5)  { animation-delay: 0.25s; }
+.pp-card.service-card:nth-child(6)  { animation-delay: 0.30s; }
+.pp-card.service-card:nth-child(7)  { animation-delay: 0.35s; }
+.pp-card.service-card:nth-child(8)  { animation-delay: 0.40s; }
+
+@keyframes cardFadeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

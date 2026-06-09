@@ -5,37 +5,98 @@ import './AdminDashboard.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
-// Icons
-const Icons = {
-  Users: () => <span className="icon">👥</span>,
-  Package: () => <span className="icon">📦</span>,
-  Star: () => <span className="icon">⭐</span>,
-  Settings: () => <span className="icon">⚙️</span>,
-  Plus: () => <span>➕</span>,
-  Edit: () => <span>✏️</span>,
-  Delete: () => <span>🗑️</span>,
-  Close: () => <span>×</span>,
-  Check: () => <span>✓</span>,
-}
+const IconUsers = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+)
+
+const IconPackage = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/>
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+    <line x1="12" y1="22.08" x2="12" y2="12"/>
+  </svg>
+)
+
+const IconSettings = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+)
+
+const IconStar = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+  </svg>
+)
+
+const IconPlus = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+)
+
+const IconEdit = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+  </svg>
+)
+
+const IconTrash = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"/>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+    <line x1="10" y1="11" x2="10" y2="17"/>
+    <line x1="14" y1="11" x2="14" y2="17"/>
+  </svg>
+)
+
+const IconX = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+)
+
+const IconCheck = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+)
+
+const IconLogout = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+)
+
+const IconArrowLeft = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </svg>
+)
 
 function AdminDashboard() {
   const navigate = useNavigate()
-  const { user, token } = useAuth()
+  const { token } = useAuth()
   const [activeTab, setActiveTab] = useState('accounts')
-  
-  // Helper to get token
   const getToken = () => token || sessionStorage.getItem('token')
 
   useEffect(() => {
-    if (!token && !sessionStorage.getItem('token')) {
-      navigate('/login')
-    }
+    if (!token && !sessionStorage.getItem('token')) navigate('/login')
   }, [navigate, token])
 
   const [isLoading, setIsLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
 
-  // Accounts state
   const [accounts, setAccounts] = useState([])
   const [showAccountModal, setShowAccountModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -44,7 +105,6 @@ function AdminDashboard() {
     email: '', fullName: '', phone: '', role: 'Customer', password: ''
   })
 
-  // Products state
   const [products, setProducts] = useState([])
   const [showProductModal, setShowProductModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState(null)
@@ -53,7 +113,6 @@ function AdminDashboard() {
   })
   const productFileRef = useRef(null)
 
-  // Services state
   const [services, setServices] = useState([])
   const [showServiceModal, setShowServiceModal] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
@@ -63,7 +122,6 @@ function AdminDashboard() {
   const serviceFileRef = useRef(null)
   const [pendingServiceBlobs, setPendingServiceBlobs] = useState([])
 
-  // Crop modal state
   const [cropModal, setCropModal] = useState({ open: false, file: null, preview: null })
   const [cropArea, setCropArea] = useState({ x: 0, y: 0, size: 100 })
   const [isDragging, setIsDragging] = useState(false)
@@ -72,9 +130,8 @@ function AdminDashboard() {
   const cropStartRef = useRef(null)
   const cropContainerRef = useRef(null)
   const imgRef = useRef(null)
-  const [cropTarget, setCropTarget] = useState(null) // 'product' | 'service'
+  const [cropTarget, setCropTarget] = useState(null)
 
-  // Pro Membership state
   const [proPrice, setProPrice] = useState('')
 
   useEffect(() => {
@@ -84,13 +141,11 @@ function AdminDashboard() {
     else if (activeTab === 'promembership') fetchProMembership()
   }, [activeTab])
 
-  // Show success message
   const showSuccess = (msg) => {
     setSuccessMessage(msg)
     setTimeout(() => setSuccessMessage(''), 3000)
   }
 
-  // ============ ACCOUNTS ============
   const fetchAccounts = async () => {
     setIsLoading(true)
     try {
@@ -124,9 +179,10 @@ function AdminDashboard() {
     const isEdit = !!selectedAccount
     const url = isEdit ? `${API_BASE_URL}/api/admin/accounts/${selectedAccount.accountId || selectedAccount.userId}` : `${API_BASE_URL}/api/admin/accounts`
     const method = isEdit ? 'PUT' : 'POST'
-    const body = isEdit ? { email: accountForm.email, fullName: accountForm.fullName, phone: accountForm.phone, role: accountForm.role }
-                    : { ...accountForm }
-    
+    const body = isEdit
+      ? { email: accountForm.email, fullName: accountForm.fullName, phone: accountForm.phone, role: accountForm.role }
+      : { ...accountForm }
+
     try {
       const res = await fetch(url, {
         method,
@@ -135,7 +191,7 @@ function AdminDashboard() {
       })
       if (res.ok) {
         setShowAccountModal(false)
-        showSuccess(isEdit ? 'Account updated successfully!' : 'Account created successfully!')
+        showSuccess(isEdit ? 'Account updated!' : 'Account created!')
         fetchAccounts()
       }
     } catch (e) { console.log(e) }
@@ -148,12 +204,11 @@ function AdminDashboard() {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
       setShowDeleteModal(false)
-      showSuccess('Account deleted successfully!')
+      showSuccess('Account deleted!')
       fetchAccounts()
     } catch (e) { console.log(e) }
   }
 
-  // ============ PRODUCTS ============
   const fetchProducts = async () => {
     setIsLoading(true)
     try {
@@ -206,7 +261,6 @@ function AdminDashboard() {
       createdAt: selectedProduct?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
-    
     try {
       const res = await fetch(url, {
         method,
@@ -215,7 +269,7 @@ function AdminDashboard() {
       })
       if (res.ok) {
         setShowProductModal(false)
-        showSuccess(isEdit ? 'Product updated successfully!' : 'Product created successfully!')
+        showSuccess(isEdit ? 'Product updated!' : 'Product created!')
         fetchProducts()
       }
     } catch (e) { console.log(e) }
@@ -228,7 +282,7 @@ function AdminDashboard() {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
-      showSuccess('Product deleted successfully!')
+      showSuccess('Product deleted!')
       fetchProducts()
     } catch (e) { console.log(e) }
   }
@@ -272,13 +326,11 @@ function AdminDashboard() {
       setProductForm(prev => ({ ...prev, previewImages: [...prev.previewImages, previewUrl] }))
       const formData = new FormData()
       formData.append('file', blob, 'product.jpg')
-      console.log('[Product] Uploading image...')
       fetch(`${API_BASE_URL}/api/uploads/image`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getToken()}` },
         body: formData,
       }).then(res => res.json()).then(data => {
-        console.log('[Product] Upload response:', data)
         setProductForm(prev => ({ ...prev, images: [...prev.images, data.url || data.imageUrl || data] }))
       }).catch(err => console.error('[Product] Upload error:', err))
     }
@@ -401,22 +453,13 @@ function AdminDashboard() {
     }))
   }
 
-  // ============ SERVICES ============
   const fetchServices = async () => {
     setIsLoading(true)
     try {
       const res = await fetch(`${API_BASE_URL}/api/admin/services`, {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
-      if (res.ok) {
-        const data = await res.json()
-        console.log('Services data:', data)
-        if (data.length > 0) {
-          console.log('Service keys:', Object.keys(data[0]))
-          console.log('Duration value:', data[0].duration, data[0].durationMinutes, data[0].time)
-        }
-        setServices(data)
-      }
+      if (res.ok) setServices(await res.json())
     } catch (e) { console.log(e) }
     setIsLoading(false)
   }
@@ -467,10 +510,8 @@ function AdminDashboard() {
     const url = isEdit ? `${API_BASE_URL}/api/admin/services/${selectedService.serviceId}` : `${API_BASE_URL}/api/admin/services`
     const method = isEdit ? 'PUT' : 'POST'
 
-    // Upload pending blobs first, then save
     let uploadedUrls = [...serviceForm.images]
     if (pendingServiceBlobs.length > 0) {
-      console.log('[Service] Uploading', pendingServiceBlobs.length, 'pending images...')
       for (const blob of pendingServiceBlobs) {
         const formData = new FormData()
         formData.append('file', blob, 'service.jpg')
@@ -481,17 +522,12 @@ function AdminDashboard() {
             body: formData,
           })
           const data = await res.json()
-          const imageUrl = data.url || data.imageUrl || data
-          console.log('[Service] Uploaded:', imageUrl)
-          uploadedUrls.push(imageUrl)
-        } catch (err) {
-          console.error('[Service] Upload error:', err)
-        }
+          uploadedUrls.push(data.url || data.imageUrl || data)
+        } catch (err) { console.error('[Service] Upload error:', err) }
       }
       setPendingServiceBlobs([])
     }
 
-    console.log('[Service] Final images:', uploadedUrls)
     const body = {
       serviceId: selectedService?.serviceId || 0,
       name: serviceForm.name,
@@ -512,7 +548,7 @@ function AdminDashboard() {
       })
       if (res.ok) {
         setShowServiceModal(false)
-        showSuccess(isEdit ? 'Service updated successfully!' : 'Service created successfully!')
+        showSuccess(isEdit ? 'Service updated!' : 'Service created!')
         fetchServices()
       }
     } catch (e) { console.log(e) }
@@ -524,20 +560,16 @@ function AdminDashboard() {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
-      showSuccess('Service deleted successfully!')
+      showSuccess('Service deleted!')
       fetchServices()
     } catch (e) { console.log(e) }
   }
 
-  // ============ PRO MEMBERSHIP ============
-  const fetchProMembership = async () => {
-    // In real app, fetch current price
-    setProPrice('99.99')
-  }
+  const fetchProMembership = () => { setProPrice('99000') }
 
   const handleUpdateProPrice = async (e) => {
     e.preventDefault()
-    showSuccess('Pro Membership price updated successfully!')
+    showSuccess('Pro price updated!')
   }
 
   const handleLogout = () => {
@@ -548,360 +580,357 @@ function AdminDashboard() {
     navigate('/login')
   }
 
-  // Format currency
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0)
   }
 
-  const getInitials = (name) => {
-    if (!name) return 'A'
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  const getRoleClass = (role) => {
+    const map = { 'Admin': 'admin', 'Staff': 'staff', 'Doctor': 'doctor', 'Customer': 'customer' }
+    const key = typeof role === 'number'
+      ? (role === 1 ? 'Admin' : role === 2 ? 'Staff' : role === 3 ? 'Doctor' : 'Customer')
+      : role
+    return map[key] || 'customer'
   }
 
   return (
     <>
+      {/* Crop Modal */}
       {cropModal.open && (
-        <div className="crop-modal-overlay" onClick={(e) => e.target === e.currentTarget && handleCropCancel()}>
-          <div className="crop-modal">
-            <div className="crop-modal-header">
+        <div className="adm-crop-overlay" onClick={(e) => e.target === e.currentTarget && handleCropCancel()}>
+          <div className="adm-crop">
+            <div className="adm-crop__header">
               <h3>{cropTarget === 'service' ? 'Crop Service Image' : 'Crop Product Image'}</h3>
-              <button className="crop-close-btn" onClick={handleCropCancel}>×</button>
+              <button className="adm-crop__close" onClick={handleCropCancel}>×</button>
             </div>
-            <div className="crop-canvas-wrapper">
-              <div className="crop-image-container" ref={cropContainerRef}>
-                <img
-                  ref={imgRef}
-                  src={cropModal.preview}
-                  alt="Crop preview"
-                  className="crop-image"
-                  onLoad={handleImageLoad}
-                  draggable={false}
-                />
+            <div className="adm-crop__canvas">
+              <div className="adm-crop__container" ref={cropContainerRef}>
+                <img ref={imgRef} src={cropModal.preview} alt="Crop preview" className="adm-crop__img" onLoad={handleImageLoad} draggable={false} />
                 {cropArea.size > 0 && (() => {
                   const s = getCropStyle()
                   return (
-                    <div
-                      className="crop-overlay"
+                    <div className="adm-crop__overlay"
                       style={getOverlayContainerStyle()}
                       onMouseMove={handleOverlayMouseMove}
                       onMouseUp={handleOverlayMouseUp}
                       onMouseLeave={handleOverlayMouseUp}
                     >
-                      <div className="crop-overlay-top" style={{ height: s.top }} />
-                      <div className="crop-overlay-bottom" style={{ height: `calc(100% - ${s.top + s.height}px)`, top: s.top + s.height }} />
-                      <div className="crop-overlay-left" style={{ top: s.top, height: s.height, width: s.left }} />
-                      <div className="crop-overlay-right" style={{ top: s.top, height: s.height, left: s.left + s.width, width: `calc(100% - ${s.left + s.width}px)` }} />
-                      <div className="crop-grid" style={{ ...s }}>
+                      <div className="adm-crop__shade-t" style={{ height: s.top }} />
+                      <div className="adm-crop__shade-b" style={{ height: `calc(100% - ${s.top + s.height}px)`, top: s.top + s.height }} />
+                      <div className="adm-crop__shade-l" style={{ top: s.top, height: s.height, width: s.left }} />
+                      <div className="adm-crop__shade-r" style={{ top: s.top, height: s.height, left: s.left + s.width, width: `calc(100% - ${s.left + s.width}px)` }} />
+                      <div className="adm-crop__grid" style={{ ...s }}>
                         {[...Array(7)].map((_, i) => (
-                          <div key={`v${i}`} className="crop-grid-line crop-grid-v" style={{ left: `${((i + 1) / 8) * 100}%` }} />
+                          <div key={`v${i}`} className="adm-crop__grid-line adm-crop__grid-line--v" style={{ left: `${((i + 1) / 8) * 100}%` }} />
                         ))}
                         {[...Array(7)].map((_, i) => (
-                          <div key={`h${i}`} className="crop-grid-line crop-grid-h" style={{ top: `${((i + 1) / 8) * 100}%` }} />
+                          <div key={`h${i}`} className="adm-crop__grid-line adm-crop__grid-line--h" style={{ top: `${((i + 1) / 8) * 100}%` }} />
                         ))}
                       </div>
-                      <div className="crop-border" style={s} onMouseDown={handleOverlayMouseDown} />
-                      <div className="crop-corner crop-corner-tl" style={{ left: s.left - 7, top: s.top - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'tl')} />
-                      <div className="crop-corner crop-corner-tr" style={{ left: s.left + s.width - 7, top: s.top - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'tr')} />
-                      <div className="crop-corner crop-corner-bl" style={{ left: s.left - 7, top: s.top + s.height - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'bl')} />
-                      <div className="crop-corner crop-corner-br" style={{ left: s.left + s.width - 7, top: s.top + s.height - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'br')} />
+                      <div className="adm-crop__border" style={s} onMouseDown={handleOverlayMouseDown} />
+                      <div className="adm-crop__corner adm-crop__corner--tl" style={{ left: s.left - 7, top: s.top - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'tl')} />
+                      <div className="adm-crop__corner adm-crop__corner--tr" style={{ left: s.left + s.width - 7, top: s.top - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'tr')} />
+                      <div className="adm-crop__corner adm-crop__corner--bl" style={{ left: s.left - 7, top: s.top + s.height - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'bl')} />
+                      <div className="adm-crop__corner adm-crop__corner--br" style={{ left: s.left + s.width - 7, top: s.top + s.height - 7 }} onMouseDown={(e) => handleCornerMouseDown(e, 'br')} />
                     </div>
                   )
                 })()}
               </div>
             </div>
-            <div className="crop-modal-footer">
-              <button className="crop-btn crop-btn-cancel" onClick={handleCropCancel}>Cancel</button>
-              <button className="crop-btn crop-btn-ok" onClick={handleCropConfirm}>OK</button>
+            <div className="adm-crop__footer">
+              <button className="adm-crop__btn adm-crop__btn--cancel" onClick={handleCropCancel}>Cancel</button>
+              <button className="adm-crop__btn adm-crop__btn--ok" onClick={handleCropConfirm}>OK</button>
             </div>
           </div>
         </div>
       )}
-      <main className="admin-page">
-      {/* Header */}
-      <header className="admin-header">
-        <div className="admin-header-left">
-          <Link to="/home" className="back-link">← Back</Link>
-        </div>
-        <h1>Admin Dashboard</h1>
-        <div className="admin-header-right">
-          {/* Spacer */}
-        </div>
-      </header>
 
-      {successMessage && (
-        <div className="admin-success-banner">
-          <Icons.Check /> {successMessage}
-        </div>
-      )}
-
-      {/* Main Layout with Sidebar */}
-      <div className="admin-layout">
-        {/* Sidebar */}
-        <aside className="admin-sidebar">
-          <nav className="sidebar-nav">
-            <button className={`sidebar-btn ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
-              <Icons.Users /> <span>Accounts</span>
-            </button>
-            <button className={`sidebar-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
-              <Icons.Package /> <span>Products</span>
-            </button>
-            <button className={`sidebar-btn ${activeTab === 'services' ? 'active' : ''}`} onClick={() => setActiveTab('services')}>
-              <Icons.Settings /> <span>Services</span>
-            </button>
-            <button className={`sidebar-btn ${activeTab === 'promembership' ? 'active' : ''}`} onClick={() => setActiveTab('promembership')}>
-              <Icons.Star /> <span>Pro Membership</span>
-            </button>
-          </nav>
-          
-          <div className="sidebar-footer">
-            <button className="sidebar-logout-btn" onClick={handleLogout}>
-              🚪 <span>Log out</span>
-            </button>
+      <div className="adm">
+        {/* Header */}
+        <div className="adm-header">
+          <div className="adm-header__left">
+            <Link to="/home" className="adm-header__back"><IconArrowLeft /> Back to home</Link>
           </div>
-        </aside>
+          <div className="adm-header__center">
+            <h1 className="adm-header__title">Admin Dashboard</h1>
+          </div>
+          <div className="adm-header__right" />
+        </div>
 
-        {/* Content */}
-        <div className="admin-content">
-        {/* ACCOUNTS TAB */}
-        {activeTab === 'accounts' && (
-          <div className="tab-panel">
-            <div className="panel-header">
-              <h2>Account Management</h2>
-              <button className="add-btn" onClick={() => openAccountModal()}>
-                <Icons.Plus /> Add Account
-              </button>
-            </div>
-            <div className="table-wrapper">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {accounts.map(account => (
-                    <tr key={account.userId || account.accountId}>
-                      <td>{account.userId || account.accountId}</td>
-                      <td>{account.fullName || account.username}</td>
-                      <td>{account.email || account.username}</td>
-                      <td>{account.phone || '-'}</td>
-                      <td>
-                        <span className={`role-badge role-${account.role}`}>
-                          {account.role === 1 ? 'Admin' : account.role === 2 ? 'Staff' : account.role === 3 ? 'Doctor' : 'Customer'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="action-btns">
-                          <button className="edit-btn" onClick={() => openAccountModal(account)}><Icons.Edit /></button>
-                          <button className="delete-btn" onClick={() => { setSelectedAccount(account); setShowDeleteModal(true); }}><Icons.Delete /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {accounts.length === 0 && <div className="empty-state">No accounts found</div>}
-            </div>
+        {successMessage && (
+          <div className="adm-success">
+            <IconCheck /> {successMessage}
           </div>
         )}
 
-        {/* PRODUCTS TAB */}
-        {activeTab === 'products' && (
-          <div className="tab-panel">
-            <div className="panel-header">
-              <h2>Product Management</h2>
-              <button className="add-btn" onClick={() => openProductModal()}>
-                <Icons.Plus /> Add Product
+        <div className="adm-layout">
+          {/* Sidebar */}
+          <aside className="adm-sidebar">
+            <nav className="adm-sidebar__nav">
+              <button className={`adm-sidebar__btn ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
+                <IconUsers /> <span>Accounts</span>
+              </button>
+              <button className={`adm-sidebar__btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
+                <IconPackage /> <span>Products</span>
+              </button>
+              <button className={`adm-sidebar__btn ${activeTab === 'services' ? 'active' : ''}`} onClick={() => setActiveTab('services')}>
+                <IconSettings /> <span>Services</span>
+              </button>
+              <button className={`adm-sidebar__btn ${activeTab === 'promembership' ? 'active' : ''}`} onClick={() => setActiveTab('promembership')}>
+                <IconStar /> <span>Pro Membership</span>
+              </button>
+            </nav>
+            <div className="adm-sidebar__footer">
+              <button className="adm-sidebar__logout" onClick={handleLogout}>
+                <IconLogout /> <span>Log out</span>
               </button>
             </div>
-            <div className="table-wrapper">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th style={{width: '60px'}}>Image</th>
-                    <th>Product Name</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map(product => (
-                    <tr key={product.productId}>
-                      <td>
-                        {(product.thumbnailUrl || product.images?.[0]) ? (
-                          <img src={product.thumbnailUrl || product.images[0]} alt={product.name} className="product-thumb" />
-                        ) : (
-                          <div className="product-thumb-placeholder">📦</div>
-                        )}
-                      </td>
-                      <td className="product-name-cell">
-                        <span className="product-name">{product.name}</span>
-                        <span className="product-brand">{product.brand || '-'}</span>
-                      </td>
-                      <td className="price-cell">{formatPrice(product.price)}</td>
-                      <td>{product.stockQuantity}</td>
-                      <td>
-                        <div className="action-btns">
-                          <button className="edit-btn" onClick={() => openProductModal(product)}><Icons.Edit /></button>
-                          <button className="delete-btn" onClick={() => handleDeleteProduct(product)}><Icons.Delete /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {products.length === 0 && <div className="empty-state">No products found</div>}
-            </div>
-          </div>
-        )}
+          </aside>
 
-        {/* SERVICES TAB */}
-        {activeTab === 'services' && (
-          <div className="tab-panel">
-            <div className="panel-header">
-              <h2>Service Management</h2>
-              <button className="add-btn" onClick={() => openServiceModal()}>
-                <Icons.Plus /> Add Service
-              </button>
-            </div>
-            <div className="table-wrapper">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th style={{width: '60px'}}>Image</th>
-                    <th>Service Name</th>
-                    <th>Duration</th>
-                    <th>Price</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {services.map(service => (
-                    <tr key={service.serviceId}>
-                      <td>
-                        {(service.thumbnailUrl || service.images?.[0]) ? (
-                          <img src={service.thumbnailUrl || service.images[0]} alt={service.name} className="product-thumb" />
-                        ) : (
-                          <div className="product-thumb-placeholder">⚙️</div>
-                        )}
-                      </td>
-                      <td className="product-name-cell">
-                        <span className="product-name">{service.name}</span>
-                      </td>
-                      <td>{service.durationMinutes ?? service.duration ?? '-'} min</td>
-                      <td className="price-cell">{formatPrice(service.price)}</td>
-                      <td>
-                        <div className="action-btns">
-                          <button className="edit-btn" onClick={() => openServiceModal(service)}><Icons.Edit /></button>
-                          <button className="delete-btn" onClick={() => handleDeleteService(service)}><Icons.Delete /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {services.length === 0 && <div className="empty-state">No services found</div>}
-            </div>
-          </div>
-        )}
+          {/* Content */}
+          <div className="adm-content">
 
-        {/* PRO MEMBERSHIP TAB */}
-        {activeTab === 'promembership' && (
-          <div className="tab-panel">
-            <div className="panel-header">
-              <h2>Pro Membership Settings</h2>
-            </div>
-            <div className="pro-settings-card">
-              <div className="pro-icon-wrapper">
-                <span className="pro-icon">⭐</span>
-              </div>
-              <h3>Pro Membership Plan</h3>
-              <p>Update pricing for Pro Membership plans</p>
-              <form className="pro-form" onSubmit={handleUpdateProPrice}>
-                <div className="pro-price-input">
-                  <label>Pro Price (VND)</label>
-                  <input
-                    type="number"
-                    value={proPrice}
-                    onChange={(e) => setProPrice(e.target.value)}
-                    placeholder="e.g. 199000"
-                    required
-                  />
+            {/* ACCOUNTS */}
+            {activeTab === 'accounts' && (
+              <div className="adm-panel">
+                <div className="adm-panel__header">
+                  <h2>Account Management</h2>
+                  <button className="adm-add-btn" onClick={() => openAccountModal()}>
+                    <IconPlus /> Add Account
+                  </button>
                 </div>
-                <button type="submit" className="update-price-btn">
-                  💾 Update Price
-                </button>
-              </form>
-            </div>
+                <div className="adm-table-wrap">
+                  <table className="adm-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {accounts.map(account => (
+                        <tr key={account.userId || account.accountId}>
+                          <td>{account.userId || account.accountId}</td>
+                          <td>{account.fullName || account.username}</td>
+                          <td>{account.email || account.username}</td>
+                          <td>{account.phone || '—'}</td>
+                          <td>
+                            <span className={`adm-role-badge adm-role-badge--${getRoleClass(account.role)}`}>
+                              {account.role === 1 ? 'Admin' : account.role === 2 ? 'Staff' : account.role === 3 ? 'Doctor' : 'Customer'}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="adm-actions">
+                              <button className="adm-action-btn adm-action-btn--edit" onClick={() => openAccountModal(account)}><IconEdit /></button>
+                              <button className="adm-action-btn adm-action-btn--delete" onClick={() => { setSelectedAccount(account); setShowDeleteModal(true); }}><IconTrash /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {accounts.length === 0 && <div className="adm-empty">No accounts found</div>}
+                </div>
+              </div>
+            )}
+
+            {/* PRODUCTS */}
+            {activeTab === 'products' && (
+              <div className="adm-panel">
+                <div className="adm-panel__header">
+                  <h2>Product Management</h2>
+                  <button className="adm-add-btn" onClick={() => openProductModal()}>
+                    <IconPlus /> Add Product
+                  </button>
+                </div>
+                <div className="adm-table-wrap">
+                  <table className="adm-table">
+                    <thead>
+                      <tr>
+                        <th style={{width: '64px'}}>Image</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map(product => (
+                        <tr key={product.productId}>
+                          <td>
+                            {(product.thumbnailUrl || product.images?.[0]) ? (
+                              <img src={product.thumbnailUrl || product.images[0]} alt={product.name} className="adm-thumb" />
+                            ) : (
+                              <div className="adm-thumb-placeholder"><IconPackage /></div>
+                            )}
+                          </td>
+                          <td>
+                            <div className="adm-cell-name">
+                              <span className="adm-cell-name__title">{product.name}</span>
+                              <span className="adm-cell-name__sub">{product.brand || '—'}</span>
+                            </div>
+                          </td>
+                          <td><span className="adm-price">{formatPrice(product.price)}</span></td>
+                          <td>{product.stockQuantity}</td>
+                          <td>
+                            <div className="adm-actions">
+                              <button className="adm-action-btn adm-action-btn--edit" onClick={() => openProductModal(product)}><IconEdit /></button>
+                              <button className="adm-action-btn adm-action-btn--delete" onClick={() => handleDeleteProduct(product)}><IconTrash /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {products.length === 0 && <div className="adm-empty">No products found</div>}
+                </div>
+              </div>
+            )}
+
+            {/* SERVICES */}
+            {activeTab === 'services' && (
+              <div className="adm-panel">
+                <div className="adm-panel__header">
+                  <h2>Service Management</h2>
+                  <button className="adm-add-btn" onClick={() => openServiceModal()}>
+                    <IconPlus /> Add Service
+                  </button>
+                </div>
+                <div className="adm-table-wrap">
+                  <table className="adm-table">
+                    <thead>
+                      <tr>
+                        <th style={{width: '64px'}}>Image</th>
+                        <th>Service Name</th>
+                        <th>Duration</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {services.map(service => (
+                        <tr key={service.serviceId}>
+                          <td>
+                            {(service.thumbnailUrl || service.images?.[0]) ? (
+                              <img src={service.thumbnailUrl || service.images[0]} alt={service.name} className="adm-thumb" />
+                            ) : (
+                              <div className="adm-thumb-placeholder"><IconSettings /></div>
+                            )}
+                          </td>
+                          <td>
+                            <div className="adm-cell-name">
+                              <span className="adm-cell-name__title">{service.name}</span>
+                            </div>
+                          </td>
+                          <td>{service.durationMinutes ?? service.duration ?? '—'} min</td>
+                          <td><span className="adm-price">{formatPrice(service.price)}</span></td>
+                          <td>
+                            <div className="adm-actions">
+                              <button className="adm-action-btn adm-action-btn--edit" onClick={() => openServiceModal(service)}><IconEdit /></button>
+                              <button className="adm-action-btn adm-action-btn--delete" onClick={() => handleDeleteService(service)}><IconTrash /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {services.length === 0 && <div className="adm-empty">No services found</div>}
+                </div>
+              </div>
+            )}
+
+            {/* PRO MEMBERSHIP */}
+            {activeTab === 'promembership' && (
+              <div className="adm-panel">
+                <div className="adm-panel__header">
+                  <h2>Pro Membership</h2>
+                </div>
+                <div className="adm-pro-card">
+                  <div className="adm-pro-card__icon">
+                    <IconStar />
+                  </div>
+                  <h3>Pro Membership Plan</h3>
+                  <p>Set the monthly subscription price for Pro Membership</p>
+                  <form className="adm-pro-form" onSubmit={handleUpdateProPrice}>
+                    <div>
+                      <label>Pro Price (VND)</label>
+                      <input type="number" value={proPrice} onChange={(e) => setProPrice(e.target.value)} placeholder="e.g. 99000" required />
+                    </div>
+                    <button type="submit" className="adm-pro-update-btn">Update Price</button>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
-        )}
         </div>
       </div>
-    </main>
 
       {/* Account Modal */}
       {showAccountModal && (
-        <div className="modal-overlay" onClick={() => setShowAccountModal(false)}>
-          <div className="admin-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{selectedAccount ? 'Update Account' : 'Create New Account'}</h3>
-              <button className="close-btn" onClick={() => setShowAccountModal(false)}><Icons.Close /></button>
+        <div className="adm-modal-overlay" onClick={() => setShowAccountModal(false)}>
+          <div className="adm-modal" onClick={e => e.stopPropagation()}>
+            <div className="adm-modal__header">
+              <h3>{selectedAccount ? 'Update Account' : 'Create Account'}</h3>
+              <button className="adm-modal__close" onClick={() => setShowAccountModal(false)}><IconX /></button>
             </div>
-            <form className="modal-form" onSubmit={handleSaveAccount}>
-              <div className="form-group">
-                <label>Name</label>
-                <input type="text" value={accountForm.fullName} onChange={e => setAccountForm(p => ({ ...p, fullName: e.target.value }))} placeholder="Enter name" required />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input type="email" value={accountForm.email} onChange={e => setAccountForm(p => ({ ...p, email: e.target.value }))} placeholder="Enter email" required />
-              </div>
-              <div className="form-group">
-                <label>Phone</label>
-                <input type="tel" value={accountForm.phone} onChange={e => setAccountForm(p => ({ ...p, phone: e.target.value }))} placeholder="Enter phone" />
-              </div>
-              <div className="form-group">
-                <label>Role</label>
-                <select value={accountForm.role} onChange={e => setAccountForm(p => ({ ...p, role: e.target.value }))}>
-                  <option value="Customer">Customer</option>
-                  <option value="Doctor">Doctor</option>
-                  <option value="Staff">Staff</option>
-                  <option value="Admin">Admin</option>
-                </select>
-              </div>
-              {!selectedAccount && (
-                <div className="form-group">
-                  <label>Password</label>
-                  <input type="password" value={accountForm.password} onChange={e => setAccountForm(p => ({ ...p, password: e.target.value }))} placeholder="Enter password" required />
+            <div className="adm-modal__body">
+              <form onSubmit={handleSaveAccount}>
+                <div className="adm-form-row">
+                  <div className="adm-form-group">
+                    <label>Name</label>
+                    <input type="text" value={accountForm.fullName} onChange={e => setAccountForm(p => ({ ...p, fullName: e.target.value }))} placeholder="Enter name" required />
+                  </div>
+                  <div className="adm-form-group">
+                    <label>Email</label>
+                    <input type="email" value={accountForm.email} onChange={e => setAccountForm(p => ({ ...p, email: e.target.value }))} placeholder="Enter email" required />
+                  </div>
                 </div>
-              )}
-              <div className="modal-actions">
-                <button type="button" className="cancel-btn" onClick={() => setShowAccountModal(false)}>Cancel</button>
-                <button type="submit" className="submit-btn">{selectedAccount ? '💾 Update' : '✨ Create'}</button>
-              </div>
-            </form>
+                <div className="adm-form-row">
+                  <div className="adm-form-group">
+                    <label>Phone</label>
+                    <input type="tel" value={accountForm.phone} onChange={e => setAccountForm(p => ({ ...p, phone: e.target.value }))} placeholder="Enter phone" />
+                  </div>
+                  <div className="adm-form-group">
+                    <label>Role</label>
+                    <select value={accountForm.role} onChange={e => setAccountForm(p => ({ ...p, role: e.target.value }))}>
+                      <option value="Customer">Customer</option>
+                      <option value="Doctor">Doctor</option>
+                      <option value="Staff">Staff</option>
+                      <option value="Admin">Admin</option>
+                    </select>
+                  </div>
+                </div>
+                {!selectedAccount && (
+                  <div className="adm-form-group">
+                    <label>Password</label>
+                    <input type="password" value={accountForm.password} onChange={e => setAccountForm(p => ({ ...p, password: e.target.value }))} placeholder="Enter password" required />
+                  </div>
+                )}
+                <div className="adm-modal-actions">
+                  <button type="button" className="adm-btn adm-btn--cancel" onClick={() => setShowAccountModal(false)}>Cancel</button>
+                  <button type="submit" className="adm-btn adm-btn--submit">{selectedAccount ? 'Update' : 'Create'}</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Modal */}
       {showDeleteModal && (
-        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
-          <div className="delete-modal" onClick={e => e.stopPropagation()}>
-            <div className="delete-icon-wrapper">
-              <span className="delete-icon">🗑️</span>
+        <div className="adm-modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="adm-delete-modal" onClick={e => e.stopPropagation()}>
+            <div className="adm-delete-icon">
+              <IconTrash />
             </div>
-            <h3>Confirm Delete</h3>
-            <p>Are you sure you want to delete account <strong>"{selectedAccount?.fullName || selectedAccount?.email}"</strong>?</p>
-            <div className="delete-actions">
-              <button className="cancel-delete-btn" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-              <button className="confirm-delete-btn" onClick={handleDeleteAccount}>🗑️ Delete</button>
+            <h3>Delete Account</h3>
+            <p>Are you sure you want to delete <strong>"{selectedAccount?.fullName || selectedAccount?.email}"</strong>?</p>
+            <div className="adm-delete-actions">
+              <button className="adm-btn adm-btn--cancel" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button className="adm-btn adm-btn--delete" onClick={handleDeleteAccount}>Delete</button>
             </div>
           </div>
         </div>
@@ -909,151 +938,151 @@ function AdminDashboard() {
 
       {/* Product Modal */}
       {showProductModal && (
-        <div className="modal-overlay" onClick={() => setShowProductModal(false)}>
-          <div className="admin-modal product-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{selectedProduct ? 'Update Product' : 'Create New Product'}</h3>
-              <button className="close-btn" onClick={() => setShowProductModal(false)}><Icons.Close /></button>
+        <div className="adm-modal-overlay" onClick={() => setShowProductModal(false)}>
+          <div className="adm-modal adm-modal--wide" onClick={e => e.stopPropagation()}>
+            <div className="adm-modal__header">
+              <h3>{selectedProduct ? 'Update Product' : 'Create Product'}</h3>
+              <button className="adm-modal__close" onClick={() => setShowProductModal(false)}><IconX /></button>
             </div>
-            <form className="modal-form" onSubmit={handleSaveProduct}>
-              {/* Image Upload */}
-              <div className="product-image-upload-section">
-                <label className="upload-label">Product Images (multiple allowed)</label>
-                <div className="product-images-grid">
-                  {productForm.previewImages.map((img, index) => (
-                    <div key={index} className="product-image-item">
-                      <img src={img} alt={`Image ${index + 1}`} />
-                      <button type="button" className="remove-image-btn" onClick={() => removeProductImage(index)}>×</button>
+            <div className="adm-modal__body">
+              <form onSubmit={handleSaveProduct}>
+                {/* Image Upload */}
+                <div className="adm-upload-section">
+                  <label>Product Images</label>
+                  <div className="adm-upload-grid">
+                    {productForm.previewImages.map((img, index) => (
+                      <div key={index} className="adm-upload-item">
+                        <img src={img} alt={`Image ${index + 1}`} />
+                        <button type="button" className="adm-upload-remove" onClick={() => removeProductImage(index)}>×</button>
+                      </div>
+                    ))}
+                    <div className="adm-upload-add" onClick={() => productFileRef.current?.click()}>
+                      <span>+</span>
+                      <span>Add</span>
                     </div>
-                  ))}
-                  <div className="add-image-btn" onClick={() => productFileRef.current?.click()}>
-                    <span>+</span>
-                    <span>Add Image</span>
+                  </div>
+                  <input type="file" ref={productFileRef} onChange={handleProductImageChange} accept="image/*" style={{ display: 'none' }} />
+                </div>
+
+                <div className="adm-form-row">
+                  <div className="adm-form-group">
+                    <label>Product Name *</label>
+                    <input type="text" value={productForm.name} onChange={e => setProductForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Dog Food" required />
+                  </div>
+                  <div className="adm-form-group">
+                    <label>Brand</label>
+                    <input type="text" value={productForm.brand} onChange={e => setProductForm(p => ({ ...p, brand: e.target.value }))} placeholder="e.g. Pedigree" />
                   </div>
                 </div>
-                <input type="file" ref={productFileRef} onChange={handleProductImageChange} accept="image/*" multiple style={{ display: 'none' }} />
-              </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Product Name *</label>
-                  <input type="text" value={productForm.name} onChange={e => setProductForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Dog Food" required />
+                <div className="adm-form-group">
+                  <label>Description</label>
+                  <textarea value={productForm.description} onChange={e => setProductForm(p => ({ ...p, description: e.target.value }))} placeholder="Enter description" rows={3} />
                 </div>
-                <div className="form-group">
-                  <label>Brand</label>
-                  <input type="text" value={productForm.brand} onChange={e => setProductForm(p => ({ ...p, brand: e.target.value }))} placeholder="e.g. Pedigree" />
-                </div>
-              </div>
 
-              <div className="form-group">
-                <label>Description</label>
-                <textarea value={productForm.description} onChange={e => setProductForm(p => ({ ...p, description: e.target.value }))} placeholder="Enter product description" rows={3} />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Price (VND) *</label>
-                  <input type="number" value={productForm.price} onChange={e => setProductForm(p => ({ ...p, price: e.target.value }))} placeholder="e.g. 150000" required />
+                <div className="adm-form-row">
+                  <div className="adm-form-group">
+                    <label>Price (VND) *</label>
+                    <input type="number" value={productForm.price} onChange={e => setProductForm(p => ({ ...p, price: e.target.value }))} placeholder="e.g. 150000" required />
+                  </div>
+                  <div className="adm-form-group">
+                    <label>Stock *</label>
+                    <input type="number" value={productForm.stockQuantity} onChange={e => setProductForm(p => ({ ...p, stockQuantity: e.target.value }))} placeholder="e.g. 100" required />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Stock *</label>
-                  <input type="number" value={productForm.stockQuantity} onChange={e => setProductForm(p => ({ ...p, stockQuantity: e.target.value }))} placeholder="e.g. 100" required />
-                </div>
-              </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Category</label>
-                  <select value={productForm.category} onChange={e => setProductForm(p => ({ ...p, category: parseInt(e.target.value) }))}>
-                    <option value={1}>Food</option>
-                    <option value={2}>Toys</option>
-                    <option value={3}>Grooming</option>
-                    <option value={4}>Health</option>
-                    <option value={5}>Accessories</option>
-                  </select>
+                <div className="adm-form-row">
+                  <div className="adm-form-group">
+                    <label>Category</label>
+                    <select value={productForm.category} onChange={e => setProductForm(p => ({ ...p, category: parseInt(e.target.value) }))}>
+                      <option value={1}>Food</option>
+                      <option value={2}>Toys</option>
+                      <option value={3}>Grooming</option>
+                      <option value={4}>Health</option>
+                      <option value={5}>Accessories</option>
+                    </select>
+                  </div>
+                  <div className="adm-form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" value={productForm.weight} onChange={e => setProductForm(p => ({ ...p, weight: e.target.value }))} placeholder="e.g. 1.5" step="0.1" />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Weight (kg)</label>
-                  <input type="number" value={productForm.weight} onChange={e => setProductForm(p => ({ ...p, weight: e.target.value }))} placeholder="e.g. 1.5" step="0.1" />
+
+                <div className="adm-checkbox">
+                  <input type="checkbox" id="isActiveProd" checked={productForm.isActive} onChange={e => setProductForm(p => ({ ...p, isActive: e.target.checked }))} />
+                  <label htmlFor="isActiveProd">Active</label>
                 </div>
-              </div>
 
-              <div className="checkbox-group">
-                <input type="checkbox" name="isActive" id="isActive"
-                  checked={productForm.isActive}
-                  onChange={e => setProductForm(p => ({ ...p, isActive: e.target.checked }))} />
-                <label htmlFor="isActive">Active</label>
-              </div>
-
-              <div className="modal-actions">
-                <button type="button" className="cancel-btn" onClick={() => setShowProductModal(false)}>Cancel</button>
-                <button type="submit" className="submit-btn">{selectedProduct ? '💾 Update' : '✨ Create'}</button>
-              </div>
-            </form>
+                <div className="adm-modal-actions">
+                  <button type="button" className="adm-btn adm-btn--cancel" onClick={() => setShowProductModal(false)}>Cancel</button>
+                  <button type="submit" className="adm-btn adm-btn--submit">{selectedProduct ? 'Update' : 'Create'}</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Service Modal */}
       {showServiceModal && (
-        <div className="modal-overlay" onClick={() => setShowServiceModal(false)}>
-          <div className="admin-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{selectedService ? 'Update Service' : 'Create New Service'}</h3>
-              <button className="close-btn" onClick={() => setShowServiceModal(false)}><Icons.Close /></button>
+        <div className="adm-modal-overlay" onClick={() => setShowServiceModal(false)}>
+          <div className="adm-modal" onClick={e => e.stopPropagation()}>
+            <div className="adm-modal__header">
+              <h3>{selectedService ? 'Update Service' : 'Create Service'}</h3>
+              <button className="adm-modal__close" onClick={() => setShowServiceModal(false)}><IconX /></button>
             </div>
-            <form className="modal-form" onSubmit={handleSaveService}>
-              {/* Image Upload */}
-              <div className="product-image-upload-section">
-                <label className="upload-label">Service Images (multiple allowed)</label>
-                <div className="product-images-grid">
-                  {serviceForm.previewImages.map((img, index) => (
-                    <div key={index} className="product-image-item">
-                      <img src={img} alt={`Image ${index + 1}`} />
-                      <button type="button" className="remove-image-btn" onClick={() => removeServiceImage(index)}>×</button>
+            <div className="adm-modal__body">
+              <form onSubmit={handleSaveService}>
+                {/* Image Upload */}
+                <div className="adm-upload-section">
+                  <label>Service Images</label>
+                  <div className="adm-upload-grid">
+                    {serviceForm.previewImages.map((img, index) => (
+                      <div key={index} className="adm-upload-item">
+                        <img src={img} alt={`Image ${index + 1}`} />
+                        <button type="button" className="adm-upload-remove" onClick={() => removeServiceImage(index)}>×</button>
+                      </div>
+                    ))}
+                    <div className="adm-upload-add" onClick={() => serviceFileRef.current?.click()}>
+                      <span>+</span>
+                      <span>Add</span>
                     </div>
-                  ))}
-                  <div className="add-image-btn" onClick={() => serviceFileRef.current?.click()}>
-                    <span>+</span>
-                    <span>Add Image</span>
+                  </div>
+                  <input type="file" ref={serviceFileRef} onChange={handleServiceImageChange} accept="image/*" style={{ display: 'none' }} />
+                </div>
+
+                <div className="adm-form-group">
+                  <label>Service Name *</label>
+                  <input type="text" value={serviceForm.name} onChange={e => setServiceForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Grooming, Vet Checkup" required />
+                </div>
+
+                <div className="adm-form-group">
+                  <label>Description</label>
+                  <textarea value={serviceForm.description} onChange={e => setServiceForm(p => ({ ...p, description: e.target.value }))} placeholder="Enter description" rows={3} />
+                </div>
+
+                <div className="adm-form-row">
+                  <div className="adm-form-group">
+                    <label>Duration (min) *</label>
+                    <input type="number" value={serviceForm.duration} onChange={e => setServiceForm(p => ({ ...p, duration: e.target.value }))} placeholder="e.g. 60" required />
+                  </div>
+                  <div className="adm-form-group">
+                    <label>Price (VND) *</label>
+                    <input type="number" value={serviceForm.price} onChange={e => setServiceForm(p => ({ ...p, price: e.target.value }))} placeholder="e.g. 200000" required />
                   </div>
                 </div>
-                <input type="file" ref={serviceFileRef} onChange={handleServiceImageChange} accept="image/*" multiple style={{ display: 'none' }} />
-              </div>
 
-              <div className="form-group">
-                <label>Service Name *</label>
-                <input type="text" value={serviceForm.name} onChange={e => setServiceForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Grooming, Vet Checkup" required />
-              </div>
-
-              <div className="form-group">
-                <label>Description</label>
-                <textarea value={serviceForm.description} onChange={e => setServiceForm(p => ({ ...p, description: e.target.value }))} placeholder="Enter service description" rows={3} />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Duration (minutes) *</label>
-                  <input type="number" value={serviceForm.duration} onChange={e => setServiceForm(p => ({ ...p, duration: e.target.value }))} placeholder="e.g. 60" required />
+                <div className="adm-checkbox">
+                  <input type="checkbox" id="isActiveSvc" checked={serviceForm.isActive} onChange={e => setServiceForm(p => ({ ...p, isActive: e.target.checked }))} />
+                  <label htmlFor="isActiveSvc">Active</label>
                 </div>
-                <div className="form-group">
-                  <label>Price (VND) *</label>
-                  <input type="number" value={serviceForm.price} onChange={e => setServiceForm(p => ({ ...p, price: e.target.value }))} placeholder="e.g. 200000" required />
+
+                <div className="adm-modal-actions">
+                  <button type="button" className="adm-btn adm-btn--cancel" onClick={() => setShowServiceModal(false)}>Cancel</button>
+                  <button type="submit" className="adm-btn adm-btn--submit">{selectedService ? 'Update' : 'Create'}</button>
                 </div>
-              </div>
-
-              <div className="checkbox-group">
-                <input type="checkbox" name="isActiveService" id="isActiveService"
-                  checked={serviceForm.isActive}
-                  onChange={e => setServiceForm(p => ({ ...p, isActive: e.target.checked }))} />
-                <label htmlFor="isActiveService">Active</label>
-              </div>
-
-              <div className="modal-actions">
-                <button type="button" className="cancel-btn" onClick={() => setShowServiceModal(false)}>Cancel</button>
-                <button type="submit" className="submit-btn">{selectedService ? '💾 Update' : '✨ Create'}</button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

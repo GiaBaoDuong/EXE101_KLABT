@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from 'react-router-dom'
 import Homepage from './pages/Homepage/Homepage'
 import Products from './pages/Products/Products'
 import ProductDetail from './pages/ProductDetail/ProductDetail'
@@ -14,8 +14,20 @@ import AdminDashboard from './pages/AdminDashboard/AdminDashboard'
 import Staff from './pages/Staff/Staff'
 import Doctor from './pages/Doctor/Doctor'
 import Notifications from './pages/Notifications/Notifications'
+import SharedNav from './components/SharedNav/SharedNav'
+import Footer from './components/Footer/Footer'
 import { useAuth } from './context/AuthContext'
+import { useEffect } from 'react'
 import './App.css'
+
+/** Auto-scroll to top on every route change */
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
 
 function LoadingScreen() {
   return (
@@ -43,82 +55,79 @@ function LoadingScreen() {
   )
 }
 
-function App() {
-  const { isAuthenticated, isLoading, user } = useAuth()
+/** Wrap with SharedNav + Footer. Pages already render their own SharedNav. */
+function PageLayout({ children }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <main style={{ flex: 1 }}>
+        {children}
+      </main>
+      <Footer />
+    </div>
+  )
+}
 
-  // Show loading screen while checking auth state
+function App() {
+  const { isAuthenticated, isLoading } = useAuth()
+
   if (isLoading) {
     return <LoadingScreen />
   }
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
-        {/* Default - Login Page */}
-        <Route path="/" element={<Login />} />
-        {/* Products - Public */}
-        <Route path="/products" element={<Products />} />
-        <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/services" element={<Services />} />
-        {/* Auth Required */}
+        {/* Public product pages */}
+        <Route path="/products" element={<PageLayout><Products /></PageLayout>} />
+        <Route path="/products/:id" element={<PageLayout><ProductDetail /></PageLayout>} />
+        <Route path="/services" element={<PageLayout><Services /></PageLayout>} />
+
+        {/* Auth pages */}
         <Route
           path="/home"
-          element={isAuthenticated ? <Homepage /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <PageLayout><Homepage /></PageLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/pet-profile"
-          element={isAuthenticated ? <PetProfile /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <PageLayout><PetProfile /></PageLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/health-record"
-          element={isAuthenticated ? <PetHealthRecord /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <PageLayout><PetHealthRecord /></PageLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/purchases"
-          element={isAuthenticated ? <Purchases /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <PageLayout><Purchases /></PageLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/grooming"
-          element={isAuthenticated ? <PetGrooming /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <PageLayout><PetGrooming /></PageLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/user-profile"
-          element={isAuthenticated ? <UserProfile /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <PageLayout><UserProfile /></PageLayout> : <Navigate to="/login" />}
         />
-        {/* Admin Dashboard - cho Admin & Staff */}
         <Route
           path="/admin"
-          element={
-            isAuthenticated
-              ? <AdminDashboard />
-              : <Navigate to="/login" />
-          }
+          element={isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" />}
         />
-        {/* Staff Dashboard */}
         <Route
           path="/staff"
-          element={
-            isAuthenticated
-              ? <Staff />
-              : <Navigate to="/login" />
-          }
+          element={isAuthenticated ? <Staff /> : <Navigate to="/login" />}
         />
-        {/* Doctor Dashboard */}
         <Route
           path="/doctor"
-          element={
-            isAuthenticated
-              ? <Doctor />
-              : <Navigate to="/login" />
-          }
+          element={isAuthenticated ? <Doctor /> : <Navigate to="/login" />}
         />
         <Route
           path="/notifications"
-          element={isAuthenticated ? <Notifications /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <PageLayout><Notifications /></PageLayout> : <Navigate to="/login" />}
         />
-        {/* Login/Register - công khai */}
+        {/* Standalone — no footer */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   )

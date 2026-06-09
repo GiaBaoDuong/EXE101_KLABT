@@ -7,6 +7,7 @@ import './PetProfile.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
+
 function PetProfile() {
   const { user, token } = useAuth()
   const fileInputRef = useRef(null)
@@ -616,16 +617,6 @@ function PetProfile() {
         <Link to="/health-record" className="nav-tab">Pet Health Record</Link>
         <Link to="/grooming" className="nav-tab">Grooming Booking</Link>
       </div>
-
-      <footer className="footer">
-        <Link to="/home" className="logo-block">K-LABT</Link>
-        <div className="footer-links">
-          <div><h4>Shop</h4><a href="#">Walk</a><a href="#">Carry</a><a href="#">Play</a><a href="#">Shop All</a></div>
-          <div><h4>Info</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Reviews</a></div>
-          <div><h4>Help</h4><a href="#">Contact</a><a href="#">FAQ</a><a href="#">Account</a></div>
-          <div><h4>Join the Pack!</h4><a href="#">Facebook</a><a href="#">Instagram</a></div>
-        </div>
-      </footer>
 
       {/* Create/Edit Pet Modal */}
       {(showCreateModal || showEditModal) && (

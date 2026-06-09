@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import '../Homepage/Homepage.css'
 import SharedNav from '../../components/SharedNav/SharedNav'
@@ -21,6 +21,41 @@ const ArrowRight = () => (
     <path d="M2.5 6h7M6 2.5l3.5 3.5L6 9.5" />
   </svg>
 )
+
+const PawIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-5.5 1c-.83 0-1.5.67-1.5 1.5S5.67 14 6.5 14 8 13.33 8 12.5 7.33 11 6.5 11zM4 7c-.83 0-1.5.67-1.5 1.5S3.17 10 4 10s1.5-.67 1.5-1.5S4.83 7 4 7zm8 0c-.83 0-1.5.67-1.5 1.5S11.17 10 12 10s1.5-.67 1.5-1.5S12.83 7 12 7zm5.5 1c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5S18.33 8 17.5 8zM10 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+  </svg>
+)
+
+function useScrollReveal(options = {}) {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('is-visible')
+          // Propagate is-visible to direct child cards for stagger animations
+          const cards = el.querySelectorAll(
+            '.home-cat-card, .home-product-card, .home-social__card, .home-member-item'
+          )
+          cards.forEach(card => card.classList.add('is-visible'))
+          observer.unobserve(el)
+        }
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px', ...options }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return ref
+}
 
 function ProductCard({ product }) {
   return (
@@ -45,15 +80,31 @@ function ProductCard({ product }) {
 function Homepage() {
   const { user } = useAuth()
   const [showWelcome, setShowWelcome] = useState(false)
+  const [isLeaving, setIsLeaving] = useState(false)
   const [products, setProducts] = useState([])
   const [services, setServices] = useState([])
+
+  // Scroll reveal refs
+  const categoriesHeaderRef = useScrollReveal()
+  const catGridRef = useScrollReveal()
+  const socialHeaderRef = useScrollReveal()
+  const socialGridRef = useScrollReveal()
+  const productsHeaderRef = useScrollReveal()
+  const productsGridRef = useScrollReveal()
+  const splitBanner1Ref = useScrollReveal()
+  const splitBanner2Ref = useScrollReveal()
+  const splitBanner3Ref = useScrollReveal()
+  const memberBandRef = useScrollReveal()
 
   useEffect(() => {
     const loggedIn = sessionStorage.getItem('justLoggedIn')
     if (loggedIn === 'true' && user?.fullName) {
       setShowWelcome(true)
       sessionStorage.removeItem('justLoggedIn')
-      setTimeout(() => setShowWelcome(false), 5000)
+      setTimeout(() => {
+        setIsLeaving(true)
+        setTimeout(() => setShowWelcome(false), 400)
+      }, 5000)
     }
     fetchProducts()
     fetchServices()
@@ -87,8 +138,16 @@ function Homepage() {
       <SharedNav cartCount={0} />
 
       {showWelcome && (
-        <div className="welcome-banner">
-          <span>Welcome back, {user?.fullName}!</span>
+        <div className={`home-welcome${isLeaving ? ' is-leaving' : ''}`}>
+          <div className="home-welcome__inner">
+            <div className="home-welcome__icon">
+              <PawIcon />
+            </div>
+            <div className="home-welcome__text">
+              <span className="home-welcome__greeting">Welcome back</span>
+              <span className="home-welcome__name">{user?.fullName}</span>
+            </div>
+          </div>
         </div>
       )}
 
@@ -117,47 +176,47 @@ function Homepage() {
 
       {/* Promo Bar */}
       <div className="home-promo-bar">
-        <span>●</span> 20% Off Sitewide — Ends Sunday
+        <span className="home-promo-bar-inner">● 20% Off Sitewide — Ends Sunday &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ● 20% Off Sitewide — Ends Sunday</span>
       </div>
 
       {/* Category Grid */}
       <section className="home-categories">
-        <div className="home-categories__header">
+        <div className="home-categories__header reveal-header" ref={categoriesHeaderRef}>
           <h2 className="home-categories__title">Shop by Category</h2>
           <Link to="/products" className="home-categories__link">
             View All <ArrowRight />
           </Link>
         </div>
-        <div className="home-categories__grid">
-          <div className="home-cat-card">
-            <img src={petHeroImage2} alt="Walk" className="home-cat-card__img" />
+        <div className="home-categories__grid reveal" ref={catGridRef}>
+          <Link to="/products?cat=walk" className="home-cat-card">
+            <img src={petHeroImage2} alt="Walk" className="home-cat-card__image" />
             <div className="home-cat-card__overlay" />
             <span className="home-cat-card__label">Walk</span>
-          </div>
-          <div className="home-cat-card">
-            <img src={petHeroImage3} alt="Carry" className="home-cat-card__img" />
+          </Link>
+          <Link to="/products?cat=carry" className="home-cat-card">
+            <img src={petHeroImage3} alt="Carry" className="home-cat-card__image" />
             <div className="home-cat-card__overlay" />
             <span className="home-cat-card__label">Carry</span>
-          </div>
-          <div className="home-cat-card">
-            <img src={petHeroImage4} alt="Play" className="home-cat-card__img" />
+          </Link>
+          <Link to="/products?cat=play" className="home-cat-card">
+            <img src={petHeroImage4} alt="Play" className="home-cat-card__image" />
             <div className="home-cat-card__overlay" />
             <span className="home-cat-card__label">Play</span>
-          </div>
-          <div className="home-cat-card">
-            <img src={petHeroImage5} alt="Live" className="home-cat-card__img" />
+          </Link>
+          <Link to="/products?cat=live" className="home-cat-card">
+            <img src={petHeroImage5} alt="Live" className="home-cat-card__image" />
             <div className="home-cat-card__overlay" />
             <span className="home-cat-card__label">Live</span>
-          </div>
+          </Link>
         </div>
       </section>
 
       {/* Social Row — Featured Services */}
       <section className="home-social">
-        <div className="home-social__header">
+        <div className="home-social__header reveal-header" ref={socialHeaderRef}>
           <h2 className="home-social__title">Make Life with Your Pet Look as Good as It Feels</h2>
         </div>
-        <div className="home-social__grid">
+        <div className="home-social__grid reveal" ref={socialGridRef}>
           {featuredServices.length === 0 && Array.from({ length: 4 }).map((_, idx) => (
             <div key={idx} className="home-social__card">
               <div className="home-social__card-img-wrap">
@@ -189,13 +248,13 @@ function Homepage() {
 
       {/* Product Section */}
       <section className="home-products">
-        <div className="home-products__header">
+        <div className="home-products__header reveal-header" ref={productsHeaderRef}>
           <h2 className="home-products__title">Top Picks</h2>
           <Link to="/products" className="home-products__link">
             Shop All <ArrowRight />
           </Link>
         </div>
-        <div className="home-products__grid">
+        <div className="home-products__grid reveal" ref={productsGridRef}>
           {topPickProducts.map(product => (
             <ProductCard key={product.productId} product={product} />
           ))}
@@ -203,7 +262,7 @@ function Homepage() {
       </section>
 
       {/* Split Banner — New Products */}
-      <section className="home-split-banner">
+      <section className="home-split-banner reveal" ref={splitBanner1Ref}>
         <div className="home-split-banner__image">
           <img src={petHomepage6} alt="New products" />
         </div>
@@ -216,7 +275,7 @@ function Homepage() {
       </section>
 
       {/* Split Banner — Grooming */}
-      <section className="home-split-banner home-split-banner--reversed">
+      <section className="home-split-banner home-split-banner--reversed reveal" ref={splitBanner2Ref}>
         <div className="home-split-banner__image">
           <img src={petHomepage7} alt="Grooming services" />
         </div>
@@ -229,7 +288,7 @@ function Homepage() {
       </section>
 
       {/* Split Banner — Pet Care */}
-      <section className="home-split-banner">
+      <section className="home-split-banner reveal" ref={splitBanner3Ref}>
         <div className="home-split-banner__image">
           <img src={petHomepage9} alt="Pet care" />
         </div>
@@ -242,7 +301,7 @@ function Homepage() {
       </section>
 
       {/* Member Benefit Band */}
-      <div className="home-member-band">
+      <div className="home-member-band reveal" ref={memberBandRef}>
         <div className="home-member-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <rect x="1" y="3" width="15" height="13" rx="2" />
@@ -277,59 +336,6 @@ function Homepage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="products-footer">
-        <div className="products-footer__inner">
-          <div className="products-footer__grid">
-            <div className="products-footer__brand">
-              <Link to="/home" className="products-footer__logo">K-LABT</Link>
-              <p className="products-footer__tagline">Premium care products for your beloved pets. Quality you can trust.</p>
-            </div>
-            <div>
-              <h4 className="products-footer__col-title">Shop</h4>
-              <ul className="products-footer__links">
-                <li><Link to="/products">All Products</Link></li>
-                <li><Link to="/products?cat=1">Food</Link></li>
-                <li><Link to="/products?cat=2">Toys</Link></li>
-                <li><Link to="/products?cat=3">Grooming</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="products-footer__col-title">Services</h4>
-              <ul className="products-footer__links">
-                <li><Link to="/services">All Services</Link></li>
-                <li><Link to="/grooming">Grooming</Link></li>
-                <li><Link to="/doctor">Pet Doctor</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="products-footer__col-title">Pet Care</h4>
-              <ul className="products-footer__links">
-                <li><Link to="/pet-profile">Pet Profile</Link></li>
-                <li><Link to="/health-record">Health Record</Link></li>
-                <li><Link to="/purchases">Purchases</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="products-footer__col-title">Help</h4>
-              <ul className="products-footer__links">
-                <li><a href="#">Contact Us</a></li>
-                <li><a href="#">FAQ</a></li>
-                <li><a href="#">Shipping</a></li>
-                <li><a href="#">Returns</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="products-footer__bottom">
-            <p className="products-footer__copyright">© 2026 K-LABT. All rights reserved.</p>
-            <div className="products-footer__legal">
-              <a href="#">Privacy</a>
-              <a href="#">Terms</a>
-              <a href="#">Cookies</a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </main>
   )
 }

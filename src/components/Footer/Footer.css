@@ -1,0 +1,145 @@
+/* ========================================
+   FOOTER — Nike-inspired commerce system
+   ======================================== */
+
+/* Design tokens match index.css */
+:root {
+  --ft-bg: #f5f5f5;
+  --ft-divider: #e0e0e0;
+  --ft-ink: #111111;
+  --ft-charcoal: #555555;
+  --ft-mute: #888888;
+  --ft-link-gap: 10px;
+  --ft-col-gap: 24px;
+}
+
+.ft {
+  background: var(--ft-bg);
+  border-top: 1px solid var(--ft-divider);
+  margin-top: auto;
+}
+
+.ft__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--spacing-section) var(--spacing-section) var(--spacing-xl);
+}
+
+/* --- 4-column grid --- */
+.ft__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-section) var(--ft-col-gap);
+}
+
+/* --- Column header --- */
+.ft__col-head {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ft-ink);
+  margin: 0 0 12px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+/* --- Link list --- */
+.ft__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ft-link-gap);
+}
+
+.ft__link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ft-mute);
+  text-decoration: none;
+  letter-spacing: 0;
+  transition: color 0.15s;
+  display: inline-block;
+}
+
+.ft__link:hover {
+  color: var(--ft-ink);
+}
+
+/* --- Divider --- */
+.ft__rule {
+  height: 1px;
+  background: var(--ft-divider);
+  margin: var(--spacing-xl) 0 var(--spacing-lg);
+}
+
+/* --- Fine print row --- */
+.ft__fine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.ft__copyright {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ft-mute);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.ft__legal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ft__legal-link {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ft-mute);
+  text-decoration: none;
+  letter-spacing: 0;
+  transition: color 0.15s;
+}
+
+.ft__legal-link:hover {
+  color: var(--ft-ink);
+  text-decoration: underline;
+}
+
+.ft__dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ft-mute);
+  flex-shrink: 0;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1023px) {
+  .ft__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 599px) {
+  .ft__inner {
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
+  }
+
+  .ft__grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+  }
+
+  .ft__fine {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
