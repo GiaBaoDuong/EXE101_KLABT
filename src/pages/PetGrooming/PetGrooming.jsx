@@ -1,14 +1,48 @@
-import petHeroImage from '../../assets/petHomepage1.jpg';
-import petHeroImage2 from '../../assets/petHomepage2.jpg';
-import petHeroImage3 from '../../assets/petHomepage3.jpg';
 import { Link, useNavigate } from 'react-router-dom';
 import '../PetGrooming/PetGrooming.css'
-import AppHeader from '../../components/AppHeader/AppHeader'
+import SharedNav from '../../components/SharedNav/SharedNav'
 import { useAuth } from '../../context/AuthContext'
 import { useNotification } from '../../context/NotificationContext'
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
+
+const petHeroImage = 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1200&q=80'
+const petHeroImage2 = 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=800&q=80'
+
+/* SVG Icons */
+const IconBathtub = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 12h20M6 12V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v7" />
+    <path d="M4 19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3z" />
+  </svg>
+)
+const IconClock = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+  </svg>
+)
+const IconTag = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+    <line x1="7" y1="7" x2="7.01" y2="7" />
+  </svg>
+)
+const IconCheckCircle = () => (
+  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+)
+const IconCalendar = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+)
+const IconStar = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+)
 
 const testimonials = [
   {
@@ -26,7 +60,7 @@ const testimonials = [
     text: 'They truly understand how to handle nervous pets. Highly recommend!',
     rating: 5,
   },
-];
+]
 
 function PetGrooming() {
   const { user, token } = useAuth()
@@ -117,8 +151,8 @@ function PetGrooming() {
             localStorage.setItem('notified_bookings', JSON.stringify([...notifiedBookingsRef.current]))
             addNotification({
               type: 'booking_confirmed',
-              title: 'Lịch hẹn đã được xác nhận!',
-              message: `Mã lịch hẹn #${b.bookingCode || b.bookingId} đã được xác nhận.`,
+              title: 'Booking confirmed!',
+              message: `Booking #${b.bookingCode || b.bookingId} has been confirmed.`,
               link: '/grooming',
             })
           } else if (b.status === 5 && !notifiedBookingsRef.current.has(`${key}_5`)) {
@@ -126,8 +160,8 @@ function PetGrooming() {
             localStorage.setItem('notified_bookings', JSON.stringify([...notifiedBookingsRef.current]))
             addNotification({
               type: 'booking_rejected',
-              title: 'Lịch hẹn đã bị từ chối',
-              message: `Mã lịch hẹn #${b.bookingCode || b.bookingId} đã bị từ chối.`,
+              title: 'Booking rejected',
+              message: `Booking #${b.bookingCode || b.bookingId} has been rejected.`,
               link: '/grooming',
             })
           }
@@ -180,7 +214,7 @@ function PetGrooming() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!selectedDate || !selectedTime || !formData.petId || !formData.serviceId) {
-      alert('Vui lòng chọn thú cưng, dịch vụ, ngày và giờ!')
+      alert('Please select a pet, service, date, and time!')
       return
     }
 
@@ -220,8 +254,8 @@ function PetGrooming() {
         setShowSuccessModal(true)
         addNotification({
           type: 'booking_pending',
-          title: 'Đặt lịch thành công!',
-          message: `Mã lịch hẹn: ${data.bookingCode || data.bookingId}. Trạng thái: Đang chờ xác nhận.`,
+          title: 'Booking successful!',
+          message: `Booking ID: ${data.bookingCode || data.bookingId}. Status: Pending confirmation.`,
           link: '/home',
         })
         setFormData({ petId: '', serviceId: '', note: '' })
@@ -229,11 +263,11 @@ function PetGrooming() {
         setSelectedTime('')
       } else {
         const errData = await res.json().catch(() => ({}))
-        alert(errData.message || 'Đặt lịch thất bại. Vui lòng thử lại.')
+        alert(errData.message || 'Booking failed. Please try again.')
       }
     } catch (err) {
       console.error('Booking error:', err)
-      alert('Đặt lịch thất bại. Vui lòng kiểm tra kết nối và thử lại.')
+      alert('Booking failed. Please check your connection and try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -241,34 +275,25 @@ function PetGrooming() {
 
   const getStatusInfo = (status) => {
     switch (status) {
-      case 1: return { label: 'Chờ xử lý', color: '#f59e0b', bg: '#fef3c7' }
-      case 2: return { label: 'Đã xác nhận', color: '#3b82f6', bg: '#dbeafe' }
-      case 3: return { label: 'Đang thực hiện', color: '#8b5cf6', bg: '#ede9fe' }
-      case 4: return { label: 'Đã hoàn thành', color: '#22c55e', bg: '#dcfce7' }
-      case 5: return { label: 'Đã hủy', color: '#ef4444', bg: '#fee2e2' }
-      default: return { label: 'Không xác định', color: '#999', bg: '#f1f5f9' }
+      case 1: return { label: 'Pending', color: '#f59e0b', bg: '#fef3c7' }
+      case 2: return { label: 'Confirmed', color: '#3b82f6', bg: '#dbeafe' }
+      case 3: return { label: 'In Progress', color: '#8b5cf6', bg: '#ede9fe' }
+      case 4: return { label: 'Completed', color: '#22c55e', bg: '#dcfce7' }
+      case 5: return { label: 'Cancelled', color: '#ef4444', bg: '#fee2e2' }
+      default: return { label: 'Unknown', color: '#999', bg: '#f1f5f9' }
     }
   }
 
   return (
     <main className="pet-grooming">
-      <AppHeader
-        leftText="About"
-        nav={[
-          { label: 'Pet Profile', to: '/pet-profile' },
-          { label: 'Product', to: '/products' },
-          { label: 'Service', to: '/services' },
-          { label: 'Grooming Booking', to: '/grooming' },
-          { label: 'Purchases', to: '/purchases' },
-        ]}
-        cartCount={0}
-      />
+      <SharedNav cartCount={0} />
 
       {/* Hero Banner Section */}
       <section className="grooming-hero">
         <div className="hero-image-wrapper">
           <img src={petHeroImage} alt="Happy groomed dog" className="hero-dog-image" />
         </div>
+        <div className="hero-overlay" />
         <div className="hero-content">
           <p className="hero-subtitle">Premium grooming service</p>
           <h1 className="hero-title">Paw & Pamper</h1>
@@ -284,43 +309,61 @@ function PetGrooming() {
       {/* Feature Icons Section */}
       <section className="feature-icons">
         <div className="feature-icon-item">
-          <div className="feature-circle">
-            <span className="feature-emoji">🛁</span>
-          </div>
-          <p>Our Service</p>
+          <div className="feature-circle"><IconBathtub /></div>
+          <p>Premium Care</p>
         </div>
         <div className="feature-icon-item">
-          <div className="feature-circle">
-            <span className="feature-emoji">⏰</span>
-          </div>
-          <p>Time</p>
+          <div className="feature-circle"><IconClock /></div>
+          <p>Flexible Time</p>
         </div>
         <div className="feature-icon-item">
-          <div className="feature-circle">
-            <span className="feature-emoji">💰</span>
-          </div>
-          <p>Price</p>
+          <div className="feature-circle"><IconTag /></div>
+          <p>Best Value</p>
         </div>
       </section>
 
       {/* Services Section */}
       <section className="services-section">
-        <div className="services-header">
-          <div className="services-title-row">
-            <h2>Professional Services</h2>
-          </div>
+        <div className="section-header">
+          <h2>Professional Services</h2>
         </div>
         <div className="services-grid">
           {isLoadingServices ? (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#888' }}>Đang tải dịch vụ...</p>
+            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--color-mute)' }}>Loading services...</p>
           ) : services.length === 0 ? (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#888' }}>Không có dịch vụ</p>
+            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--color-mute)' }}>No services available</p>
           ) : services.map(service => (
-            <div key={service.serviceId} className="service-card">
-              <div className="service-icon">{service.name?.[0] || '⚡'}</div>
-              <h3>{service.name}</h3>
-              <p>{service.description}</p>
-              <span className="service-price-tag">{formatPrice(service.price)}</span>
+            <div key={service.serviceId} className="pp-card service-card">
+              <div className="pp-card__image-wrap">
+                {service.thumbnailUrl || service.images?.[0] ? (
+                  <img src={service.thumbnailUrl || service.images[0]} alt={service.name} className="pp-card__image" />
+                ) : (
+                  <div className="pp-card__placeholder">
+                    <span className="pp-card__placeholder-icon"><IconBathtub /></span>
+                  </div>
+                )}
+              </div>
+              <div className="pp-card__body">
+                <div className="pp-card__head">
+                  <div>
+                    <h3 className="pp-card__title">{service.name}</h3>
+                    <p className="pp-card__species">{service.category || 'Grooming'}</p>
+                  </div>
+                </div>
+                <p className="service-card__desc">{service.description}</p>
+                <div className="pp-card__actions">
+                  <span className="service-card__price">{formatPrice(service.price)}</span>
+                  <button
+                    className="pp-btn-primary"
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, serviceId: String(service.serviceId) }))
+                      document.getElementById('booking').scrollIntoView({ behavior: 'smooth' })
+                    }}
+                  >
+                    Select Service
+                  </button>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -332,13 +375,13 @@ function PetGrooming() {
           className={`grooming-tab ${activeSection === 'book' ? 'active' : ''}`}
           onClick={() => setActiveSection('book')}
         >
-          Đặt lịch
+          Book Now
         </button>
         <button
           className={`grooming-tab ${activeSection === 'history' ? 'active' : ''}`}
           onClick={() => { setActiveSection('history'); if (bookings.length === 0) fetchBookings() }}
         >
-          Lịch sử đặt lịch
+          Booking History
         </button>
       </div>
 
@@ -353,9 +396,9 @@ function PetGrooming() {
           {/* Pet & Service Row */}
           <div className="form-row">
             <div className="form-group">
-              <label>Chọn thú cưng</label>
+              <label>Select Pet</label>
               {isLoadingPets ? (
-                <select disabled><option>Đang tải...</option></select>
+                <select disabled><option>Loading...</option></select>
               ) : (
                 <select
                   name="petId"
@@ -363,7 +406,7 @@ function PetGrooming() {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="">-- Chọn thú cưng --</option>
+                  <option value="">-- Select Pet --</option>
                   {pets.map(p => (
                     <option key={p.petId} value={p.petId}>{p.name}</option>
                   ))}
@@ -371,9 +414,9 @@ function PetGrooming() {
               )}
             </div>
             <div className="form-group">
-              <label>Chọn dịch vụ</label>
+              <label>Select Service</label>
               {isLoadingServices ? (
-                <select disabled><option>Đang tải...</option></select>
+                <select disabled><option>Loading...</option></select>
               ) : (
                 <select
                   name="serviceId"
@@ -381,7 +424,7 @@ function PetGrooming() {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="">-- Chọn dịch vụ --</option>
+                  <option value="">-- Select Service --</option>
                   {services.map(s => (
                     <option key={s.serviceId} value={s.serviceId}>{s.name} - {formatPrice(s.price)}</option>
                   ))}
@@ -389,7 +432,7 @@ function PetGrooming() {
               )}
             </div>
             <div className="form-group">
-              <label>Ngày đặt</label>
+              <label>Booking Date</label>
               <input
                 type="date"
                 value={selectedDate}
@@ -403,7 +446,7 @@ function PetGrooming() {
           {/* Time & Note Row */}
           <div className="form-row schedule-row">
             <div className="form-group">
-              <label>Giờ hẹn</label>
+              <label>Time</label>
               <input
                 type="time"
                 value={selectedTime}
@@ -412,20 +455,20 @@ function PetGrooming() {
               />
             </div>
             <div className="form-group" style={{ gridColumn: '2 / -1' }}>
-              <label>Ghi chú</label>
+              <label>Note</label>
               <input
                 type="text"
                 name="note"
                 value={formData.note}
                 onChange={handleInputChange}
-                placeholder="Yêu cầu đặc biệt..."
+                placeholder="Special requests..."
               />
             </div>
           </div>
 
           {/* Submit Button */}
           <button type="submit" className="confirm-btn" disabled={isSubmitting}>
-            {isSubmitting ? 'Đang gửi...' : 'Book Appointment'}
+            {isSubmitting ? 'Submitting...' : 'Book Appointment'}
           </button>
         </form>
       </section>
@@ -435,20 +478,20 @@ function PetGrooming() {
       {/* BOOKING HISTORY SECTION */}
       {activeSection === 'history' && (
         <section className="booking-history-section">
-          <h2 className="booking-title">Lịch sử đặt lịch</h2>
+          <h2 className="booking-title">Booking History</h2>
 
           {isLoadingBookings ? (
             <div className="history-loading">
               <div className="history-spinner"></div>
-              <p>Đang tải...</p>
+              <p>Loading...</p>
             </div>
           ) : bookings.length === 0 ? (
             <div className="history-empty">
-              <div className="history-empty-icon">&#128197;</div>
-              <p className="history-empty-title">Chưa có lịch hẹn nào</p>
-              <p className="history-empty-sub">Hãy đặt lịch grooming cho thú cưng của bạn ngay!</p>
+              <IconCalendar />
+              <p className="history-empty-title">No bookings yet</p>
+              <p className="history-empty-sub">Book a grooming session for your pet now!</p>
               <button className="history-empty-btn" onClick={() => setActiveSection('book')}>
-                Đặt lịch ngay
+                Book now
               </button>
             </div>
           ) : (
@@ -463,28 +506,21 @@ function PetGrooming() {
                   >
                     <div className="bhc-header">
                       <div className="bhc-id">
-                        <span className="bhc-label">Mã lịch hẹn</span>
+                        <span className="bhc-label">Booking ID</span>
                         <span className="bhc-value">#{booking.bookingCode || booking.bookingId}</span>
                       </div>
-                      <span
-                        className="bhc-status"
-                        style={{ color: status.color, background: status.bg }}
-                      >
+                      <span className="bhc-status" style={{ color: status.color, background: status.bg }}>
                         {status.label}
                       </span>
                     </div>
                     <div className="bhc-body">
                       <div className="bhc-info">
-                        <span className="bhc-info-icon">&#128054;</span>
-                        <span>{booking.petName || 'Thú cưng'}</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span>{booking.petName || 'Pet'}</span>
                       </div>
                       <div className="bhc-info">
-                        <span className="bhc-info-icon">&#128197;</span>
+                        <IconCalendar />
                         <span>{new Date(booking.bookingDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
-                      </div>
-                      <div className="bhc-info">
-                        <span className="bhc-info-icon">&#128339;</span>
-                        <span>{booking.startTime ? new Date(booking.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '-'}</span>
                       </div>
                     </div>
                     {booking.services?.length > 0 && (
@@ -496,7 +532,7 @@ function PetGrooming() {
                     )}
                     <div className="bhc-footer">
                       <span className="bhc-price">{formatPrice(booking.totalPrice)}</span>
-                      <span className="bhc-view-detail">Xem chi tiết &#8250;</span>
+                      <span className="bhc-view-detail">View details →</span>
                     </div>
                   </div>
                 )
@@ -513,13 +549,13 @@ function PetGrooming() {
             {isLoadingDetail ? (
               <div className="bdm-loading">
                 <div className="history-spinner"></div>
-                <p>Đang tải chi tiết...</p>
+                <p>Loading details...</p>
               </div>
             ) : selectedBookingDetail ? (
             <>
             <div className="bdm-header">
               <div>
-                <h2 className="bdm-title">Chi tiết lịch hẹn</h2>
+                <h2 className="bdm-title">Booking Details</h2>
                 <p className="bdm-code">#{selectedBookingDetail.bookingCode || selectedBookingDetail.bookingId}</p>
               </div>
               <button className="bdm-close" onClick={() => { setSelectedBookingDetail(null); setIsDetailModalOpen(false) }}>
@@ -538,44 +574,44 @@ function PetGrooming() {
                   </span>
                 )
               })()}
-              <span className="bdm-created">Đặt lúc: {new Date(selectedBookingDetail.createdAt).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+              <span className="bdm-created">Booked: {new Date(selectedBookingDetail.createdAt).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
             </div>
 
             <div className="bdm-content">
               <div className="bdm-section">
-                <h3 className="bdm-section-title">&#128054; Thông tin thú cưng</h3>
+                <h3 className="bdm-section-title">&#128054; Pet Information</h3>
                 <div className="bdm-grid">
                   <div className="bdm-field">
-                    <span className="bdm-field-label">Tên thú cưng</span>
+                    <span className="bdm-field-label">Pet Name</span>
                     <span className="bdm-field-value">{selectedBookingDetail.petName}</span>
                   </div>
                 </div>
               </div>
 
               <div className="bdm-section">
-                <h3 className="bdm-section-title">&#128197; Thông tin lịch hẹn</h3>
+                <h3 className="bdm-section-title">&#128197; Booking Information</h3>
                 <div className="bdm-grid">
                   <div className="bdm-field">
-                    <span className="bdm-field-label">Ngày hẹn</span>
+                    <span className="bdm-field-label">Date</span>
                     <span className="bdm-field-value">
                       {new Date(selectedBookingDetail.bookingDate).toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
                     </span>
                   </div>
                   <div className="bdm-field">
-                    <span className="bdm-field-label">Giờ bắt đầu</span>
+                    <span className="bdm-field-label">Start Time</span>
                     <span className="bdm-field-value">
                       {selectedBookingDetail.startTime ? new Date(selectedBookingDetail.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '-'}
                     </span>
                   </div>
                   <div className="bdm-field">
-                    <span className="bdm-field-label">Giờ kết thúc</span>
+                    <span className="bdm-field-label">End Time</span>
                     <span className="bdm-field-value">
                       {selectedBookingDetail.endTime ? new Date(selectedBookingDetail.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '-'}
                     </span>
                   </div>
                   {selectedBookingDetail.note && (
                     <div className="bdm-field bdm-field-full">
-                      <span className="bdm-field-label">Ghi chú</span>
+                      <span className="bdm-field-label">Note</span>
                       <span className="bdm-field-value">{selectedBookingDetail.note}</span>
                     </div>
                   )}
@@ -584,7 +620,7 @@ function PetGrooming() {
 
               {selectedBookingDetail.services?.length > 0 && (
                 <div className="bdm-section">
-                  <h3 className="bdm-section-title">&#127770; Dịch vụ đã đặt</h3>
+                  <h3 className="bdm-section-title">&#127770; Booked Services</h3>
                   <div className="bdm-services">
                     {selectedBookingDetail.services.map((s, i) => (
                       <div key={i} className="bdm-service-row">
@@ -600,7 +636,7 @@ function PetGrooming() {
                     ))}
                   </div>
                   <div className="bdm-total">
-                    <span>Tổng cộng</span>
+                    <span>Total</span>
                     <span className="bdm-total-price">{formatPrice(selectedBookingDetail.totalPrice)}</span>
                   </div>
                 </div>
@@ -616,61 +652,63 @@ function PetGrooming() {
       {showSuccessModal && bookingResult && (
         <div className="booking-modal-overlay" onClick={() => setShowSuccessModal(false)}>
           <div className="booking-modal" onClick={e => e.stopPropagation()}>
-            <div className="booking-modal-icon">&#9989;</div>
-            <h2>Đặt lịch thành công!</h2>
+            <div className="booking-modal-icon">
+              <IconCheckCircle />
+            </div>
+            <h2>Booking Successful!</h2>
             <div className="booking-modal-detail">
               <div className="modal-detail-row">
-                <span className="modal-detail-label">Mã lịch hẹn</span>
+                <span className="modal-detail-label">Booking ID</span>
                 <span className="modal-detail-value">{bookingResult.bookingCode || bookingResult.bookingId}</span>
               </div>
               <div className="modal-detail-row">
-                <span className="modal-detail-label">Thú cưng</span>
+                <span className="modal-detail-label">Pet</span>
                 <span className="modal-detail-value">{bookingResult.petName}</span>
               </div>
               <div className="modal-detail-row">
-                <span className="modal-detail-label">Ngày</span>
+                <span className="modal-detail-label">Date</span>
                 <span className="modal-detail-value">{formatDateTime(bookingResult.bookingDate)}</span>
               </div>
               <div className="modal-detail-row">
-                <span className="modal-detail-label">Giờ</span>
+                <span className="modal-detail-label">Time</span>
                 <span className="modal-detail-value">{formatDateTime(bookingResult.startTime)}</span>
               </div>
               {bookingResult.services?.length > 0 && (
                 <div className="modal-detail-row">
-                  <span className="modal-detail-label">Dịch vụ</span>
+                  <span className="modal-detail-label">Service</span>
                   <span className="modal-detail-value">
                     {bookingResult.services.map(s => s.serviceName).join(', ')}
                   </span>
                 </div>
               )}
               <div className="modal-detail-row">
-                <span className="modal-detail-label">Tổng tiền</span>
+                <span className="modal-detail-label">Total</span>
                 <span className="modal-detail-value total-price">
                   {formatPrice(bookingResult.totalPrice)}
                 </span>
               </div>
                 <div className="modal-detail-row">
-                  <span className="modal-detail-label">Trạng thái</span>
+                  <span className="modal-detail-label">Status</span>
                   <span className="modal-detail-value status-pending">
-                    Chờ xử lý
+                    Pending
                   </span>
                 </div>
             </div>
             <p className="booking-modal-note">
-              Nhân viên sẽ xác nhận lịch hẹn trong thời gian sớm nhất. Thông báo sẽ được gửi đến bạn.
+              Staff will confirm your booking as soon as possible. You will be notified.
             </p>
             <div className="booking-modal-actions">
               <button
                 className="modal-btn-home"
                 onClick={() => { setShowSuccessModal(false); navigate('/home') }}
               >
-                Về trang chủ
+                Go to Home
               </button>
               <button
                 className="modal-btn-close"
                 onClick={() => setShowSuccessModal(false)}
               >
-                Đóng
+                Close
               </button>
             </div>
           </div>
@@ -683,9 +721,11 @@ function PetGrooming() {
         <div className="testimonials-grid">
           {testimonials.map((item, index) => (
             <div key={index} className="testimonial-card">
-              <div className="stars">{'★'.repeat(item.rating)}</div>
+              <div className="stars">
+                {Array.from({ length: item.rating }).map((_, i) => <IconStar key={i} />)}
+              </div>
               <p className="testimonial-text">"{item.text}"</p>
-              <p className="testimonial-author">- {item.name}</p>
+              <p className="testimonial-author">— {item.name}</p>
             </div>
           ))}
         </div>

@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './Products.css'
-import AppHeader from '../../components/AppHeader/AppHeader'
+import SharedNav from '../../components/SharedNav/SharedNav'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
 const CATEGORIES = [
-  { id: 0, name: 'Tất cả', icon: '🏪' },
-  { id: 1, name: 'Thức ăn', icon: '🍖' },
-  { id: 2, name: 'Đồ chơi', icon: '🎾' },
-  { id: 3, name: 'Vệ sinh', icon: '🛁' },
-  { id: 4, name: 'Y tế', icon: '💊' },
-  { id: 5, name: 'Phụ kiện', icon: '🎀' },
+  { id: 0, name: 'All', icon: null },
+  { id: 1, name: 'Food', icon: null },
+  { id: 2, name: 'Toys', icon: null },
+  { id: 3, name: 'Grooming', icon: null },
+  { id: 4, name: 'Health', icon: null },
+  { id: 5, name: 'Accessories', icon: null },
 ]
 
 function Products() {
@@ -35,7 +35,7 @@ function Products() {
     }
 
     if (searchTerm) {
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.brand?.toLowerCase().includes(searchTerm.toLowerCase())
       )
@@ -70,158 +70,219 @@ function Products() {
 
   const getCategoryName = (id) => {
     const cat = CATEGORIES.find(c => c.id === id)
-    return cat?.name || 'Khác'
+    return cat?.name || 'Other'
   }
 
   return (
     <main className="products-page">
-      {/* App Header */}
-      <AppHeader
-        leftText="About"
-        nav={[
-          { label: 'Pet Profile', to: '/pet-profile' },
-          { label: 'Product', to: '/products' },
-          { label: 'Service', to: '/services' },
-          { label: 'Grooming Booking', to: '/grooming' },
-          { label: 'Purchases', to: '/purchases' },
-        ]}
-        cartCount={0}
-      />
+      {/* Shared Nav */}
+      <SharedNav cartCount={0} />
 
-      {/* Hero Banner */}
+      {/* Campaign Hero */}
       <section className="products-hero">
-        <div className="hero-image-wrapper">
-          <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600" alt="Happy dog" className="hero-dog-image" />
-        </div>
-        <div className="hero-content">
-          <p className="hero-subtitle">Pet Care Products</p>
-          <h1 className="hero-title">Pet Shop</h1>
+        <img
+          src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1600&q=80"
+          alt="Happy dog"
+          className="products-hero__bg"
+        />
+        <div className="products-hero__overlay" />
+        <div className="products-hero__content">
+          <p className="products-hero__eyebrow">Pet Care Products</p>
+          <h1 className="products-hero__title">Pet Shop</h1>
           <button
-            className="hero-btn"
+            className="products-hero__cta"
             onClick={() => document.getElementById('shop').scrollIntoView({ behavior: 'smooth' })}
           >
-            Mua sắm ngay
+            Shop Now
+            <span className="products-hero__cta-arrow" aria-hidden="true">&#8594;</span>
           </button>
         </div>
       </section>
 
-      {/* Feature Icons */}
-      <section className="feature-icons">
-        {CATEGORIES.map(cat => (
-          <div
-            key={cat.id}
-            className={`feature-icon-item ${selectedCategory === cat.id ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(cat.id)}
-          >
-            <div className="feature-circle">
-              <span className="feature-emoji">{cat.icon}</span>
-            </div>
-            <p>{cat.name}</p>
-          </div>
-        ))}
-      </section>
-
-      {/* Main Container */}
-      <div className="products-container" id="shop">
-        <div className="products-toolbar">
-          {/* Search */}
-          <div className="search-box">
-            <span className="search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            {searchTerm && (
-              <button className="clear-btn" onClick={() => setSearchTerm('')}>✕</button>
-            )}
-          </div>
-
-          {/* Results Info */}
-          <div className="results-info">
-            <span className="results-count">
-              Tìm thấy <strong>{filteredProducts.length}</strong> sản phẩm
+      {/* Subnav Bar */}
+      <nav className="products-subnav">
+        <div className="products-subnav__inner">
+          <span className="products-subnav__breadcrumb">
+            Home / Products <span>/ All</span>
+          </span>
+          <div className="products-subnav__right">
+            <span className="products-subnav__count">
+              {filteredProducts.length} Products
             </span>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-select">
-              <option value="name">Tên A-Z</option>
-              <option value="price-low">Giá thấp → cao</option>
-              <option value="price-high">Giá cao → thấp</option>
-            </select>
+            <div className="products-subnav__sort">
+              <span className="products-subnav__sort-label">Sort By</span>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                <option value="name">Name A-Z</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </select>
+            </div>
           </div>
         </div>
+      </nav>
 
-        {/* Products Grid */}
+      {/* Category Filter */}
+      <div className="products-filter-bar">
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.id}
+            className={`filter-chip ${selectedCategory === cat.id ? 'is-active' : ''}`}
+            onClick={() => setSelectedCategory(cat.id)}
+          >
+            {cat.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="products-search">
+        <div className="search-pill">
+          <span className="search-pill__icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="search-pill__input"
+          />
+          {searchTerm && (
+            <button className="search-pill__clear" onClick={() => setSearchTerm('')} aria-label="Clear search">
+              <svg width="10" height="10" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M1 1l12 12M13 1L1 13" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Products Grid */}
+      <div id="shop">
         {isLoading ? (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Đang tải sản phẩm...</p>
+          <div className="products-loading">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column' }}>
+                <div className="skeleton-card__image" />
+                <div className="skeleton-card__body">
+                  <div className="skeleton-line skeleton-line--sm" />
+                  <div className="skeleton-line skeleton-line--lg" />
+                  <div className="skeleton-line skeleton-line--md" />
+                  <div className="skeleton-line skeleton-line--price" />
+                  <div className="skeleton-line skeleton-line--btn" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="empty-container">
-            <span className="empty-icon">📦</span>
-            <h3>Không tìm thấy sản phẩm</h3>
-            <p>Thử thay đổi từ khóa tìm kiếm</p>
+          <div className="products-empty">
+            <p className="products-empty__title">No Results</p>
+            <p className="products-empty__sub">Try adjusting your search or filter to find what you're looking for.</p>
+            <button className="products-empty__action" onClick={() => { setSearchTerm(''); setSelectedCategory(0) }}>
+              Clear Filters
+            </button>
           </div>
         ) : (
-          <div className="products-grid">
-            {filteredProducts.map(product => (
-              <article key={product.productId} className="service-card" onClick={() => navigate(`/products/${product.productId}`)}>
-                <div className="service-image">
-                  {product.thumbnailUrl || product.images?.[0] ? (
-                    <img src={product.thumbnailUrl || product.images[0]} alt={product.name} />
-                  ) : (
-                    <div className="service-placeholder">📦</div>
-                  )}
-                </div>
-                <div className="service-info">
-                  <h3 className="service-name">{product.name}</h3>
-                  <div className="service-meta">
-                    <span className="service-time">{getCategoryName(product.category)}</span>
-                    <span className="service-price">{formatPrice(product.price)}</span>
+          <div className="products-grid-wrapper">
+            <div className="products-grid">
+              {filteredProducts.map(product => (
+                <article
+                  key={product.productId}
+                  className="product-card"
+                  onClick={() => navigate(`/products/${product.productId}`)}
+                >
+                  <div className="product-card__image-wrap">
+                    {product.thumbnailUrl || product.images?.[0] ? (
+                      <img
+                        src={product.thumbnailUrl || product.images[0]}
+                        alt={product.name}
+                        className="product-card__image"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="product-card__placeholder">🐾</div>
+                    )}
+                    <span className="product-card__badge">{getCategoryName(product.category)}</span>
                   </div>
-                  <div
-                    className="service-book-btn"
-                    onClick={(e) => { e.stopPropagation(); navigate(`/products/${product.productId}`) }}
-                  >
-                    Mua ngay
+                  <div className="product-card__body">
+                    <span className="product-card__category">{getCategoryName(product.category)}</span>
+                    <h3 className="product-card__name">{product.name}</h3>
+                    {product.brand && (
+                      <span className="product-card__brand">{product.brand}</span>
+                    )}
+                    <div className="product-card__price-row">
+                      <span className="product-card__price">{formatPrice(product.price)}</span>
+                    </div>
+                    <div
+                      className="product-card__cta"
+                      onClick={e => { e.stopPropagation(); navigate(`/products/${product.productId}`) }}
+                    >
+                      View Details
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
       {/* Footer */}
-      <footer className="footer">
-        <Link to="/home" className="logo-block">K-LABT</Link>
-        <div className="footer-links">
-          <div>
-            <h4>Shop</h4>
-            <Link to="/products">Sản phẩm</Link>
-            <Link to="/services">Dịch vụ</Link>
-            <Link to="/grooming">Grooming</Link>
+      <footer className="products-footer">
+        <div className="products-footer__inner">
+          <div className="products-footer__grid">
+            <div className="products-footer__brand">
+              <Link to="/home" className="products-footer__logo">K-LABT</Link>
+              <p className="products-footer__tagline">
+                Premium care products for your beloved pets. Quality you can trust.
+              </p>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Shop</h4>
+              <ul className="products-footer__links">
+                <li><Link to="/products">All Products</Link></li>
+                <li><Link to="/products?cat=1">Food</Link></li>
+                <li><Link to="/products?cat=2">Toys</Link></li>
+                <li><Link to="/products?cat=3">Grooming</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Services</h4>
+              <ul className="products-footer__links">
+                <li><Link to="/services">All Services</Link></li>
+                <li><Link to="/grooming">Grooming</Link></li>
+                <li><Link to="/doctor">Pet Doctor</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Pet Care</h4>
+              <ul className="products-footer__links">
+                <li><Link to="/pet-profile">Pet Profile</Link></li>
+                <li><Link to="/health-record">Health Record</Link></li>
+                <li><Link to="/purchases">Purchases</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Help</h4>
+              <ul className="products-footer__links">
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Shipping</a></li>
+                <li><a href="#">Returns</a></li>
+              </ul>
+            </div>
           </div>
-          <div>
-            <h4>Pet Care</h4>
-            <Link to="/pet-profile">Pet Profile</Link>
-            <Link to="/health-record">Health Record</Link>
+          <div className="products-footer__bottom">
+            <p className="products-footer__copyright">© 2026 K-LABT. All rights reserved.</p>
+            <div className="products-footer__legal">
+              <a href="#">Privacy</a>
+              <a href="#">Terms</a>
+              <a href="#">Cookies</a>
+            </div>
           </div>
-          <div>
-            <h4>Help</h4>
-            <a href="#">Contact</a>
-            <a href="#">FAQ</a>
-          </div>
-          <div>
-            <h4>Follow Us</h4>
-            <a href="#">Facebook</a>
-            <a href="#">Instagram</a>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>© 2026 K-LABT. Made with ❤️ for your pets</p>
         </div>
       </footer>
     </main>

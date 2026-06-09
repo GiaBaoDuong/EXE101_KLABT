@@ -7,11 +7,11 @@ import './AppHeader.css'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
 const BOOKING_STATUSES = {
-  1: { label: 'Chờ xử lý', color: '#f59e0b' },
-  2: { label: 'Đã xác nhận', color: '#3b82f6' },
-  3: { label: 'Đang thực hiện', color: '#8b5cf6' },
-  4: { label: 'Đã hoàn thành', color: '#22c55e' },
-  5: { label: 'Đã hủy', color: '#ef4444' },
+  1: { label: 'Pending', color: '#f59e0b' },
+  2: { label: 'Confirmed', color: '#3b82f6' },
+  3: { label: 'In Progress', color: '#8b5cf6' },
+  4: { label: 'Completed', color: '#22c55e' },
+  5: { label: 'Cancelled', color: '#ef4444' },
 }
 
 function IconSearch(props) {
@@ -181,11 +181,11 @@ export default function AppHeader({
   const formatNotifTime = (timestamp) => {
     const diff = Date.now() - new Date(timestamp).getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'Vừa xong'
-    if (mins < 60) return `${mins} phút trước`
+    if (mins < 1) return 'Just now'
+    if (mins < 60) return `${mins}m ago`
     const hrs = Math.floor(mins / 60)
-    if (hrs < 24) return `${hrs} giờ trước`
-    return `${Math.floor(hrs / 24)} ngày trước`
+    if (hrs < 24) return `${hrs}h ago`
+    return `${Math.floor(hrs / 24)}d ago`
   }
 
   const formatDate = (dateStr) => {
@@ -243,10 +243,10 @@ export default function AppHeader({
             {showNotifPanel && (
               <div className="notif-panel">
                 <div className="notif-header">
-                  <h3>Thông báo</h3>
+                  <h3>Notifications</h3>
                   {unreadCount > 0 && (
                     <button className="notif-mark-read" onClick={markAllAsRead}>
-                      Đánh dấu đã đọc
+                      Mark all read
                     </button>
                   )}
                 </div>
@@ -254,7 +254,7 @@ export default function AppHeader({
                   {notifications.length === 0 ? (
                     <div className="notif-empty">
                       <IconBell className="notif-empty-icon" />
-                      <p>Chưa có thông báo nào</p>
+                      <p>No notifications yet</p>
                     </div>
                   ) : (
                     notifications.map(notif => (
@@ -280,7 +280,7 @@ export default function AppHeader({
                   )}
                   <div className="notif-footer">
                     <button className="notif-view-all" onClick={() => { setShowNotifPanel(false); navigate('/notifications') }}>
-                      Xem tất cả thông báo
+                      View all notifications
                     </button>
                   </div>
                 </div>
@@ -302,22 +302,34 @@ export default function AppHeader({
             {showUserDropdown && (
               <div className="dropdown-menu">
                 <div className="dropdown-header">
+                  <div className="dropdown-user-avatar">
+                    {user?.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user?.fullName} />
+                    ) : (
+                      <span className="dropdown-user-initials">
+                        {(user?.fullName || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                      </span>
+                    )}
+                  </div>
                   <div className="dropdown-user-info">
-                    <span className="dropdown-name">{user?.fullName}</span>
-                    <span className="dropdown-email">{user?.email}</span>
+                    <span className="dropdown-name">{user?.fullName || 'User'}</span>
+                    <span className="dropdown-email">{user?.email || ''}</span>
                   </div>
                 </div>
-                <div className="dropdown-divider"></div>
+                <div className="dropdown-divider" />
 
                 {/* Booking History */}
                 <div className="dropdown-booking-section">
-                  <div className="dropdown-section-title">
-                    <span className="dropdown-section-icon"><IconCalendar className="section-icon" /></span>
-                    Lịch sử đặt lịch
+                  <div className="dropdown-section-header">
+                    <div className="dropdown-section-title">
+                      <IconCalendar className="section-icon" />
+                      Booking History
+                    </div>
+                    <button className="dropdown-booking-new-btn" onClick={handleBookings}>+ Book now</button>
                   </div>
                   {userBookings.length === 0 ? (
                     <div className="dropdown-booking-empty">
-                      <p>Chưa có lịch hẹn nào</p>
+                      <p>No bookings yet</p>
                     </div>
                   ) : (
                     <div className="dropdown-booking-list">
@@ -326,16 +338,13 @@ export default function AppHeader({
                         return (
                           <div key={b.bookingId} className="dropdown-booking-item">
                             <div className="booking-item-left">
-                              <span className="booking-service-name">{b.serviceName || 'Dịch vụ'}</span>
+                              <span className="booking-service-name">{b.serviceName || 'Service'}</span>
                               <span className="booking-date-time">
                                 <IconClock className="clock-icon" />
                                 {formatDate(b.bookingDate || b.date)}
                               </span>
                             </div>
-                            <span
-                              className="booking-status-chip"
-                              style={{ color: status.color }}
-                            >
+                            <span className="booking-status-chip" style={{ color: status.color }}>
                               {status.label}
                             </span>
                           </div>
@@ -343,20 +352,18 @@ export default function AppHeader({
                       })}
                     </div>
                   )}
-                  <button className="dropdown-booking-more" onClick={handleBookings}>
-                    Đặt lịch mới →
-                  </button>
                 </div>
 
-                <div className="dropdown-divider"></div>
-                <button className="dropdown-item" onClick={handleEditProfile}>
-                  <span className="dropdown-icon">&#9998;</span>
-                  Chỉnh sửa thông tin
-                </button>
-                <button className="dropdown-item logout-item" onClick={handleLogout}>
-                  <span className="dropdown-icon"><IconLogout className="logout-icon" /></span>
-                  Đăng xuất
-                </button>
+                <div className="dropdown-actions">
+                  <button className="dropdown-item" onClick={handleEditProfile}>
+                    <IconEdit />
+                    Edit profile
+                  </button>
+                  <button className="dropdown-item logout-item" onClick={handleLogout}>
+                    <IconLogout />
+                    Log out
+                  </button>
+                </div>
               </div>
             )}
           </div>

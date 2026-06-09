@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import './ImageCropper.css'
 
-export default function ImageCropper({ preview, onConfirm, onCancel, title = 'Cắt ảnh' }) {
+export default function ImageCropper({ preview, onConfirm, onCancel, title = 'Crop Image' }) {
   const [cropArea, setCropArea] = useState({ x: 0, y: 0, size: 100 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragType, setDragType] = useState(null)
@@ -195,8 +195,8 @@ export default function ImageCropper({ preview, onConfirm, onCancel, title = 'C�
           </div>
         </div>
         <div className="ic-footer">
-          <button className="ic-btn ic-btn-cancel" onClick={handleCancel}>Hủy</button>
-          <button className="ic-btn ic-btn-ok" onClick={handleConfirm}>OK</button>
+          <button className="ic-btn ic-btn-cancel" onClick={handleCancel}>Cancel</button>
+          <button className="ic-btn ic-btn-ok" onClick={handleConfirm}>Apply</button>
         </div>
       </div>
     </div>

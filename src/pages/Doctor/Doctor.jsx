@@ -2,15 +2,16 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Doctor.css'
 import { useAuth } from '../../context/AuthContext'
+import SharedNav from '../../components/SharedNav/SharedNav'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
 const BOOKING_STATUSES = {
-  1: { label: 'Chờ xử lý', color: '#f59e0b' },
-  2: { label: 'Đã xác nhận', color: '#3b82f6' },
-  3: { label: '�ang thực hiện', color: '#8b5cf6' },
-  4: { label: 'Đã hoàn thành', color: '#22c55e' },
-  5: { label: 'Đã hủy', color: '#ef4444' },
+  1: { label: 'Pending', color: '#f59e0b' },
+  2: { label: 'Confirmed', color: '#3b82f6' },
+  3: { label: 'In Progress', color: '#8b5cf6' },
+  4: { label: 'Completed', color: '#22c55e' },
+  5: { label: 'Cancelled', color: '#ef4444' },
 }
 
 const TABS = {
@@ -75,14 +76,14 @@ function Doctor() {
           setSelectedBooking(prev => ({ ...prev, status: newStatus }))
         }
         setSelectedBooking(null)
-        alert('Cập nhật trạng thái thành công!')
+        alert('Status updated successfully!')
       } else {
         const errData = await res.json().catch(() => ({}))
-        alert(`Cập nhật thất bại: ${errData.message || res.status}`)
+        alert(`Update failed: ${errData.message || res.status}`)
       }
     } catch (e) {
       console.error('Failed to update status:', e)
-      alert('Đã xảy ra lỗi khi cập nhật.')
+      alert('An error occurred while updating.')
     } finally {
       setIsSubmitting(false)
     }
@@ -90,7 +91,7 @@ function Doctor() {
 
   const handleCompleteBooking = async (bookingId) => {
     if (!medicalNote.trim()) {
-      alert('Vui lòng nhập ghi chú khám bệnh.')
+      alert('Please enter medical notes.')
       return
     }
     setIsSubmitting(true)
@@ -109,15 +110,15 @@ function Doctor() {
         }
         setSelectedBooking(null)
         setMedicalNote('')
-        alert('Hoàn tất lịch hẹn thành công!')
+        alert('Appointment completed successfully!')
         fetchMyBookings()
       } else {
         const errData = await res.json().catch(() => ({}))
-        alert(`Hoàn tất thất bại: ${errData.message || res.status}`)
+        alert(`Completion failed: ${errData.message || res.status}`)
       }
     } catch (e) {
       console.error('Failed to complete booking:', e)
-      alert('Đã xảy ra lỗi khi hoàn tất.')
+      alert('An error occurred while completing.')
     } finally {
       setIsSubmitting(false)
     }
@@ -141,7 +142,7 @@ function Doctor() {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0)
   }
 
-  const getStatusInfo = (status) => BOOKING_STATUSES[status] || { label: 'Không xác định', color: '#999' }
+  const getStatusInfo = (status) => BOOKING_STATUSES[status] || { label: 'Unknown', color: '#999' }
 
   const getServiceNames = (services) => {
     if (!services || services.length === 0) return '-'
@@ -169,13 +170,15 @@ function Doctor() {
 
   return (
     <div className="doctor-dashboard">
+      <SharedNav cartCount={0} />
+
       {/* Sidebar */}
       <aside className="doctor-sidebar">
         <div className="sidebar-header">
           <div className="sidebar-logo">&#128137; Doctor</div>
           <div className="sidebar-user">
-            <span className="sidebar-user-name">{user?.fullName || user?.name || 'Bác sĩ'}</span>
-            <span className="sidebar-user-role">Bác sĩ Thú y</span>
+            <span className="sidebar-user-name">{user?.fullName || user?.name || 'Doctor'}</span>
+            <span className="sidebar-user-role">Veterinarian</span>
           </div>
         </div>
 
@@ -185,7 +188,7 @@ function Doctor() {
             onClick={() => setActiveTab(TABS.MY_BOOKINGS)}
           >
             <span className="nav-icon">&#128197;</span>
-            <span>Lịch hẹn của tôi</span>
+            <span>My Appointments</span>
             {pendingCount + inProgressCount > 0 && (
               <span className="nav-badge">{pendingCount + inProgressCount}</span>
             )}
@@ -195,16 +198,16 @@ function Doctor() {
             onClick={() => setActiveTab(TABS.COMPLETED)}
           >
             <span className="nav-icon">&#9989;</span>
-            <span>Đã hoàn thành</span>
+            <span>Completed History</span>
           </button>
         </nav>
 
         <div className="sidebar-footer">
           <button className="sidebar-btn-home" onClick={() => navigate('/home')}>
-            &#127968; Về trang chủ
+            &#127968; Back to Home
           </button>
           <button className="sidebar-btn-logout" onClick={handleLogout}>
-            &#128682; Đăng xuất
+            &#128682; Log out
           </button>
         </div>
       </aside>
@@ -213,19 +216,19 @@ function Doctor() {
       <main className="doctor-main">
         <header className="doctor-header">
           <h1 className="doctor-title">
-            {activeTab === TABS.MY_BOOKINGS ? 'Lịch hẹn của tôi' : 'Lịch sử hoàn thành'}
+            {activeTab === TABS.MY_BOOKINGS ? 'My Appointments' : 'Completed History'}
           </h1>
           <div className="header-stats">
             {pendingCount > 0 && (
               <div className="stat-chip stat-pending">
                 <span className="stat-dot"></span>
-                Chờ thực hiện: {pendingCount}
+                Pending: {pendingCount}
               </div>
             )}
             {inProgressCount > 0 && (
               <div className="stat-chip stat-inprogress">
                 <span className="stat-dot"></span>
-                Đang thực hiện: {inProgressCount}
+                In Progress: {inProgressCount}
               </div>
             )}
           </div>
@@ -236,7 +239,7 @@ function Doctor() {
           <input
             type="text"
             className="doctor-search"
-            placeholder="Tìm kiếm mã lịch hẹn, tên thú cưng, khách hàng..."
+            placeholder="Search booking ID, pet name, customer..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -245,11 +248,11 @@ function Doctor() {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="2">Đã xác nhận</option>
-            <option value="3">Đang thực hiện</option>
-            <option value="4">Đã hoàn thành</option>
-            <option value="5">Đã hủy</option>
+            <option value="all">All statuses</option>
+            <option value="2">Confirmed</option>
+            <option value="3">In Progress</option>
+            <option value="4">Completed</option>
+            <option value="5">Cancelled</option>
           </select>
         </div>
 
@@ -257,15 +260,15 @@ function Doctor() {
         <div className="doctor-stats-row">
           <div className="doc-stat-card doc-stat-pending">
             <div className="doc-stat-num">{pendingCount}</div>
-            <div className="doc-stat-label">Chờ thực hiện</div>
+            <div className="doc-stat-label">Pending</div>
           </div>
           <div className="doc-stat-card doc-stat-inprogress">
             <div className="doc-stat-num">{inProgressCount}</div>
-            <div className="doc-stat-label">Đang thực hiện</div>
+            <div className="doc-stat-label">In Progress</div>
           </div>
           <div className="doc-stat-card doc-stat-completed">
             <div className="doc-stat-num">{bookings.filter(b => b.status === 4).length}</div>
-            <div className="doc-stat-label">Đã hoàn thành</div>
+            <div className="doc-stat-label">Completed</div>
           </div>
         </div>
 
@@ -273,13 +276,13 @@ function Doctor() {
         {isLoading ? (
           <div className="doctor-loading">
             <div className="doctor-spinner"></div>
-            <p>Đang tải dữ liệu...</p>
+            <p>Loading data...</p>
           </div>
         ) : displayedBookings.length === 0 ? (
           <div className="doctor-empty">
             <div className="doctor-empty-icon">&#128218;</div>
             <p className="doctor-empty-title">
-              {activeTab === TABS.MY_BOOKINGS ? 'Không có lịch hẹn nào' : 'Chưa có lịch hẹn hoàn thành'}
+              {activeTab === TABS.MY_BOOKINGS ? 'No appointments yet' : 'No completed appointments yet'}
             </p>
           </div>
         ) : (
@@ -294,7 +297,7 @@ function Doctor() {
                 >
                   <div className="dbc-header">
                     <div className="dbc-id">
-                      <span className="dbc-label">Mã lịch hẹn</span>
+                      <span className="dbc-label">Booking ID</span>
                       <span className="dbc-value">#{booking.bookingCode || booking.bookingId}</span>
                     </div>
                     <span
@@ -309,21 +312,21 @@ function Doctor() {
                     <div className="dbc-row">
                       <span className="dbc-icon">&#128054;</span>
                       <div className="dbc-info">
-                        <span className="dbc-info-label">Thú cưng</span>
+                        <span className="dbc-info-label">Pet</span>
                         <span className="dbc-info-value">{booking.petName || '-'}</span>
                       </div>
                     </div>
                     <div className="dbc-row">
                       <span className="dbc-icon">&#128100;</span>
                       <div className="dbc-info">
-                        <span className="dbc-info-label">Khách hàng</span>
+                        <span className="dbc-info-label">Customer</span>
                         <span className="dbc-info-value">{booking.customerName || '-'}</span>
                       </div>
                     </div>
                     <div className="dbc-row">
                       <span className="dbc-icon">&#128197;</span>
                       <div className="dbc-info">
-                        <span className="dbc-info-label">Ngày hẹn</span>
+                        <span className="dbc-info-label">Date</span>
                         <span className="dbc-info-value">
                           {booking.bookingDate
                             ? new Date(booking.bookingDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -334,7 +337,7 @@ function Doctor() {
                     <div className="dbc-row">
                       <span className="dbc-icon">&#128339;</span>
                       <div className="dbc-info">
-                        <span className="dbc-info-label">Giờ hẹn</span>
+                        <span className="dbc-info-label">Time</span>
                         <span className="dbc-info-value">
                           {booking.startTime
                             ? new Date(booking.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
@@ -354,14 +357,14 @@ function Doctor() {
 
                   {booking.medicalNote && (
                     <div className="dbc-medical-note">
-                      <span className="dbc-note-label">&#128221; Ghi chú khám bệnh:</span>
+                      <span className="dbc-note-label">&#128221; Medical notes:</span>
                       <span className="dbc-note-text">{booking.medicalNote}</span>
                     </div>
                   )}
 
                   <div className="dbc-footer">
                     <span className="dbc-price">{formatPrice(booking.totalPrice)}</span>
-                    <span className="dbc-view-detail">Chi tiết &#8250;</span>
+                    <span className="dbc-view-detail">Details &#8250;</span>
                   </div>
                 </div>
               )
@@ -375,25 +378,25 @@ function Doctor() {
         <div className="doctor-modal-overlay" onClick={() => setSelectedBooking(null)}>
           <div className="doctor-modal" onClick={e => e.stopPropagation()}>
             <div className="dm-header">
-              <h3 className="dm-title">Chi tiết lịch hẹn</h3>
+              <h3 className="dm-title">Appointment Details</h3>
               <button className="dm-close" onClick={() => setSelectedBooking(null)}>&times;</button>
             </div>
 
             <div className="dm-body">
               <div className="dm-row">
-                <span className="dm-label">Mã lịch hẹn</span>
+                <span className="dm-label">Booking ID</span>
                 <span className="dm-value">#{selectedBooking.bookingCode || selectedBooking.bookingId}</span>
               </div>
               <div className="dm-row">
-                <span className="dm-label">Thú cưng</span>
+                <span className="dm-label">Pet</span>
                 <span className="dm-value">{selectedBooking.petName || '-'}</span>
               </div>
               <div className="dm-row">
-                <span className="dm-label">Khách hàng</span>
+                <span className="dm-label">Customer</span>
                 <span className="dm-value">{selectedBooking.customerName || '-'}</span>
               </div>
               <div className="dm-row">
-                <span className="dm-label">Ngày hẹn</span>
+                <span className="dm-label">Date</span>
                 <span className="dm-value">
                   {selectedBooking.bookingDate
                     ? new Date(selectedBooking.bookingDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -401,7 +404,7 @@ function Doctor() {
                 </span>
               </div>
               <div className="dm-row">
-                <span className="dm-label">Giờ hẹn</span>
+                <span className="dm-label">Time</span>
                 <span className="dm-value">
                   {selectedBooking.startTime
                     ? new Date(selectedBooking.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
@@ -409,20 +412,20 @@ function Doctor() {
                 </span>
               </div>
               <div className="dm-row">
-                <span className="dm-label">Dịch vụ</span>
+                <span className="dm-label">Service</span>
                 <span className="dm-value">{getServiceNames(selectedBooking.services)}</span>
               </div>
               <div className="dm-row">
-                <span className="dm-label">Tổng giá</span>
+                <span className="dm-label">Total</span>
                 <span className="dm-value dm-price">{formatPrice(selectedBooking.totalPrice)}</span>
               </div>
               <div className="dm-row">
-                <span className="dm-label">Ghi chú khách</span>
+                <span className="dm-label">Customer Notes</span>
                 <span className="dm-value">{selectedBooking.note || '-'}</span>
               </div>
 
               <div className="dm-status-bar">
-                <span className="dm-status-label">Trạng thái:</span>
+                <span className="dm-status-label">Status:</span>
                 {(() => {
                   const s = getStatusInfo(selectedBooking.status)
                   return (
@@ -436,11 +439,11 @@ function Doctor() {
               {/* Medical Note - for completing */}
               {selectedBooking.status === 3 && (
                 <div className="dm-medical-section">
-                  <label className="dm-note-label">&#128221; Ghi chú khám bệnh</label>
+                  <label className="dm-note-label">&#128221; Medical Notes</label>
                   <textarea
                     className="dm-note-input"
                     rows={4}
-                    placeholder="Nhập ghi chú khám bệnh, chẩn đoán, đơn thuốc..."
+                    placeholder="Enter medical notes, diagnosis, prescriptions..."
                     value={medicalNote}
                     onChange={(e) => setMedicalNote(e.target.value)}
                   />
@@ -450,7 +453,7 @@ function Doctor() {
               {/* Show medical note if already completed */}
               {selectedBooking.status === 4 && selectedBooking.medicalNote && (
                 <div className="dm-medical-section">
-                  <label className="dm-note-label">&#128221; Ghi chú khám bệnh</label>
+                  <label className="dm-note-label">&#128221; Medical Notes</label>
                   <div className="dm-note-readonly">{selectedBooking.medicalNote}</div>
                 </div>
               )}
@@ -463,7 +466,7 @@ function Doctor() {
                   onClick={() => handleUpdateStatus(selectedBooking.bookingId, 3)}
                   disabled={isSubmitting}
                 >
-                  &#9654; Bắt đầu khám
+                  &#9654; Start Exam
                 </button>
               )}
               {selectedBooking.status === 3 && (
@@ -472,14 +475,14 @@ function Doctor() {
                   onClick={() => handleCompleteBooking(selectedBooking.bookingId)}
                   disabled={isSubmitting}
                 >
-                  &#9989; Hoàn tất & Lưu ghi chú
+                  &#9989; Complete & Save Notes
                 </button>
               )}
               <button
                 className="dm-btn dm-btn-cancel"
                 onClick={() => setSelectedBooking(null)}
               >
-                Đóng
+                Close
               </button>
             </div>
           </div>

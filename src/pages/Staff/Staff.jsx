@@ -12,18 +12,18 @@ const TABS = {
 }
 
 const BOOKING_STATUSES = {
-  1: { label: 'Chờ xử lý', color: '#f59e0b' },
-  2: { label: 'Đã xác nhận', color: '#3b82f6' },
-  3: { label: 'Đang thực hiện', color: '#8b5cf6' },
-  4: { label: 'Đã hoàn thành', color: '#22c55e' },
-  5: { label: 'Đã hủy', color: '#ef4444' },
+  1: { label: 'Pending', color: '#f59e0b' },
+  2: { label: 'Confirmed', color: '#3b82f6' },
+  3: { label: 'In Progress', color: '#8b5cf6' },
+  4: { label: 'Completed', color: '#22c55e' },
+  5: { label: 'Cancelled', color: '#ef4444' },
 }
 
 const ORDER_STATUSES = {
-  0: { label: 'Chờ xử lý', color: '#f59e0b' },
-  1: { label: 'Đang giao', color: '#3b82f6' },
-  2: { label: 'Đã giao', color: '#22c55e' },
-  3: { label: 'Đã hủy', color: '#ef4444' },
+  0: { label: 'Pending', color: '#f59e0b' },
+  1: { label: 'Shipping', color: '#3b82f6' },
+  2: { label: 'Delivered', color: '#22c55e' },
+  3: { label: 'Cancelled', color: '#ef4444' },
 }
 
 const Icons = {
@@ -61,9 +61,10 @@ function Staff() {
       }
 
       if (activeTab === TABS.BOOKINGS) {
-        const [bRes, dRes] = await Promise.all([
+        const [bRes, dRes, aRes] = await Promise.all([
           fetch(`${API_BASE_URL}/api/staff/BookingManagement`, { headers }),
           fetch(`${API_BASE_URL}/api/staff/BookingManagement/available-doctors`, { headers }),
+          fetch(`${API_BASE_URL}/api/admin/accounts`, { headers }),
         ])
         if (bRes.ok) {
           const bData = await bRes.json()
@@ -72,6 +73,14 @@ function Staff() {
         if (dRes.ok) {
           const dData = await dRes.json()
           setDoctors(Array.isArray(dData) ? dData : dData.data || [])
+        }
+        if (aRes.ok) {
+          const aData = await aRes.json()
+          const allAccounts = Array.isArray(aData) ? aData : aData.data || []
+          const filteredDoctors = allAccounts.filter(a => a.role === 3)
+          if (filteredDoctors.length > 0) {
+            setDoctors(filteredDoctors)
+          }
         }
       } else if (activeTab === TABS.FEEDBACKS) {
         const res = await fetch(`${API_BASE_URL}/api/staff/feedbacks`, { headers })
@@ -115,11 +124,11 @@ function Staff() {
         setConfirmModal(null)
       } else {
         const errData = await res.json().catch(() => ({}))
-        alert(`Cập nhật thất bại: ${errData.message || res.status}`)
+        alert(`Update failed: ${errData.message || res.status}`)
       }
     } catch (e) {
       console.error('Failed to approve booking:', e)
-      alert('Đã xảy ra lỗi khi xác nhận.')
+      alert('An error occurred while confirming.')
     }
   }
 
@@ -143,17 +152,17 @@ function Staff() {
         setConfirmModal(null)
       } else {
         const errData = await res.json().catch(() => ({}))
-        alert(`Cập nhật thất bại: ${errData.message || res.status}`)
+        alert(`Update failed: ${errData.message || res.status}`)
       }
     } catch (e) {
       console.error('Failed to reject booking:', e)
-      alert('Đã xảy ra lỗi khi từ chối.')
+      alert('An error occurred while rejecting.')
     }
   }
 
   const handleAssignDoctor = async (bookingId) => {
     if (!selectedBookingDoctor) {
-      alert('Vui lòng chọn bác sĩ.')
+      alert('Please select a doctor.')
       return
     }
     try {
@@ -170,9 +179,9 @@ function Staff() {
         setBookings(prev => prev.map(b => b.bookingId === bookingId ? { ...b, doctorId: parseInt(selectedBookingDoctor) } : b))
         setSelectedBooking(null)
         setSelectedBookingDoctor('')
-        alert('Đã chỉ định bác sĩ thành công!')
+        alert('Doctor assigned successfully!')
       } else {
-        alert('Chỉ định bác sĩ thất bại.')
+        alert('Failed to assign doctor.')
       }
     } catch (e) {
       console.error('Failed to assign doctor:', e)
@@ -217,7 +226,7 @@ function Staff() {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0)
   }
 
-  const getStatusInfo = (status, statuses) => statuses[status] || { label: 'Không xác định', color: '#999' }
+  const getStatusInfo = (status, statuses) => statuses[status] || { label: 'Unknown', color: '#999' }
 
   const getServiceNames = (services) => {
     if (!services || services.length === 0) return '-'
@@ -232,6 +241,15 @@ function Staff() {
       b.petName?.toLowerCase().includes(search) ||
       b.services?.some(s => s.serviceName?.toLowerCase().includes(search))
     const matchStatus = statusFilter === 'all' || b.status === parseInt(statusFilter)
+    return matchSearch && matchStatus
+  })
+
+  const filteredOrders = orders.filter(o => {
+    const search = searchTerm.toLowerCase()
+    const matchSearch = !search ||
+      o.orderId?.toString().includes(search) ||
+      o.userName?.toLowerCase().includes(search)
+    const matchStatus = statusFilter === 'all' || o.status === parseInt(statusFilter)
     return matchSearch && matchStatus
   })
 
@@ -257,21 +275,21 @@ function Staff() {
         <nav className="sidebar-nav">
           <button className={`sidebar-btn ${activeTab === TABS.BOOKINGS ? 'active' : ''}`} onClick={() => setActiveTab(TABS.BOOKINGS)}>
             <Icons.Calendar />
-            <span>Đặt lịch</span>
+            <span>Bookings</span>
             {pendingCount > 0 && <span className="sidebar-badge">{pendingCount}</span>}
           </button>
           <button className={`sidebar-btn ${activeTab === TABS.FEEDBACKS ? 'active' : ''}`} onClick={() => setActiveTab(TABS.FEEDBACKS)}>
             <Icons.Star />
-            <span>Phản hồi</span>
+            <span>Feedback</span>
           </button>
           <button className={`sidebar-btn ${activeTab === TABS.ORDERS ? 'active' : ''}`} onClick={() => setActiveTab(TABS.ORDERS)}>
             <Icons.Package />
-            <span>Đơn hàng</span>
+            <span>Orders</span>
           </button>
         </nav>
         <div className="sidebar-footer">
           <button className="sidebar-logout-btn" onClick={handleLogout}>
-            🚪 <span>Đăng xuất</span>
+            🚪 <span>Log out</span>
           </button>
         </div>
       </aside>
@@ -282,19 +300,19 @@ function Staff() {
         {activeTab === TABS.BOOKINGS && (
           <div className="tab-panel">
             <div className="panel-header">
-              <h2>Quản lý Đặt lịch</h2>
+              <h2>Booking Management</h2>
               <div className="panel-stats">
-                <span className="stat-chip pending">{pendingCount} chờ</span>
-                <span className="stat-chip confirmed">{confirmedCount} xác nhận</span>
-                <span className="stat-chip completed">{completedCount} hoàn thành</span>
-                <span className="stat-chip cancelled">{cancelledCount} hủy</span>
+                <span className="stat-chip pending">{pendingCount} pending</span>
+                <span className="stat-chip confirmed">{confirmedCount} confirmed</span>
+                <span className="stat-chip completed">{completedCount} completed</span>
+                <span className="stat-chip cancelled">{cancelledCount} cancelled</span>
               </div>
             </div>
             <div className="panel-toolbar">
               <div className="search-box">
                 <input
                   type="text"
-                  placeholder="Tìm kiếm mã, thú cưng, dịch vụ..."
+                  placeholder="Search ID, pet, service..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   className="search-input"
@@ -308,7 +326,7 @@ function Staff() {
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value)}
               >
-                <option value="all">Tất cả</option>
+                <option value="all">All</option>
                 {Object.entries(BOOKING_STATUSES).map(([k, v]) => (
                   <option key={k} value={k}>{v.label}</option>
                 ))}
@@ -317,25 +335,25 @@ function Staff() {
             {isLoading ? (
               <div className="loading-container">
                 <div className="loading-spinner"></div>
-                <p>Đang tải dữ liệu...</p>
+                <p>Loading data...</p>
               </div>
             ) : (
               <div className="table-wrapper">
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Mã</th>
-                      <th>Thú cưng</th>
-                      <th>Dịch vụ</th>
-                      <th>Ngày giờ</th>
-                      <th>Tổng tiền</th>
-                      <th>Trạng thái</th>
-                      <th>Thao tác</th>
+                      <th>ID</th>
+                      <th>Pet</th>
+                      <th>Service</th>
+                      <th>Date & Time</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredBookings.length === 0 ? (
-                      <tr><td colSpan="7" className="empty-cell">Chưa có lịch hẹn nào</td></tr>
+                      <tr><td colSpan="7" className="empty-cell">No bookings yet</td></tr>
                     ) : filteredBookings.map(b => (
                       <tr key={b.bookingId}>
                         <td className="cell-id">#{b.bookingCode || b.bookingId}</td>
@@ -356,9 +374,9 @@ function Staff() {
                                 setSelectedBooking(b)
                                 setSelectedBookingDoctor(b.doctorId ? String(b.doctorId) : '')
                               }}
-                              title="Chi tiết"
+                              title="Details"
                             >
-                              Chi tiết
+                              Details
                             </button>
                           </div>
                         </td>
@@ -375,17 +393,17 @@ function Staff() {
         {activeTab === TABS.FEEDBACKS && (
           <div className="tab-panel">
             <div className="panel-header">
-              <h2>Quản lý Phản hồi</h2>
+              <h2>Feedback Management</h2>
             </div>
             {isLoading ? (
               <div className="loading-container">
                 <div className="loading-spinner"></div>
-                <p>Đang tải dữ liệu...</p>
+                <p>Loading data...</p>
               </div>
             ) : (
               <div className="feedbacks-grid">
                 {feedbacks.length === 0 ? (
-                  <div className="empty-state">Chưa có phản hồi nào</div>
+                  <div className="empty-state">No feedback yet</div>
                 ) : feedbacks.map(f => (
                   <div className="feedback-card" key={f.feedbackId || f.id}>
                     <div className="feedback-header">
@@ -394,7 +412,7 @@ function Staff() {
                           {(f.userName || f.name || 'U')[0].toUpperCase()}
                         </div>
                         <div>
-                          <div className="feedback-name">{f.userName || f.name || 'Người dùng'}</div>
+                          <div className="feedback-name">{f.userName || f.name || 'User'}</div>
                           <div className="feedback-date">{formatDate(f.createdAt || f.date)}</div>
                         </div>
                       </div>
@@ -403,7 +421,7 @@ function Staff() {
                       {renderStars(f.rating || 0)}
                     </div>
                     <p className="feedback-comment">
-                      {f.comment || f.content || <span className="text-muted">Không có bình luận</span>}
+                      {f.comment || f.content || <span className="text-muted">No comments</span>}
                     </p>
                   </div>
                 ))}
@@ -416,13 +434,13 @@ function Staff() {
         {activeTab === TABS.ORDERS && (
           <div className="tab-panel">
             <div className="panel-header">
-              <h2>Quản lý Đơn hàng</h2>
+              <h2>Order Management</h2>
             </div>
             <div className="panel-toolbar">
               <div className="search-box">
                 <input
                   type="text"
-                  placeholder="Tìm kiếm..."
+                  placeholder="Search..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   className="search-input"
@@ -436,7 +454,7 @@ function Staff() {
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value)}
               >
-                <option value="all">Tất cả</option>
+                <option value="all">All</option>
                 {Object.entries(ORDER_STATUSES).map(([k, v]) => (
                   <option key={k} value={k}>{v.label}</option>
                 ))}
@@ -445,7 +463,7 @@ function Staff() {
             {isLoading ? (
               <div className="loading-container">
                 <div className="loading-spinner"></div>
-                <p>Đang tải dữ liệu...</p>
+                <p>Loading data...</p>
               </div>
             ) : (
               <div className="table-wrapper">
@@ -453,16 +471,16 @@ function Staff() {
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>Khách hàng</th>
-                      <th>Tổng tiền</th>
-                      <th>Ngày đặt</th>
-                      <th>Trạng thái</th>
-                      <th>Thao tác</th>
+                      <th>Customer</th>
+                      <th>Total</th>
+                      <th>Order Date</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredOrders.length === 0 ? (
-                      <tr><td colSpan="6" className="empty-cell">Chưa có đơn hàng nào</td></tr>
+                      <tr><td colSpan="6" className="empty-cell">No orders yet</td></tr>
                     ) : filteredOrders.map(o => (
                       <tr key={o.orderId}>
                         <td className="cell-id">#{o.orderId}</td>
@@ -475,7 +493,7 @@ function Staff() {
                           </span>
                         </td>
                         <td>
-                          <button className="action-btn detail-btn" onClick={() => setSelectedOrder(o)}>Chi tiết</button>
+                          <button className="action-btn detail-btn" onClick={() => setSelectedOrder(o)}>Details</button>
                         </td>
                       </tr>
                     ))}
@@ -492,60 +510,60 @@ function Staff() {
         <div className="modal-overlay" onClick={() => setSelectedBooking(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Chi tiết lịch hẹn #{selectedBooking.bookingCode || selectedBooking.bookingId}</h3>
+              <h3>Booking Details #{selectedBooking.bookingCode || selectedBooking.bookingId}</h3>
               <button className="modal-close" onClick={() => setSelectedBooking(null)}>✕</button>
             </div>
             <div className="modal-body">
               <div className="detail-grid">
                 <div className="detail-item">
-                  <label>Thú cưng</label>
+                  <label>Pet</label>
                   <span>{selectedBooking.petName || '-'}</span>
                 </div>
                 <div className="detail-item">
-                  <label>Ngày đặt</label>
+                  <label>Date</label>
                   <span>{formatDate(selectedBooking.bookingDate)}</span>
                 </div>
                 <div className="detail-item">
-                  <label>Giờ bắt đầu</label>
+                  <label>Start Time</label>
                   <span>{formatDate(selectedBooking.startTime)}</span>
                 </div>
                 <div className="detail-item">
-                  <label>Giờ kết thúc</label>
+                  <label>End Time</label>
                   <span>{formatDate(selectedBooking.endTime)}</span>
                 </div>
                 <div className="detail-item full-width">
-                  <label>Dịch vụ</label>
+                  <label>Service</label>
                   <span>{getServiceNames(selectedBooking.services)}</span>
                 </div>
                 <div className="detail-item">
-                  <label>Tổng tiền</label>
+                  <label>Total</label>
                   <span style={{ color: '#22c55e', fontWeight: 700 }}>{formatPrice(selectedBooking.totalPrice)}</span>
                 </div>
                 <div className="detail-item">
-                  <label>Trạng thái</label>
+                  <label>Status</label>
                   <span className="status-badge" style={{ backgroundColor: getStatusInfo(selectedBooking.status, BOOKING_STATUSES).color }}>
                     {getStatusInfo(selectedBooking.status, BOOKING_STATUSES).label}
                   </span>
                 </div>
                 <div className="detail-item full-width">
-                  <label>Ghi chú</label>
+                  <label>Note</label>
                   <span>{selectedBooking.note || '-'}</span>
                 </div>
               </div>
 
               {/* Assign Doctor */}
               <div className="assign-doctor-section">
-                <h4>Chỉ định bác sĩ</h4>
+                <h4>Assign Doctor</h4>
                 <div className="assign-doctor-row">
                   <select
                     value={selectedBookingDoctor}
                     onChange={e => setSelectedBookingDoctor(e.target.value)}
                     className="form-select"
                   >
-                    <option value="">-- Chọn bác sĩ --</option>
+                    <option value="">-- Select Doctor --</option>
                     {doctors.map(d => (
-                      <option key={d.doctorId} value={d.doctorId}>
-                        {d.fullName || d.name || `Bác sĩ #${d.doctorId}`}
+                      <option key={d.userId || d.doctorId} value={d.userId || d.doctorId}>
+                        {d.fullName || d.name || `Dr. #${d.userId || d.doctorId}`}
                       </option>
                     ))}
                   </select>
@@ -554,17 +572,17 @@ function Staff() {
                     onClick={() => handleAssignDoctor(selectedBooking.bookingId)}
                     disabled={!selectedBookingDoctor}
                   >
-                    Gán bác sĩ
+                    Assign
                   </button>
                 </div>
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setSelectedBooking(null)}>Đóng</button>
+              <button className="btn-cancel" onClick={() => setSelectedBooking(null)}>Close</button>
               {selectedBooking.status === 1 && (
                 <>
-                  <button className="btn-reject" onClick={() => setConfirmModal({ type: 'reject', booking: selectedBooking, message: 'Bạn có chắc muốn từ chối lịch hẹn này?' })}>Từ chối</button>
-                  <button className="btn-approve" onClick={() => setConfirmModal({ type: 'approve', booking: selectedBooking, message: 'Bạn có chắc muốn xác nhận lịch hẹn này?' })}>Xác nhận</button>
+                  <button className="btn-reject" onClick={() => setConfirmModal({ type: 'reject', booking: selectedBooking, message: 'Are you sure you want to reject this booking?' })}>Reject</button>
+                  <button className="btn-approve" onClick={() => setConfirmModal({ type: 'approve', booking: selectedBooking, message: 'Are you sure you want to confirm this booking?' })}>Confirm</button>
                 </>
               )}
             </div>
@@ -580,20 +598,20 @@ function Staff() {
               {confirmModal.type === 'approve' ? '✔️' : '✕'}
             </div>
             <h3 className="confirm-modal-title">
-              {confirmModal.type === 'approve' ? 'Xác nhận lịch hẹn' : 'Từ chối lịch hẹn'}
+              {confirmModal.type === 'approve' ? 'Confirm Booking' : 'Reject Booking'}
             </h3>
             <p className="confirm-modal-message">{confirmModal.message}</p>
             <p className="confirm-modal-info">
-              Mã: <strong>#{confirmModal.booking.bookingCode || confirmModal.booking.bookingId}</strong>
-              {confirmModal.booking.petName && <> &nbsp;|&nbsp; Thú cưng: <strong>{confirmModal.booking.petName}</strong></>}
+              ID: <strong>#{confirmModal.booking.bookingCode || confirmModal.booking.bookingId}</strong>
+              {confirmModal.booking.petName && <> &nbsp;|&nbsp; Pet: <strong>{confirmModal.booking.petName}</strong></>}
             </p>
             <div className="confirm-modal-actions">
-              <button className="btn-cancel" onClick={() => setConfirmModal(null)}>Hủy</button>
+              <button className="btn-cancel" onClick={() => setConfirmModal(null)}>Cancel</button>
               <button
                 className={confirmModal.type === 'approve' ? 'btn-approve' : 'btn-reject'}
                 onClick={confirmModal.type === 'approve' ? handleApproveBooking : handleRejectBooking}
               >
-                {confirmModal.type === 'approve' ? 'Xác nhận' : 'Từ chối'}
+                {confirmModal.type === 'approve' ? 'Confirm' : 'Reject'}
               </button>
             </div>
           </div>
@@ -605,12 +623,12 @@ function Staff() {
         <div className="modal-overlay" onClick={() => setSelectedOrder(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Chỉnh sửa đơn hàng #{selectedOrder.orderId}</h3>
+              <h3>Edit Order #{selectedOrder.orderId}</h3>
               <button className="modal-close" onClick={() => setSelectedOrder(null)}>✕</button>
             </div>
             <div className="modal-body">
               <div className="form-group">
-                <label>Trạng thái</label>
+                <label>Status</label>
                 <select
                   value={selectedOrder.status}
                   onChange={e => setSelectedOrder({ ...selectedOrder, status: parseInt(e.target.value) })}
@@ -623,8 +641,8 @@ function Staff() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setSelectedOrder(null)}>Hủy</button>
-              <button className="btn-save" onClick={() => updateOrderStatus(selectedOrder.orderId, selectedOrder.status)}>Lưu thay đổi</button>
+              <button className="btn-cancel" onClick={() => setSelectedOrder(null)}>Cancel</button>
+              <button className="btn-save" onClick={() => updateOrderStatus(selectedOrder.orderId, selectedOrder.status)}>Save Changes</button>
             </div>
           </div>
         </div>

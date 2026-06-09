@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token')
   }
 
-  // Khôi phục trạng thái từ localStorage khi app load
+  // Restore state from localStorage on app load
   useEffect(() => {
     const savedAuth = localStorage.getItem('isAuthenticated')
     const savedUser = localStorage.getItem('user')
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
-    throw new Error('useAuth phải được sử dụng bên trong AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
 }

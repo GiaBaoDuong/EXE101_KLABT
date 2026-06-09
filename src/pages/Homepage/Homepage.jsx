@@ -1,53 +1,62 @@
-import heroPlaceholder from '../../assets/hero.png';
-import petHeroImage from '../../assets/petHomepage1.jpg';
-import petHeroImage2 from '../../assets/petHomepage2.jpg';
-import petHeroImage3 from '../../assets/petHomepage3.jpg';
-import petHeroImage4 from '../../assets/petHomepage4.jpg';
-import petHeroImage5 from '../../assets/petHomepage5.jpg';
-import petHomepage6 from '../../assets/petHomepage6.jpg';
-import petHomepage7 from '../../assets/petHomepage7.jpg';
-import petHomepage9 from '../../assets/petHomepage9.jpg';
-import { Link, useNavigate } from 'react-router-dom';
-import '../Homepage/Homepage.css'
-import AppHeader from '../../components/AppHeader/AppHeader'
-import { useAuth } from '../../context/AuthContext'
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import '../Homepage/Homepage.css'
+import SharedNav from '../../components/SharedNav/SharedNav'
+import { useAuth } from '../../context/AuthContext'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
+const heroPlaceholder = 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800&q=80'
+const petHeroImage = 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800&q=80'
+const petHeroImage2 = 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=600&q=80'
+const petHeroImage3 = 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&q=80'
+const petHeroImage4 = 'https://images.unsplash.com/photo-1535930891776-0c2dfb7daeda?w=600&q=80'
+const petHeroImage5 = 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&q=80'
+const petHomepage6 = 'https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?w=800&q=80'
+const petHomepage7 = 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=800&q=80'
+const petHomepage9 = 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80'
+
+const ArrowRight = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2.5 6h7M6 2.5l3.5 3.5L6 9.5" />
+  </svg>
+)
+
 function ProductCard({ product }) {
   return (
-    <article className="product-card">
-      <div className="img-slot">
+    <article className="home-product-card">
+      <div className="home-product-card__image-wrap">
         {product.thumbnailUrl || product.images?.[0] ? (
-          <img src={product.thumbnailUrl || product.images[0]} alt={product.name} />
+          <img src={product.thumbnailUrl || product.images[0]} alt={product.name} className="home-product-card__image" />
         ) : (
-          <img src={heroPlaceholder} alt={product.name} />
+          <img src={heroPlaceholder} alt={product.name} className="home-product-card__image" />
         )}
       </div>
-      <h4>{product.name}</h4>
+      <div className="home-product-card__body">
+        <h3 className="home-product-card__name">{product.name}</h3>
+        <span className="home-product-card__price">
+          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price || 0)}
+        </span>
+      </div>
     </article>
   )
 }
 
 function Homepage() {
-  const { logout, user } = useAuth()
-  const navigate = useNavigate()
+  const { user } = useAuth()
   const [showWelcome, setShowWelcome] = useState(false)
-  const [justLoggedIn, setJustLoggedIn] = useState(false)
   const [products, setProducts] = useState([])
+  const [services, setServices] = useState([])
 
   useEffect(() => {
     const loggedIn = sessionStorage.getItem('justLoggedIn')
     if (loggedIn === 'true' && user?.fullName) {
-      setJustLoggedIn(true)
       setShowWelcome(true)
       sessionStorage.removeItem('justLoggedIn')
-      setTimeout(() => {
-        setShowWelcome(false)
-      }, 5000)
+      setTimeout(() => setShowWelcome(false), 5000)
     }
     fetchProducts()
+    fetchServices()
   }, [user])
 
   const fetchProducts = async () => {
@@ -57,158 +66,267 @@ function Homepage() {
         const data = await res.json()
         setProducts(data)
       }
-    } catch (e) {
-      console.log('Failed to fetch products')
-    }
+    } catch (e) { /* silent */ }
   }
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
+  const fetchServices = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/Service`)
+      if (res.ok) {
+        const data = await res.json()
+        setServices(Array.isArray(data) ? data : [])
+      }
+    } catch (e) { /* silent */ }
   }
 
-  const topPickProducts = products.slice(0, 8)
+  const topPickProducts = products.slice(0, 4)
+  const featuredServices = services.slice(0, 4)
 
   return (
     <main className="homepage">
-      <AppHeader
-        leftText="About"
-        nav={[
-          { label: 'Pet Profile', to: '/pet-profile' },
-          { label: 'Product', to: '/products' },
-          { label: 'Service', to: '/services' },
-          { label: 'Grooming Booking', to: '/grooming' },
-          { label: 'Purchases', to: '/purchases' },
-        ]}
-        cartCount={0}
-      />
+      <SharedNav cartCount={0} />
 
       {showWelcome && (
         <div className="welcome-banner">
-          <span>🎉 Chào mừng {user?.fullName} đã quay trở lại!</span>
+          <span>Welcome back, {user?.fullName}!</span>
         </div>
       )}
 
-      <section className="hero-section">
-        <div className="hero-copy">
-          <h1>20% Off Flash Sale</h1>
-          <p>Save on essentials for walks to playtime and everything in between.</p>
-          <button>Shop Sale</button>
+      {/* Campaign Hero */}
+      <section className="home-hero">
+        <div className="home-hero__image-wrap">
+          <img src={petHeroImage} alt="Happy dog" />
         </div>
-        <div className="hero-image">
-          <img src={petHeroImage} alt="Hero placeholder" />
-        </div>
-      </section>
-
-      <section className="promo-strip">20% Off Sitewide Ends Soon!</section>
-
-      <section className="category-grid">
-        <div className="category-card">
-          <img src={petHeroImage2} alt="Walk category" />
-          <span>Walk</span>
-        </div>
-        <div className="category-card">
-          <img src={petHeroImage3} alt="Carry category" />
-          <span>Carry</span>
-        </div>
-        <div className="category-card">
-          <img src={petHeroImage4} alt="Play category" />
-          <span>Play</span>
-        </div>
-        <div className="category-card">
-          <img src={petHeroImage5} alt="Live category" />
-          <span>Live</span>
+        <div className="home-hero__overlay" />
+        <div className="home-hero__content">
+          <p className="home-hero__eyebrow">Flash Sale — Limited Time</p>
+          <h1 className="home-hero__title">20% Off<br />Everything</h1>
+          <p className="home-hero__sub">
+            Save on essentials for walks to playtime and everything in between. No code needed.
+          </p>
+          <div className="home-hero__cta-group">
+            <Link to="/products" className="home-hero__cta-primary">
+              Shop Sale <ArrowRight />
+            </Link>
+            <Link to="/products" className="home-hero__cta-secondary">
+              View All Products
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="social-row">
-        <h2>Make Life with Your Dog Look as Good as It Feels</h2>
-        <div className="social-cards">
-          {Array.from({ length: 5 }, (_, idx) => (
-            <div className="social-card" key={`social-${idx + 1}`}>
-              <img src={heroPlaceholder} alt={`Social post ${idx + 1}`} />
+      {/* Promo Bar */}
+      <div className="home-promo-bar">
+        <span>●</span> 20% Off Sitewide — Ends Sunday
+      </div>
+
+      {/* Category Grid */}
+      <section className="home-categories">
+        <div className="home-categories__header">
+          <h2 className="home-categories__title">Shop by Category</h2>
+          <Link to="/products" className="home-categories__link">
+            View All <ArrowRight />
+          </Link>
+        </div>
+        <div className="home-categories__grid">
+          <div className="home-cat-card">
+            <img src={petHeroImage2} alt="Walk" className="home-cat-card__img" />
+            <div className="home-cat-card__overlay" />
+            <span className="home-cat-card__label">Walk</span>
+          </div>
+          <div className="home-cat-card">
+            <img src={petHeroImage3} alt="Carry" className="home-cat-card__img" />
+            <div className="home-cat-card__overlay" />
+            <span className="home-cat-card__label">Carry</span>
+          </div>
+          <div className="home-cat-card">
+            <img src={petHeroImage4} alt="Play" className="home-cat-card__img" />
+            <div className="home-cat-card__overlay" />
+            <span className="home-cat-card__label">Play</span>
+          </div>
+          <div className="home-cat-card">
+            <img src={petHeroImage5} alt="Live" className="home-cat-card__img" />
+            <div className="home-cat-card__overlay" />
+            <span className="home-cat-card__label">Live</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Row — Featured Services */}
+      <section className="home-social">
+        <div className="home-social__header">
+          <h2 className="home-social__title">Make Life with Your Pet Look as Good as It Feels</h2>
+        </div>
+        <div className="home-social__grid">
+          {featuredServices.length === 0 && Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="home-social__card">
+              <div className="home-social__card-img-wrap">
+                <img src={heroPlaceholder} alt={`Service ${idx + 1}`} />
+              </div>
+              <div className="home-social__card-body">
+                <span className="home-social__card-name">Professional Service {idx + 1}</span>
+                <span className="home-social__card-price">Contact for price</span>
+              </div>
             </div>
+          ))}
+          {featuredServices.map(service => (
+            <Link key={service.serviceId} to="/grooming" className="home-social__card">
+              <div className="home-social__card-img-wrap">
+                <img src={service.imageUrl || service.thumbnailUrl || heroPlaceholder} alt={service.name} />
+              </div>
+              <div className="home-social__card-body">
+                <span className="home-social__card-name">{service.name}</span>
+                <span className="home-social__card-price">
+                  {service.price
+                    ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(service.price)
+                    : 'Contact'}
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
       </section>
 
-      <section className="product-section">
-        <div className="section-header">
-          <h3>Top Pick</h3>
-          <Link to="/products" className="view-all-link">Xem tất cả →</Link>
+      {/* Product Section */}
+      <section className="home-products">
+        <div className="home-products__header">
+          <h2 className="home-products__title">Top Picks</h2>
+          <Link to="/products" className="home-products__link">
+            Shop All <ArrowRight />
+          </Link>
         </div>
-        <div className="product-grid four-col">
-          {topPickProducts.slice(0, 4).map((product) => (
+        <div className="home-products__grid">
+          {topPickProducts.map(product => (
             <ProductCard key={product.productId} product={product} />
           ))}
         </div>
       </section>
 
-      <section className="split-banner">
-        <div className="copy-box pink">
-          <h3>NEW! Sản phẩm mới</h3>
-          <p>Khám phá các sản phẩm mới nhất cho thú cưng của bạn</p>
-          <Link to="/products"><button>Khám phá ngay</button></Link>
-        </div>
-        <div className="img-slot">
+      {/* Split Banner — New Products */}
+      <section className="home-split-banner">
+        <div className="home-split-banner__image">
           <img src={petHomepage6} alt="New products" />
         </div>
-      </section>
-
-      <section className="split-banner">
-        <div className="copy-box yellow">
-          <h3>Dịch vụ chăm sóc</h3>
-          <p>Đặt lịch grooming cho thú cưng của bạn ngay hôm nay</p>
-          <Link to="/grooming"><button>Đặt lịch ngay</button></Link>
-        </div>
-        <div className="img-slot">
-          <img src={petHomepage7} alt="Services" />
+        <div className="home-split-banner__content home-split-banner--pink">
+          <p className="home-split-banner__eyebrow home-split-banner__eyebrow--dark">New Arrivals</p>
+          <h2 className="home-split-banner__title home-split-banner__title--dark">New Products</h2>
+          <p className="home-split-banner__sub">Discover the latest products for your beloved pet. Quality you can trust.</p>
+          <Link to="/products" className="home-split-banner__cta">Explore Now <ArrowRight /></Link>
         </div>
       </section>
 
-      <section className="give-back">
-        <div className="img-slot">
+      {/* Split Banner — Grooming */}
+      <section className="home-split-banner home-split-banner--reversed">
+        <div className="home-split-banner__image">
+          <img src={petHomepage7} alt="Grooming services" />
+        </div>
+        <div className="home-split-banner__content home-split-banner--ink">
+          <p className="home-split-banner__eyebrow home-split-banner__eyebrow--light">Services</p>
+          <h2 className="home-split-banner__title home-split-banner__title--light">Pet Grooming</h2>
+          <p className="home-split-banner__sub home-split-banner__sub--light">Book a professional grooming session for your pet today. Happy pet, happy life.</p>
+          <Link to="/grooming" className="home-split-banner__cta">Book Now <ArrowRight /></Link>
+        </div>
+      </section>
+
+      {/* Split Banner — Pet Care */}
+      <section className="home-split-banner">
+        <div className="home-split-banner__image">
           <img src={petHomepage9} alt="Pet care" />
         </div>
-        <div className="copy-box lime">
-          <h3>Chăm sóc thú cưng</h3>
-          <p>
-            Chúng tôi luôn đồng hành cùng bạn trong việc chăm sóc và bảo vệ thú cưng yêu quý.
-          </p>
-          <Link to="/pet-profile"><button>Tìm hiểu thêm</button></Link>
+        <div className="home-split-banner__content home-split-banner--yellow">
+          <p className="home-split-banner__eyebrow home-split-banner__eyebrow--dark">Pet Care</p>
+          <h2 className="home-split-banner__title home-split-banner__title--dark">We Care</h2>
+          <p className="home-split-banner__sub">We're always by your side caring for and protecting your beloved pets.</p>
+          <Link to="/pet-profile" className="home-split-banner__cta">Learn More <ArrowRight /></Link>
         </div>
       </section>
 
-      <footer className="footer">
-        <Link to="/home" className="logo-block">
-          K-LABT
-        </Link>
-        <div className="footer-links">
-          <div>
-            <h4>Shop</h4>
-            <a href="#">Walk</a>
-            <a href="#">Carry</a>
-            <a href="#">Play</a>
-            <a href="#">Shop All</a>
+      {/* Member Benefit Band */}
+      <div className="home-member-band">
+        <div className="home-member-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="1" y="3" width="15" height="13" rx="2" />
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+            <circle cx="5.5" cy="18.5" r="2.5" />
+            <circle cx="18.5" cy="18.5" r="2.5" />
+          </svg>
+          <span className="home-member-item__text">Free Shipping Over 500K</span>
+        </div>
+        <div className="home-member-divider" />
+        <div className="home-member-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span className="home-member-item__text">In-Store Pickup</span>
+        </div>
+        <div className="home-member-divider" />
+        <div className="home-member-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          </svg>
+          <span className="home-member-item__text">30-Day Free Returns</span>
+        </div>
+        <div className="home-member-divider" />
+        <div className="home-member-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+          </svg>
+          <span className="home-member-item__text">24/7 Support</span>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="products-footer">
+        <div className="products-footer__inner">
+          <div className="products-footer__grid">
+            <div className="products-footer__brand">
+              <Link to="/home" className="products-footer__logo">K-LABT</Link>
+              <p className="products-footer__tagline">Premium care products for your beloved pets. Quality you can trust.</p>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Shop</h4>
+              <ul className="products-footer__links">
+                <li><Link to="/products">All Products</Link></li>
+                <li><Link to="/products?cat=1">Food</Link></li>
+                <li><Link to="/products?cat=2">Toys</Link></li>
+                <li><Link to="/products?cat=3">Grooming</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Services</h4>
+              <ul className="products-footer__links">
+                <li><Link to="/services">All Services</Link></li>
+                <li><Link to="/grooming">Grooming</Link></li>
+                <li><Link to="/doctor">Pet Doctor</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Pet Care</h4>
+              <ul className="products-footer__links">
+                <li><Link to="/pet-profile">Pet Profile</Link></li>
+                <li><Link to="/health-record">Health Record</Link></li>
+                <li><Link to="/purchases">Purchases</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Help</h4>
+              <ul className="products-footer__links">
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Shipping</a></li>
+                <li><a href="#">Returns</a></li>
+              </ul>
+            </div>
           </div>
-          <div>
-            <h4>Info</h4>
-            <a href="#">About</a>
-            <a href="#">Blog</a>
-            <a href="#">Reviews</a>
-            <a href="#">Wholesale</a>
-          </div>
-          <div>
-            <h4>Help</h4>
-            <a href="#">Contact</a>
-            <a href="#">FAQ</a>
-            <a href="#">Shipping & Returns</a>
-            <a href="#">Account</a>
-          </div>
-          <div>
-            <h4>Join the Pack!</h4>
-            <a href="#">Facebook</a>
-            <a href="#">Instagram</a>
+          <div className="products-footer__bottom">
+            <p className="products-footer__copyright">© 2026 K-LABT. All rights reserved.</p>
+            <div className="products-footer__legal">
+              <a href="#">Privacy</a>
+              <a href="#">Terms</a>
+              <a href="#">Cookies</a>
+            </div>
           </div>
         </div>
       </footer>

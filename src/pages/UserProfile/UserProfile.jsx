@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import SharedNav from '../../components/SharedNav/SharedNav'
 import './UserProfile.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
@@ -19,6 +20,7 @@ function UserProfile() {
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({})
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [petCount, setPetCount] = useState(0)
   const [cropModal, setCropModal] = useState({ open: false, file: null, preview: null })
   const [cropArea, setCropArea] = useState({ x: 0, y: 0, size: 100 })
   const [isDragging, setIsDragging] = useState(false)
@@ -47,14 +49,32 @@ function UserProfile() {
         setProfile(data)
         setEditForm(data)
       } else {
-        setError('Không thể tải thông tin profile')
+        setError('Unable to load profile')
       }
     } catch (err) {
-      setError('Lỗi kết nối server')
+      setError('Server connection error')
     } finally {
       setIsLoading(false)
     }
   }
+
+  const fetchPetCount = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/Pet/user/${user?.userId}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        const list = Array.isArray(data) ? data : (data ? [data] : [])
+        setPetCount(list.length)
+      }
+    } catch { /* silent */ }
+  }
+
+  useEffect(() => {
+    fetchProfile()
+    fetchPetCount()
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -245,7 +265,7 @@ function UserProfile() {
     setProfile(updatedProfile)
     login(updatedProfile, token)
     setIsEditing(false)
-    setSuccessMessage('Cập nhật profile thành công!')
+    setSuccessMessage('Profile updated successfully!')
 
     // Try to sync with server in background
     try {
@@ -284,7 +304,7 @@ function UserProfile() {
   }
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'Chưa cập nhật'
+    if (!dateString) return 'Not updated'
     const date = new Date(dateString)
     return date.toLocaleDateString('vi-VN')
   }
@@ -298,18 +318,21 @@ function UserProfile() {
     return (
       <div className="profile-loading">
         <div className="loading-spinner"></div>
-        <p>Đang tải thông tin...</p>
+        <p>Loading...</p>
       </div>
     )
   }
 
   return (
     <main className="user-profile-page">
+      <SharedNav cartCount={0} />
+
+      {/* Crop Modal */}
       {cropModal.open && (
         <div className="crop-modal-overlay" onClick={(e) => e.target === e.currentTarget && handleCropCancel()}>
           <div className="crop-modal">
             <div className="crop-modal-header">
-              <h3>Cắt ảnh đại diện</h3>
+              <h3>Crop Avatar</h3>
               <button className="crop-close-btn" onClick={handleCropCancel}>×</button>
             </div>
             <div className="crop-canvas-wrapper">
@@ -355,277 +378,254 @@ function UserProfile() {
               </div>
             </div>
             <div className="crop-modal-footer">
-              <button className="crop-btn crop-btn-cancel" onClick={handleCropCancel}>Hủy</button>
-              <button className="crop-btn crop-btn-ok" onClick={handleCropConfirm}>OK</button>
+              <button className="crop-btn crop-btn-cancel" onClick={handleCropCancel}>Cancel</button>
+              <button className="crop-btn crop-btn-ok" onClick={handleCropConfirm}>Apply</button>
             </div>
           </div>
         </div>
       )}
-      {/* Header */}
-      <header className="profile-header">
-        <Link to="/home" className="back-btn">
-          <span className="back-icon">←</span>
-          Quay lại
-        </Link>
-        <h1>Tài Khoản Của Tôi</h1>
-        <div className="header-actions">
-          {!isEditing ? (
-            <button className="edit-profile-btn" onClick={() => setIsEditing(true)}>
-              ✏️ Chỉnh sửa
-            </button>
-          ) : (
-            <div className="edit-actions">
-              <button 
-                className="save-btn" 
-                onClick={handleSave}
-                disabled={isSaving}
-              >
-                {isSaving ? 'Đang lưu...' : '💾 Lưu'}
+
+      {/* Page Header */}
+      <header className="up-page-header">
+        <div className="up-page-header__inner">
+          <div className="up-page-header__breadcrumb">
+            <Link to="/home">Home</Link>
+            <span>/</span>
+            <span>Account</span>
+          </div>
+          <h1 className="up-page-header__title">My Account</h1>
+          <div className="up-page-header__actions">
+            {!isEditing ? (
+              <button className="up-edit-btn" onClick={() => setIsEditing(true)}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit
               </button>
-              <button 
-                className="cancel-btn" 
-                onClick={() => { 
-                  setIsEditing(false); 
-                  setEditForm(profile || {}); 
-                  setError('');
-                }}
-              >
-                Hủy
-              </button>
-            </div>
-          )}
+            ) : (
+              <div className="up-page-header__actions" style={{ gap: 'var(--spacing-sm)' }}>
+                <button className="up-btn-secondary" style={{ height: '36px', padding: '0 16px', fontSize: '13px' }} onClick={() => { setIsEditing(false); setEditForm(profile || {}); setError(''); }}>
+                  Cancel
+                </button>
+                <button className="up-btn-primary" style={{ height: '36px', padding: '0 16px', fontSize: '13px' }} onClick={handleSave} disabled={isSaving}>
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
+      {/* Alert Banners */}
       {error && (
-        <div className="error-banner">
-          {error}
-          <button onClick={() => setError('')} className="close-error">×</button>
+        <div className="up-alert up-alert--error">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="up-alert__close">×</button>
         </div>
       )}
-
       {successMessage && (
-        <div className="success-banner">
-          {successMessage}
-          <button onClick={() => setSuccessMessage('')} className="close-success">×</button>
+        <div className="up-alert up-alert--success">
+          <span>{successMessage}</span>
+          <button onClick={() => setSuccessMessage('')} className="up-alert__close">×</button>
         </div>
       )}
 
-      <div className="profile-content">
-        {/* Left Sidebar - Avatar & Quick Actions */}
-        <aside className="profile-sidebar">
-          <div className="avatar-section">
-            <div className="avatar-wrapper">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleAvatarChange}
-                accept="image/*"
-                style={{ display: 'none' }}
-              />
-              
-              {uploadingAvatar ? (
-                <div className="avatar-uploading">
-                  <div className="upload-spinner"></div>
-                </div>
-              ) : (editForm?.avatarUrl || profile?.avatarUrl) ? (
-                <img 
-                  src={editForm?.avatarUrl || profile?.avatarUrl} 
-                  alt={editForm?.fullName || profile?.fullName} 
-                  className="avatar-img" 
-                />
-              ) : (
-                <div className="avatar-placeholder">
-                  {getInitials(editForm?.fullName || profile?.fullName)}
-                </div>
-              )}
-              
-              {isEditing && (
-                <button 
-                  className="change-avatar-btn" 
-                  onClick={handleAvatarClick}
-                  disabled={uploadingAvatar}
-                >
-                  📷
-                </button>
-              )}
+      <div className="up-layout">
+        {/* Left Sidebar */}
+        <aside className="up-sidebar">
+          {/* Identity Card */}
+          <div className="up-identity">
+            <div className="up-identity__hero">
+              <div className="up-identity__hero-pattern" />
             </div>
-            <h2 className="user-name">{editForm?.fullName || profile?.fullName}</h2>
-            <p className="user-email">{editForm?.email || profile?.email}</p>
-            {(editForm?.isProMember || profile?.isProMember) && (
-              <span className="pro-badge">⭐ Pro Member</span>
-            )}
+            <div className="up-identity__body">
+              <div className="up-identity__avatar-wrap">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleAvatarChange}
+                  accept="image/*"
+                />
+                {(editForm?.avatarUrl || profile?.avatarUrl) ? (
+                  <img src={editForm?.avatarUrl || profile?.avatarUrl} alt="Avatar" className="up-identity__avatar" />
+                ) : (
+                  <span className="up-identity__avatar-initials">
+                    {getInitials(editForm?.fullName || profile?.fullName)}
+                  </span>
+                )}
+                {isEditing && (
+                  <button className="up-identity__change-avatar" onClick={handleAvatarClick} title="Change photo">+</button>
+                )}
+              </div>
+              <h2 className="up-identity__name">{editForm?.fullName || profile?.fullName || 'User'}</h2>
+              <p className="up-identity__email">{editForm?.email || profile?.email}</p>
+              <span className="up-identity__role">{profile?.roleName || profile?.role || 'Member'}</span>
+            </div>
           </div>
 
-          <nav className="quick-nav">
-            <button className="nav-item active">
-              <span className="nav-icon">👤</span>
-              Thông tin cá nhân
+          {/* Side Nav */}
+          <nav className="up-side-nav">
+            <button className="up-side-nav__item active">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+              Personal Information
             </button>
-            <button className="nav-item">
-              <span className="nav-icon">🔒</span>
-              Đổi mật khẩu
+            <button className="up-side-nav__item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Change Password
             </button>
-            <button className="nav-item">
-              <span className="nav-icon">🔔</span>
-              Thông báo
+            <button className="up-side-nav__item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              Notifications
             </button>
-            <button className="nav-item">
-              <span className="nav-icon">📍</span>
-              Địa chỉ
+            <button className="up-side-nav__item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              Address
+            </button>
+            <button className="up-side-nav__item up-side-nav__item--danger" onClick={handleLogout}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Log out
             </button>
           </nav>
         </aside>
 
         {/* Main Content */}
-        <section className="profile-main">
+        <section className="up-main">
           {/* Personal Info Card */}
-          <div className="info-card">
-            <h3 className="card-title">Thông Tin Cá Nhân</h3>
-            
-            <div className="info-grid">
-              <div className="info-field">
-                <label>Họ và tên</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={editForm.fullName || ''}
-                    onChange={handleInputChange}
-                    placeholder="Nhập họ và tên"
-                  />
-                ) : (
-                  <span>{profile?.fullName || 'Chưa cập nhật'}</span>
-                )}
-              </div>
-
-              <div className="info-field">
-                <label>Email</label>
-                <span>{profile?.email || 'Chưa cập nhật'}</span>
-              </div>
-
-              <div className="info-field">
-                <label>Số điện thoại</label>
-                {isEditing ? (
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={editForm.phone || ''}
-                    onChange={handleInputChange}
-                    placeholder="Nhập số điện thoại"
-                  />
-                ) : (
-                  <span>{profile?.phone || 'Chưa cập nhật'}</span>
-                )}
-              </div>
-
-              <div className="info-field">
-                <label>Giới tính</label>
-                {isEditing ? (
-                  <select
-                    name="gender"
-                    value={editForm.gender ?? ''}
-                    onChange={handleInputChange}
-                  >
-                    <option value="">Chọn giới tính</option>
-                    <option value={0}>Nam</option>
-                    <option value={1}>Nữ</option>
-                    <option value={2}>Khác</option>
-                  </select>
-                ) : (
-                  <span>
-                    {profile?.gender === 0 ? 'Nam' : 
-                     profile?.gender === 1 ? 'Nữ' : 
-                     profile?.gender === 2 ? 'Khác' : 'Chưa cập nhật'}
-                  </span>
-                )}
-              </div>
-
-              <div className="info-field">
-                <label>Ngày sinh</label>
-                {isEditing ? (
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    value={editForm.dateOfBirth?.split('T')[0] || ''}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  <span>{formatDate(profile?.dateOfBirth)}</span>
-                )}
-              </div>
-
-              <div className="info-field">
-                <label>Địa chỉ</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="address"
-                    value={editForm.address || ''}
-                    onChange={handleInputChange}
-                    placeholder="Nhập địa chỉ"
-                  />
-                ) : (
-                  <span>{profile?.address || 'Chưa cập nhật'}</span>
-                )}
-              </div>
+          <div className="up-card">
+            <div className="up-card__header">
+              <h2 className="up-card__title">Personal Information</h2>
             </div>
-
-            {isEditing && (
-              <div className="info-grid" style={{ marginTop: '20px' }}>
-                <div className="info-field">
-                  <label>Chuyên môn (Doctor)</label>
-                  <input
-                    type="text"
-                    name="specialization"
-                    value={editForm.specialization || ''}
-                    onChange={handleInputChange}
-                    placeholder="VD: Thú y tổng quát"
-                  />
+            <div className="up-card__body" style={{ padding: 0 }}>
+              {isEditing ? (
+                <div className="up-form-actions" style={{ padding: 'var(--spacing-xl)', borderTop: 'none' }}>
+                  <div className="up-edit-form" style={{ width: '100%' }}>
+                    <div className="up-form-row">
+                      <div className="up-form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="fullName" value={editForm.fullName || ''} onChange={handleInputChange} placeholder="Enter your full name" />
+                      </div>
+                      <div className="up-form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" name="phone" value={editForm.phone || ''} onChange={handleInputChange} placeholder="Enter your phone number" />
+                      </div>
+                    </div>
+                    <div className="up-form-row">
+                      <div className="up-form-group">
+                        <label>Gender</label>
+                        <select name="gender" value={editForm.gender ?? ''} onChange={handleInputChange}>
+                          <option value="">Select gender</option>
+                          <option value={0}>Male</option>
+                          <option value={1}>Female</option>
+                          <option value={2}>Other</option>
+                        </select>
+                      </div>
+                      <div className="up-form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" name="dateOfBirth" value={editForm.dateOfBirth?.split('T')[0] || ''} onChange={handleInputChange} />
+                      </div>
+                    </div>
+                    <div className="up-form-group up-form-group--full">
+                      <label>Address</label>
+                      <input type="text" name="address" value={editForm.address || ''} onChange={handleInputChange} placeholder="Enter your address" />
+                    </div>
+                    {(profile?.role === 'Doctor' || profile?.role === 'Staff') && (
+                      <div className="up-form-row">
+                        <div className="up-form-group">
+                          <label>{profile?.role === 'Doctor' ? 'Specialization' : 'Department'}</label>
+                          <input
+                            type="text"
+                            name={profile?.role === 'Doctor' ? 'specialization' : 'department'}
+                            value={editForm.specialization || editForm.department || ''}
+                            onChange={handleInputChange}
+                            placeholder={profile?.role === 'Doctor' ? 'e.g. General Vet' : 'e.g. Reception'}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="info-field">
-                  <label>Phòng ban (Staff)</label>
-                  <input
-                    type="text"
-                    name="department"
-                    value={editForm.department || ''}
-                    onChange={handleInputChange}
-                    placeholder="VD: Lễ tân"
-                  />
+              ) : (
+                <div className="up-info-grid">
+                  <div className="up-info-cell">
+                    <span className="up-info-label">Full Name</span>
+                    <span className="up-info-value">{profile?.fullName || 'Not updated'}</span>
+                  </div>
+                  <div className="up-info-cell">
+                    <span className="up-info-label">Email</span>
+                    <span className="up-info-value">{profile?.email || 'Not updated'}</span>
+                  </div>
+                  <div className="up-info-cell">
+                    <span className="up-info-label">Phone Number</span>
+                    <span className="up-info-value">{profile?.phone || <span className="mute">Not updated</span>}</span>
+                  </div>
+                  <div className="up-info-cell">
+                    <span className="up-info-label">Gender</span>
+                    <span className="up-info-value">
+                      {profile?.gender === 0 ? 'Male' : profile?.gender === 1 ? 'Female' : profile?.gender === 2 ? 'Other' : <span className="mute">Not updated</span>}
+                    </span>
+                  </div>
+                  <div className="up-info-cell">
+                    <span className="up-info-label">Date of Birth</span>
+                    <span className="up-info-value">{formatDate(profile?.dateOfBirth)}</span>
+                  </div>
+                  <div className="up-info-cell">
+                    <span className="up-info-label">Member since</span>
+                    <span className="up-info-value">{profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString('vi-VN') : 'Not updated'}</span>
+                  </div>
+                  <div className="up-info-cell up-info-cell--full">
+                    <span className="up-info-label">Address</span>
+                    <span className="up-info-value">{profile?.address || <span className="mute">Not updated</span>}</span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
+          {/* Membership Card */}
           {(editForm?.isProMember || profile?.isProMember) && (
-            <div className="membership-card">
-              <div className="membership-icon">⭐</div>
-              <div className="membership-info">
-                <h4>Pro Member</h4>
-                <p>Hết hạn: {formatDate(editForm?.proExpiredAt || profile?.proExpiredAt)}</p>
+            <div className="up-membership">
+              <div className="up-membership__icon">⭐</div>
+              <div className="up-membership__info">
+                <h3 className="up-membership__title">Pro Member</h3>
+                <p className="up-membership__expiry">Expires: {formatDate(editForm?.proExpiredAt || profile?.proExpiredAt)}</p>
               </div>
-              <button className="upgrade-btn">Gia hạn</button>
+              <button className="up-membership__btn">Renew</button>
             </div>
           )}
 
-          <div className="stats-card">
-            <h3 className="card-title">Thống Kê Tài Khoản</h3>
-            <div className="stats-grid">
-              <div className="stat-item">
-                <span className="stat-number">0</span>
-                <span className="stat-label">Đơn hàng</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">0</span>
-                <span className="stat-label">Thú cưng</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">0</span>
-                <span className="stat-label">Đánh giá</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">{profile?.userId || 1}</span>
-                <span className="stat-label">ID</span>
+          {/* Stats Card */}
+          <div className="up-card">
+            <div className="up-card__header">
+              <h2 className="up-card__title">Statistics</h2>
+            </div>
+            <div className="up-card__body" style={{ padding: 0 }}>
+              <div className="up-stats-grid">
+                <div className="up-stat-cell">
+                  <span className="up-stat-number">0</span>
+                  <span className="up-stat-label">Orders</span>
+                </div>
+                <div className="up-stat-cell">
+                  <span className="up-stat-number">{petCount}</span>
+                  <span className="up-stat-label">Pets</span>
+                </div>
+                <div className="up-stat-cell">
+                  <span className="up-stat-number">0</span>
+                  <span className="up-stat-label">Reviews</span>
+                </div>
+                <div className="up-stat-cell">
+                  <span className="up-stat-number">{profile?.userId || '—'}</span>
+                  <span className="up-stat-label">ID</span>
+                </div>
               </div>
             </div>
           </div>

@@ -135,7 +135,7 @@ function AdminDashboard() {
       })
       if (res.ok) {
         setShowAccountModal(false)
-        showSuccess(isEdit ? 'Cập nhật tài khoản thành công!' : 'Tạo tài khoản thành công!')
+        showSuccess(isEdit ? 'Account updated successfully!' : 'Account created successfully!')
         fetchAccounts()
       }
     } catch (e) { console.log(e) }
@@ -148,7 +148,7 @@ function AdminDashboard() {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
       setShowDeleteModal(false)
-      showSuccess('Xóa tài khoản thành công!')
+      showSuccess('Account deleted successfully!')
       fetchAccounts()
     } catch (e) { console.log(e) }
   }
@@ -215,7 +215,7 @@ function AdminDashboard() {
       })
       if (res.ok) {
         setShowProductModal(false)
-        showSuccess(isEdit ? 'Cập nhật sản phẩm thành công!' : 'Tạo sản phẩm thành công!')
+        showSuccess(isEdit ? 'Product updated successfully!' : 'Product created successfully!')
         fetchProducts()
       }
     } catch (e) { console.log(e) }
@@ -228,7 +228,7 @@ function AdminDashboard() {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
-      showSuccess('Xóa sản phẩm thành công!')
+      showSuccess('Product deleted successfully!')
       fetchProducts()
     } catch (e) { console.log(e) }
   }
@@ -512,7 +512,7 @@ function AdminDashboard() {
       })
       if (res.ok) {
         setShowServiceModal(false)
-        showSuccess(isEdit ? 'Cập nhật dịch vụ thành công!' : 'Tạo dịch vụ thành công!')
+        showSuccess(isEdit ? 'Service updated successfully!' : 'Service created successfully!')
         fetchServices()
       }
     } catch (e) { console.log(e) }
@@ -524,7 +524,7 @@ function AdminDashboard() {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${getToken()}` }
       })
-      showSuccess('Xóa dịch vụ thành công!')
+      showSuccess('Service deleted successfully!')
       fetchServices()
     } catch (e) { console.log(e) }
   }
@@ -537,7 +537,7 @@ function AdminDashboard() {
 
   const handleUpdateProPrice = async (e) => {
     e.preventDefault()
-    showSuccess('Cập nhật giá Pro Membership thành công!')
+    showSuccess('Pro Membership price updated successfully!')
   }
 
   const handleLogout = () => {
@@ -564,7 +564,7 @@ function AdminDashboard() {
         <div className="crop-modal-overlay" onClick={(e) => e.target === e.currentTarget && handleCropCancel()}>
           <div className="crop-modal">
             <div className="crop-modal-header">
-              <h3>{cropTarget === 'service' ? 'Cắt ảnh dịch vụ' : 'Cắt ảnh sản phẩm'}</h3>
+              <h3>{cropTarget === 'service' ? 'Crop Service Image' : 'Crop Product Image'}</h3>
               <button className="crop-close-btn" onClick={handleCropCancel}>×</button>
             </div>
             <div className="crop-canvas-wrapper">
@@ -610,7 +610,7 @@ function AdminDashboard() {
               </div>
             </div>
             <div className="crop-modal-footer">
-              <button className="crop-btn crop-btn-cancel" onClick={handleCropCancel}>Hủy</button>
+              <button className="crop-btn crop-btn-cancel" onClick={handleCropCancel}>Cancel</button>
               <button className="crop-btn crop-btn-ok" onClick={handleCropConfirm}>OK</button>
             </div>
           </div>
@@ -620,7 +620,7 @@ function AdminDashboard() {
       {/* Header */}
       <header className="admin-header">
         <div className="admin-header-left">
-          <Link to="/home" className="back-link">← Quay lại</Link>
+          <Link to="/home" className="back-link">← Back</Link>
         </div>
         <h1>Admin Dashboard</h1>
         <div className="admin-header-right">
@@ -640,13 +640,13 @@ function AdminDashboard() {
         <aside className="admin-sidebar">
           <nav className="sidebar-nav">
             <button className={`sidebar-btn ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
-              <Icons.Users /> <span>Tài khoản</span>
+              <Icons.Users /> <span>Accounts</span>
             </button>
             <button className={`sidebar-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
-              <Icons.Package /> <span>Sản phẩm</span>
+              <Icons.Package /> <span>Products</span>
             </button>
             <button className={`sidebar-btn ${activeTab === 'services' ? 'active' : ''}`} onClick={() => setActiveTab('services')}>
-              <Icons.Settings /> <span>Dịch vụ</span>
+              <Icons.Settings /> <span>Services</span>
             </button>
             <button className={`sidebar-btn ${activeTab === 'promembership' ? 'active' : ''}`} onClick={() => setActiveTab('promembership')}>
               <Icons.Star /> <span>Pro Membership</span>
@@ -655,7 +655,7 @@ function AdminDashboard() {
           
           <div className="sidebar-footer">
             <button className="sidebar-logout-btn" onClick={handleLogout}>
-              🚪 <span>Đăng xuất</span>
+              🚪 <span>Log out</span>
             </button>
           </div>
         </aside>
@@ -666,9 +666,9 @@ function AdminDashboard() {
         {activeTab === 'accounts' && (
           <div className="tab-panel">
             <div className="panel-header">
-              <h2>Quản lý Tài khoản</h2>
+              <h2>Account Management</h2>
               <button className="add-btn" onClick={() => openAccountModal()}>
-                <Icons.Plus /> Thêm tài khoản
+                <Icons.Plus /> Add Account
               </button>
             </div>
             <div className="table-wrapper">
@@ -676,11 +676,11 @@ function AdminDashboard() {
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Họ tên</th>
+                    <th>Name</th>
                     <th>Email</th>
-                    <th>Số điện thoại</th>
-                    <th>Vai trò</th>
-                    <th>Thao tác</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -705,7 +705,7 @@ function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
-              {accounts.length === 0 && <div className="empty-state">Chưa có tài khoản nào</div>}
+              {accounts.length === 0 && <div className="empty-state">No accounts found</div>}
             </div>
           </div>
         )}
@@ -714,20 +714,20 @@ function AdminDashboard() {
         {activeTab === 'products' && (
           <div className="tab-panel">
             <div className="panel-header">
-              <h2>Quản lý Sản phẩm</h2>
+              <h2>Product Management</h2>
               <button className="add-btn" onClick={() => openProductModal()}>
-                <Icons.Plus /> Thêm sản phẩm
+                <Icons.Plus /> Add Product
               </button>
             </div>
             <div className="table-wrapper">
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th style={{width: '60px'}}>Hình</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Giá</th>
-                    <th>Tồn kho</th>
-                    <th>Thao tác</th>
+                    <th style={{width: '60px'}}>Image</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -756,7 +756,7 @@ function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
-              {products.length === 0 && <div className="empty-state">Chưa có sản phẩm nào</div>}
+              {products.length === 0 && <div className="empty-state">No products found</div>}
             </div>
           </div>
         )}
@@ -765,20 +765,20 @@ function AdminDashboard() {
         {activeTab === 'services' && (
           <div className="tab-panel">
             <div className="panel-header">
-              <h2>Quản lý Dịch vụ</h2>
+              <h2>Service Management</h2>
               <button className="add-btn" onClick={() => openServiceModal()}>
-                <Icons.Plus /> Thêm dịch vụ
+                <Icons.Plus /> Add Service
               </button>
             </div>
             <div className="table-wrapper">
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th style={{width: '60px'}}>Hình</th>
-                    <th>Tên dịch vụ</th>
-                    <th>Thời gian</th>
-                    <th>Giá</th>
-                    <th>Thao tác</th>
+                    <th style={{width: '60px'}}>Image</th>
+                    <th>Service Name</th>
+                    <th>Duration</th>
+                    <th>Price</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -794,7 +794,7 @@ function AdminDashboard() {
                       <td className="product-name-cell">
                         <span className="product-name">{service.name}</span>
                       </td>
-                      <td>{service.durationMinutes ?? service.duration ?? '-'} phút</td>
+                      <td>{service.durationMinutes ?? service.duration ?? '-'} min</td>
                       <td className="price-cell">{formatPrice(service.price)}</td>
                       <td>
                         <div className="action-btns">
@@ -806,7 +806,7 @@ function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
-              {services.length === 0 && <div className="empty-state">Chưa có dịch vụ nào</div>}
+              {services.length === 0 && <div className="empty-state">No services found</div>}
             </div>
           </div>
         )}
@@ -815,27 +815,27 @@ function AdminDashboard() {
         {activeTab === 'promembership' && (
           <div className="tab-panel">
             <div className="panel-header">
-              <h2>Cài đặt Pro Membership</h2>
+              <h2>Pro Membership Settings</h2>
             </div>
             <div className="pro-settings-card">
               <div className="pro-icon-wrapper">
                 <span className="pro-icon">⭐</span>
               </div>
-              <h3>Gói Pro Membership</h3>
-              <p>Cập nhật giá cho các gói Pro Membership</p>
+              <h3>Pro Membership Plan</h3>
+              <p>Update pricing for Pro Membership plans</p>
               <form className="pro-form" onSubmit={handleUpdateProPrice}>
                 <div className="pro-price-input">
-                  <label>Giá Pro (VND)</label>
+                  <label>Pro Price (VND)</label>
                   <input
                     type="number"
                     value={proPrice}
                     onChange={(e) => setProPrice(e.target.value)}
-                    placeholder="VD: 199000"
+                    placeholder="e.g. 199000"
                     required
                   />
                 </div>
                 <button type="submit" className="update-price-btn">
-                  💾 Cập nhật giá
+                  💾 Update Price
                 </button>
               </form>
             </div>
@@ -850,24 +850,24 @@ function AdminDashboard() {
         <div className="modal-overlay" onClick={() => setShowAccountModal(false)}>
           <div className="admin-modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{selectedAccount ? 'Cập nhật tài khoản' : 'Tạo tài khoản mới'}</h3>
+              <h3>{selectedAccount ? 'Update Account' : 'Create New Account'}</h3>
               <button className="close-btn" onClick={() => setShowAccountModal(false)}><Icons.Close /></button>
             </div>
             <form className="modal-form" onSubmit={handleSaveAccount}>
               <div className="form-group">
-                <label>Họ tên</label>
-                <input type="text" value={accountForm.fullName} onChange={e => setAccountForm(p => ({ ...p, fullName: e.target.value }))} placeholder="Nhập họ tên" required />
+                <label>Name</label>
+                <input type="text" value={accountForm.fullName} onChange={e => setAccountForm(p => ({ ...p, fullName: e.target.value }))} placeholder="Enter name" required />
               </div>
               <div className="form-group">
                 <label>Email</label>
-                <input type="email" value={accountForm.email} onChange={e => setAccountForm(p => ({ ...p, email: e.target.value }))} placeholder="Nhập email" required />
+                <input type="email" value={accountForm.email} onChange={e => setAccountForm(p => ({ ...p, email: e.target.value }))} placeholder="Enter email" required />
               </div>
               <div className="form-group">
-                <label>Số điện thoại</label>
-                <input type="tel" value={accountForm.phone} onChange={e => setAccountForm(p => ({ ...p, phone: e.target.value }))} placeholder="Nhập số điện thoại" />
+                <label>Phone</label>
+                <input type="tel" value={accountForm.phone} onChange={e => setAccountForm(p => ({ ...p, phone: e.target.value }))} placeholder="Enter phone" />
               </div>
               <div className="form-group">
-                <label>Vai trò</label>
+                <label>Role</label>
                 <select value={accountForm.role} onChange={e => setAccountForm(p => ({ ...p, role: e.target.value }))}>
                   <option value="Customer">Customer</option>
                   <option value="Doctor">Doctor</option>
@@ -877,13 +877,13 @@ function AdminDashboard() {
               </div>
               {!selectedAccount && (
                 <div className="form-group">
-                  <label>Mật khẩu</label>
-                  <input type="password" value={accountForm.password} onChange={e => setAccountForm(p => ({ ...p, password: e.target.value }))} placeholder="Nhập mật khẩu" required />
+                  <label>Password</label>
+                  <input type="password" value={accountForm.password} onChange={e => setAccountForm(p => ({ ...p, password: e.target.value }))} placeholder="Enter password" required />
                 </div>
               )}
               <div className="modal-actions">
-                <button type="button" className="cancel-btn" onClick={() => setShowAccountModal(false)}>Hủy</button>
-                <button type="submit" className="submit-btn">{selectedAccount ? '💾 Cập nhật' : '✨ Tạo mới'}</button>
+                <button type="button" className="cancel-btn" onClick={() => setShowAccountModal(false)}>Cancel</button>
+                <button type="submit" className="submit-btn">{selectedAccount ? '💾 Update' : '✨ Create'}</button>
               </div>
             </form>
           </div>
@@ -897,11 +897,11 @@ function AdminDashboard() {
             <div className="delete-icon-wrapper">
               <span className="delete-icon">🗑️</span>
             </div>
-            <h3>Xác nhận xóa</h3>
-            <p>Bạn có chắc chắn muốn xóa tài khoản <strong>"{selectedAccount?.fullName || selectedAccount?.email}"</strong>?</p>
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete account <strong>"{selectedAccount?.fullName || selectedAccount?.email}"</strong>?</p>
             <div className="delete-actions">
-              <button className="cancel-delete-btn" onClick={() => setShowDeleteModal(false)}>Hủy bỏ</button>
-              <button className="confirm-delete-btn" onClick={handleDeleteAccount}>🗑️ Xóa</button>
+              <button className="cancel-delete-btn" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button className="confirm-delete-btn" onClick={handleDeleteAccount}>🗑️ Delete</button>
             </div>
           </div>
         </div>
@@ -912,13 +912,13 @@ function AdminDashboard() {
         <div className="modal-overlay" onClick={() => setShowProductModal(false)}>
           <div className="admin-modal product-modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{selectedProduct ? 'Cập nhật sản phẩm' : 'Tạo sản phẩm mới'}</h3>
+              <h3>{selectedProduct ? 'Update Product' : 'Create New Product'}</h3>
               <button className="close-btn" onClick={() => setShowProductModal(false)}><Icons.Close /></button>
             </div>
             <form className="modal-form" onSubmit={handleSaveProduct}>
               {/* Image Upload */}
               <div className="product-image-upload-section">
-                <label className="upload-label">Hình ảnh sản phẩm (có thể chọn nhiều)</label>
+                <label className="upload-label">Product Images (multiple allowed)</label>
                 <div className="product-images-grid">
                   {productForm.previewImages.map((img, index) => (
                     <div key={index} className="product-image-item">
@@ -928,7 +928,7 @@ function AdminDashboard() {
                   ))}
                   <div className="add-image-btn" onClick={() => productFileRef.current?.click()}>
                     <span>+</span>
-                    <span>Thêm ảnh</span>
+                    <span>Add Image</span>
                   </div>
                 </div>
                 <input type="file" ref={productFileRef} onChange={handleProductImageChange} accept="image/*" multiple style={{ display: 'none' }} />
@@ -936,45 +936,45 @@ function AdminDashboard() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Tên sản phẩm *</label>
-                  <input type="text" value={productForm.name} onChange={e => setProductForm(p => ({ ...p, name: e.target.value }))} placeholder="VD: Thức ăn cho chó" required />
+                  <label>Product Name *</label>
+                  <input type="text" value={productForm.name} onChange={e => setProductForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Dog Food" required />
                 </div>
                 <div className="form-group">
-                  <label>Thương hiệu</label>
-                  <input type="text" value={productForm.brand} onChange={e => setProductForm(p => ({ ...p, brand: e.target.value }))} placeholder="VD: Pedigree" />
+                  <label>Brand</label>
+                  <input type="text" value={productForm.brand} onChange={e => setProductForm(p => ({ ...p, brand: e.target.value }))} placeholder="e.g. Pedigree" />
                 </div>
               </div>
 
               <div className="form-group">
-                <label>Mô tả</label>
-                <textarea value={productForm.description} onChange={e => setProductForm(p => ({ ...p, description: e.target.value }))} placeholder="Nhập mô tả sản phẩm" rows={3} />
+                <label>Description</label>
+                <textarea value={productForm.description} onChange={e => setProductForm(p => ({ ...p, description: e.target.value }))} placeholder="Enter product description" rows={3} />
               </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Giá (VND) *</label>
-                  <input type="number" value={productForm.price} onChange={e => setProductForm(p => ({ ...p, price: e.target.value }))} placeholder="VD: 150000" required />
+                  <label>Price (VND) *</label>
+                  <input type="number" value={productForm.price} onChange={e => setProductForm(p => ({ ...p, price: e.target.value }))} placeholder="e.g. 150000" required />
                 </div>
                 <div className="form-group">
-                  <label>Số lượng tồn *</label>
-                  <input type="number" value={productForm.stockQuantity} onChange={e => setProductForm(p => ({ ...p, stockQuantity: e.target.value }))} placeholder="VD: 100" required />
+                  <label>Stock *</label>
+                  <input type="number" value={productForm.stockQuantity} onChange={e => setProductForm(p => ({ ...p, stockQuantity: e.target.value }))} placeholder="e.g. 100" required />
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Danh mục</label>
+                  <label>Category</label>
                   <select value={productForm.category} onChange={e => setProductForm(p => ({ ...p, category: parseInt(e.target.value) }))}>
-                    <option value={1}>Thức ăn</option>
-                    <option value={2}>Đồ chơi</option>
-                    <option value={3}>Vệ sinh</option>
-                    <option value={4}>Y tế</option>
-                    <option value={5}>Phụ kiện</option>
+                    <option value={1}>Food</option>
+                    <option value={2}>Toys</option>
+                    <option value={3}>Grooming</option>
+                    <option value={4}>Health</option>
+                    <option value={5}>Accessories</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Cân nặng (kg)</label>
-                  <input type="number" value={productForm.weight} onChange={e => setProductForm(p => ({ ...p, weight: e.target.value }))} placeholder="VD: 1.5" step="0.1" />
+                  <label>Weight (kg)</label>
+                  <input type="number" value={productForm.weight} onChange={e => setProductForm(p => ({ ...p, weight: e.target.value }))} placeholder="e.g. 1.5" step="0.1" />
                 </div>
               </div>
 
@@ -982,12 +982,12 @@ function AdminDashboard() {
                 <input type="checkbox" name="isActive" id="isActive"
                   checked={productForm.isActive}
                   onChange={e => setProductForm(p => ({ ...p, isActive: e.target.checked }))} />
-                <label htmlFor="isActive">Đang bán (Active)</label>
+                <label htmlFor="isActive">Active</label>
               </div>
 
               <div className="modal-actions">
-                <button type="button" className="cancel-btn" onClick={() => setShowProductModal(false)}>Hủy</button>
-                <button type="submit" className="submit-btn">{selectedProduct ? '💾 Cập nhật' : '✨ Tạo mới'}</button>
+                <button type="button" className="cancel-btn" onClick={() => setShowProductModal(false)}>Cancel</button>
+                <button type="submit" className="submit-btn">{selectedProduct ? '💾 Update' : '✨ Create'}</button>
               </div>
             </form>
           </div>
@@ -999,13 +999,13 @@ function AdminDashboard() {
         <div className="modal-overlay" onClick={() => setShowServiceModal(false)}>
           <div className="admin-modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{selectedService ? 'Cập nhật dịch vụ' : 'Tạo dịch vụ mới'}</h3>
+              <h3>{selectedService ? 'Update Service' : 'Create New Service'}</h3>
               <button className="close-btn" onClick={() => setShowServiceModal(false)}><Icons.Close /></button>
             </div>
             <form className="modal-form" onSubmit={handleSaveService}>
               {/* Image Upload */}
               <div className="product-image-upload-section">
-                <label className="upload-label">Hình ảnh dịch vụ (có thể chọn nhiều)</label>
+                <label className="upload-label">Service Images (multiple allowed)</label>
                 <div className="product-images-grid">
                   {serviceForm.previewImages.map((img, index) => (
                     <div key={index} className="product-image-item">
@@ -1015,30 +1015,30 @@ function AdminDashboard() {
                   ))}
                   <div className="add-image-btn" onClick={() => serviceFileRef.current?.click()}>
                     <span>+</span>
-                    <span>Thêm ảnh</span>
+                    <span>Add Image</span>
                   </div>
                 </div>
                 <input type="file" ref={serviceFileRef} onChange={handleServiceImageChange} accept="image/*" multiple style={{ display: 'none' }} />
               </div>
 
               <div className="form-group">
-                <label>Tên dịch vụ *</label>
-                <input type="text" value={serviceForm.name} onChange={e => setServiceForm(p => ({ ...p, name: e.target.value }))} placeholder="VD: Grooming, Vet Checkup" required />
+                <label>Service Name *</label>
+                <input type="text" value={serviceForm.name} onChange={e => setServiceForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Grooming, Vet Checkup" required />
               </div>
 
               <div className="form-group">
-                <label>Mô tả</label>
-                <textarea value={serviceForm.description} onChange={e => setServiceForm(p => ({ ...p, description: e.target.value }))} placeholder="Nhập mô tả dịch vụ" rows={3} />
+                <label>Description</label>
+                <textarea value={serviceForm.description} onChange={e => setServiceForm(p => ({ ...p, description: e.target.value }))} placeholder="Enter service description" rows={3} />
               </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Thời gian (phút) *</label>
-                  <input type="number" value={serviceForm.duration} onChange={e => setServiceForm(p => ({ ...p, duration: e.target.value }))} placeholder="VD: 60" required />
+                  <label>Duration (minutes) *</label>
+                  <input type="number" value={serviceForm.duration} onChange={e => setServiceForm(p => ({ ...p, duration: e.target.value }))} placeholder="e.g. 60" required />
                 </div>
                 <div className="form-group">
-                  <label>Giá (VND) *</label>
-                  <input type="number" value={serviceForm.price} onChange={e => setServiceForm(p => ({ ...p, price: e.target.value }))} placeholder="VD: 200000" required />
+                  <label>Price (VND) *</label>
+                  <input type="number" value={serviceForm.price} onChange={e => setServiceForm(p => ({ ...p, price: e.target.value }))} placeholder="e.g. 200000" required />
                 </div>
               </div>
 
@@ -1046,12 +1046,12 @@ function AdminDashboard() {
                 <input type="checkbox" name="isActiveService" id="isActiveService"
                   checked={serviceForm.isActive}
                   onChange={e => setServiceForm(p => ({ ...p, isActive: e.target.checked }))} />
-                <label htmlFor="isActiveService">Đang hoạt động (Active)</label>
+                <label htmlFor="isActiveService">Active</label>
               </div>
 
               <div className="modal-actions">
-                <button type="button" className="cancel-btn" onClick={() => setShowServiceModal(false)}>Hủy</button>
-                <button type="submit" className="submit-btn">{selectedService ? '💾 Cập nhật' : '✨ Tạo mới'}</button>
+                <button type="button" className="cancel-btn" onClick={() => setShowServiceModal(false)}>Cancel</button>
+                <button type="submit" className="submit-btn">{selectedService ? '💾 Update' : '✨ Create'}</button>
               </div>
             </form>
           </div>

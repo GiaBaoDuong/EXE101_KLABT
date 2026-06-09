@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useNotification } from '../../context/NotificationContext'
+import SharedNav from '../../components/SharedNav/SharedNav'
 import './Notifications.css'
 
 function IconCalendar() {
@@ -67,12 +68,12 @@ function formatRelative(dateStr) {
   if (!dateStr) return ''
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'Vừa xong'
-  if (mins < 60) return `${mins} phút trước`
+  if (mins < 1) return 'Just now'
+  if (mins < 60) return `${mins}m ago`
   const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs} giờ trước`
+  if (hrs < 24) return `${hrs}h ago`
   const days = Math.floor(hrs / 24)
-  if (days < 30) return `${days} ngày trước`
+  if (days < 30) return `${days}d ago`
   return formatDate(dateStr)
 }
 
@@ -87,6 +88,8 @@ export default function Notifications() {
 
   return (
     <div className="notif-page">
+      <SharedNav cartCount={0} />
+
       <div className="notif-page-container">
         <div className="notif-page-header">
           <div className="notif-page-title-row">
@@ -95,7 +98,7 @@ export default function Notifications() {
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
               </svg>
             </button>
-            <h1>Thông báo</h1>
+            <h1>Notifications</h1>
           </div>
           <div className="notif-page-actions">
             <div className="notif-filter-tabs">
@@ -103,23 +106,23 @@ export default function Notifications() {
                 className={`notif-filter-tab ${filter === 'all' ? 'active' : ''}`}
                 onClick={() => setFilter('all')}
               >
-                Tất cả ({notifications.length})
+                All ({notifications.length})
               </button>
               <button
                 className={`notif-filter-tab ${filter === 'unread' ? 'active' : ''}`}
                 onClick={() => setFilter('unread')}
               >
-                Chưa đọc ({unreadCount})
+                Unread ({unreadCount})
               </button>
             </div>
             {unreadCount > 0 && (
               <button className="notif-page-action-btn" onClick={markAllAsRead}>
-                Đánh dấu đã đọc
+                Mark all read
               </button>
             )}
             {notifications.length > 0 && (
               <button className="notif-page-action-btn danger" onClick={clearNotifications}>
-                Xóa tất cả
+                Clear all
               </button>
             )}
           </div>
@@ -132,12 +135,12 @@ export default function Notifications() {
                 <IconBell />
               </div>
               <p className="notif-page-empty-title">
-                {filter === 'unread' ? 'Không có thông báo chưa đọc' : 'Chưa có thông báo nào'}
+                {filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}
               </p>
               <p className="notif-page-empty-sub">
                 {filter === 'unread'
-                  ? 'Tất cả thông báo đã được đọc'
-                  : 'Thông báo sẽ xuất hiện khi có cập nhật về lịch hẹn của bạn'}
+                  ? 'All notifications have been read'
+                  : 'Notifications will appear when there are updates about your bookings'}
               </p>
             </div>
           ) : (

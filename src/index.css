@@ -1,9 +1,205 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   margin: 0;
-  background: #dcdcdc;
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* ========================================
+   DESIGN TOKENS — K-LABT System
+   ======================================== */
+:root {
+  /* Colors */
+  --color-ink: #111111;
+  --color-charcoal: #555555;
+  --color-mute: #888888;
+  --color-ash: #aaaaaa;
+  --color-hairline: #e0e0e0;
+  --color-hairline-soft: #eeeeee;
+  --color-canvas: #ffffff;
+  --color-soft-cloud: #f4f4f4;
+  --color-purple: #667eea;
+  --color-purple-dark: #764ba2;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-xxl: 32px;
+  --spacing-section: 40px;
+
+  /* Border Radius */
+  --rounded-sm: 4px;
+  --rounded-md: 8px;
+  --rounded-lg: 12px;
+  --rounded-xl: 16px;
+  --rounded-full: 9999px;
+
+  /* Typography */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body-medium: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Bebas Neue', 'Impact', sans-serif;
+}
+
+/* ========================================
+   SHARED SKELETON ANIMATION
+   ======================================== */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ========================================
+   SHARED FOOTER — Products / Services
+   ======================================== */
+.products-footer {
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  padding: 48px 0 0;
+  margin-top: 64px;
+}
+
+.products-footer__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-section);
+}
+
+.products-footer__grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, 1fr);
+  gap: var(--spacing-xxl);
+  padding-bottom: var(--spacing-xxl);
+}
+
+.products-footer__brand {}
+
+.products-footer__logo {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-canvas);
+  text-decoration: none;
+  display: block;
+  margin-bottom: var(--spacing-lg);
+  line-height: 1;
+}
+
+.products-footer__tagline {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.6;
+  max-width: 220px;
+}
+
+.products-footer__col-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: var(--spacing-lg);
+}
+
+.products-footer__links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.products-footer__links li a,
+.products-footer__links li a:visited {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: color 0.15s;
+  font-weight: 400;
+}
+
+.products-footer__links li a:hover {
+  color: var(--color-canvas);
+}
+
+.products-footer__bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--spacing-lg) 0 var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.products-footer__copyright {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.products-footer__legal {
+  display: flex;
+  gap: var(--spacing-xl);
+}
+
+.products-footer__legal a,
+.products-footer__legal a:visited {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.products-footer__legal a:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ========================================
+   RESPONSIVE FOOTER
+   ======================================== */
+@media (max-width: 1023px) {
+  .products-footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xl);
+  }
+}
+
+@media (max-width: 640px) {
+  .products-footer {
+    padding: 32px 0 0;
+  }
+
+  .products-footer__inner {
+    padding: 0 var(--spacing-lg);
+  }
+
+  .products-footer__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+  }
+
+  .products-footer__brand {
+    grid-column: 1 / -1;
+  }
+
+  .products-footer__bottom {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+
+  .products-footer__legal {
+    gap: var(--spacing-lg);
+  }
 }

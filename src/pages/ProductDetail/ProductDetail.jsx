@@ -1,17 +1,45 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import './ProductDetail.css'
-import AppHeader from '../../components/AppHeader/AppHeader'
+import SharedNav from '../../components/SharedNav/SharedNav'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
 const CATEGORIES = [
-  { id: 1, name: 'Thức ăn' },
-  { id: 2, name: 'Đồ chơi' },
-  { id: 3, name: 'Vệ sinh' },
-  { id: 4, name: 'Y tế' },
-  { id: 5, name: 'Phụ kiện' },
+  { id: 1, name: 'Food' },
+  { id: 2, name: 'Toys' },
+  { id: 3, name: 'Grooming' },
+  { id: 4, name: 'Health' },
+  { id: 5, name: 'Accessories' },
 ]
+
+const ChevronRight = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4.5 2.5l3 3.5-3 3.5" />
+  </svg>
+)
+
+const HeartIcon = ({ filled }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+)
+
+const ShareIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+    <polyline points="16 6 12 2 8 6" />
+    <line x1="12" y1="2" x2="12" y2="13" />
+  </svg>
+)
+
+const BagIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 0 1-8 0" />
+  </svg>
+)
 
 function ProductDetail() {
   const { id } = useParams()
@@ -20,9 +48,11 @@ function ProductDetail() {
   const [isLoading, setIsLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [wishlisted, setWishlisted] = useState(false)
 
   useEffect(() => {
     fetchProduct()
+    window.scrollTo(0, 0)
   }, [id])
 
   const fetchProduct = async () => {
@@ -43,9 +73,9 @@ function ProductDetail() {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0)
   }
 
-  const getCategoryName = (id) => {
-    const cat = CATEGORIES.find(c => c.id === id)
-    return cat?.name || 'Khác'
+  const getCategoryName = (catId) => {
+    const cat = CATEGORIES.find(c => c.id === catId)
+    return cat?.name || 'Other'
   }
 
   const getAllImages = () => {
@@ -56,34 +86,32 @@ function ProductDetail() {
         images.push(...product.images)
       }
     }
-    return images.length > 0 ? images : [product?.thumbnailUrl]
+    return images.length > 0 ? images : [null]
   }
 
   const handleAddToCart = () => {
-    alert(`Đã thêm ${quantity} sản phẩm "${product.name}" vào giỏ hàng!`)
+    alert(`Added ${quantity} × "${product.name}" to your bag.`)
   }
 
-  const handleBack = () => {
-    navigate('/products')
+  const handleBuyNow = () => {
+    navigate('/purchases')
   }
 
   if (isLoading) {
     return (
-      <main className="product-detail-page">
-        <AppHeader
-          leftText="About"
-          nav={[
-            { label: 'Pet Profile', to: '/pet-profile' },
-            { label: 'Product', to: '/products' },
-            { label: 'Service', to: '/services' },
-            { label: 'Grooming Booking', to: '/grooming' },
-            { label: 'Purchases', to: '/purchases' },
-          ]}
-          cartCount={0}
-        />
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Đang tải sản phẩm...</p>
+      <main className="pdp-page">
+        <SharedNav cartCount={0} />
+        <div className="pdp-loading">
+          <div className="pdp-skeleton__image" />
+          <div className="pdp-skeleton__info">
+            <div className="skeleton-line" style={{ height: 12, width: '30%' }} />
+            <div className="skeleton-line" style={{ height: 36, width: '90%' }} />
+            <div className="skeleton-line" style={{ height: 14, width: '40%' }} />
+            <div className="skeleton-line" style={{ height: 32, width: '50%' }} />
+            <div className="skeleton-line" style={{ height: 80, width: '100%' }} />
+            <div className="skeleton-line" style={{ height: 52, width: '100%', borderRadius: 9999 }} />
+            <div className="skeleton-line" style={{ height: 52, width: '100%', borderRadius: 9999 }} />
+          </div>
         </div>
       </main>
     )
@@ -91,68 +119,70 @@ function ProductDetail() {
 
   if (!product) {
     return (
-      <main className="product-detail-page">
-        <AppHeader
-          leftText="About"
-          nav={[
-            { label: 'Pet Profile', to: '/pet-profile' },
-            { label: 'Product', to: '/products' },
-            { label: 'Service', to: '/services' },
-            { label: 'Grooming Booking', to: '/grooming' },
-            { label: 'Purchases', to: '/purchases' },
-          ]}
-          cartCount={0}
-        />
-        <div className="empty-container">
-          <span className="empty-icon">📦</span>
-          <h3>Không tìm thấy sản phẩm</h3>
-          <button onClick={handleBack} className="back-btn">Quay lại</button>
+      <main className="pdp-page">
+        <SharedNav cartCount={0} />
+        <div className="pdp-empty">
+          <p className="pdp-empty__code">404</p>
+          <h2 className="pdp-empty__title">Product Not Found</h2>
+          <p className="pdp-empty__sub">This product may have been removed or the link is incorrect.</p>
+          <Link
+            to="/products"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'var(--color-ink)', color: 'var(--color-canvas)',
+              border: 'none', borderRadius: 'var(--rounded-full)',
+              padding: '14px 28px', fontFamily: 'var(--font-body-medium)',
+              fontSize: 14, fontWeight: 500, textDecoration: 'none',
+            }}
+          >
+            Shop All Products
+          </Link>
         </div>
       </main>
     )
   }
 
   const images = getAllImages()
+  const inStock = (product.stockQuantity || 0) > 0
 
   return (
-    <main className="product-detail-page">
-      <AppHeader
-        leftText="About"
-        nav={[
-          { label: 'Pet Profile', to: '/pet-profile' },
-          { label: 'Product', to: '/products' },
-          { label: 'Service', to: '/services' },
-          { label: 'Grooming Booking', to: '/grooming' },
-          { label: 'Purchases', to: '/purchases' },
-        ]}
-        cartCount={0}
-      />
+    <main className="pdp-page">
+      <SharedNav cartCount={0} />
 
       {/* Breadcrumb */}
-      <div className="breadcrumb">
-        <Link to="/home">Trang chủ</Link>
-        <span>/</span>
-        <Link to="/products">Sản phẩm</Link>
-        <span>/</span>
-        <span>{product.name}</span>
+      <div className="pdp-breadcrumb">
+        <Link to="/home" className="pdp-breadcrumb__item">Home</Link>
+        <span className="pdp-breadcrumb__separator">/</span>
+        <Link to="/products" className="pdp-breadcrumb__item">Products</Link>
+        <span className="pdp-breadcrumb__separator">/</span>
+        <span className="pdp-breadcrumb__item pdp-breadcrumb__item--current">
+          {product.name}
+        </span>
       </div>
 
-      {/* Product Detail */}
-      <div className="product-detail-container">
-        {/* Image Gallery */}
-        <div className="product-images">
-          <div className="main-image">
-            <img src={images[selectedImage]} alt={product.name} />
+      {/* PDP Layout */}
+      <div className="pdp-layout">
+        {/* Gallery */}
+        <div className="pdp-gallery">
+          <div className="pdp-gallery__main">
+            {images[selectedImage] ? (
+              <img src={images[selectedImage]} alt={product.name} />
+            ) : (
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-soft-cloud)', fontSize: 48 }}>
+                🐾
+              </div>
+            )}
           </div>
           {images.length > 1 && (
-            <div className="thumbnail-list">
-              {images.map((img, index) => (
+            <div className="pdp-gallery__thumbs">
+              {images.map((img, idx) => (
                 <button
-                  key={index}
-                  className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
-                  onClick={() => setSelectedImage(index)}
+                  key={idx}
+                  className={`pdp-gallery__thumb ${selectedImage === idx ? 'is-active' : ''}`}
+                  onClick={() => setSelectedImage(idx)}
+                  aria-label={`View image ${idx + 1}`}
                 >
-                  <img src={img} alt={`Thumbnail ${index + 1}`} />
+                  {img && <img src={img} alt={`Thumbnail ${idx + 1}`} />}
                 </button>
               ))}
             </div>
@@ -160,71 +190,172 @@ function ProductDetail() {
         </div>
 
         {/* Product Info */}
-        <div className="product-info">
-          <span className="product-category">{getCategoryName(product.category)}</span>
-          <h1 className="product-name">{product.name}</h1>
-          {product.brand && <span className="product-brand">by {product.brand}</span>}
-          
-          <div className="product-price-detail">{formatPrice(product.price)}</div>
-          
-          <p className="product-description">{product.description}</p>
+        <div className="pdp-info">
+          <p className="pdp-info__eyebrow">{getCategoryName(product.category)}</p>
 
-          <div className="product-meta">
-            {product.stockQuantity > 0 ? (
-              <span className="stock in-stock">✓ Còn hàng ({product.stockQuantity})</span>
-            ) : (
-              <span className="stock out-of-stock">✕ Hết hàng</span>
-            )}
+          <h1 className="pdp-info__name">{product.name}</h1>
+
+          {product.brand && (
+            <p className="pdp-info__brand">{product.brand}</p>
+          )}
+
+          <div className="pdp-info__price-row">
+            <span className="pdp-info__price">{formatPrice(product.price)}</span>
+            <span className="pdp-info__price-label">VND</span>
           </div>
 
-          <div className="quantity-selector">
-            <label>Số lượng:</label>
-            <div className="quantity-controls">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
-              <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} min="1" />
-              <button onClick={() => setQuantity(quantity + 1)}>+</button>
+          <div className="pdp-disclosure-group">
+            <div className="pdp-disclosure-row">
+              <span className="pdp-disclosure-row__label">Availability</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="pdp-stock">
+                  <div className={`pdp-stock__dot ${inStock ? 'pdp-stock__dot--in' : 'pdp-stock__dot--out'}`} />
+                  <span className={`pdp-stock__text ${inStock ? 'pdp-stock__text--in' : 'pdp-stock__text--out'}`}>
+                    {inStock ? `In Stock (${product.stockQuantity})` : 'Out of Stock'}
+                  </span>
+                </div>
+                <span className="pdp-disclosure-row__chevron"><ChevronRight /></span>
+              </div>
+            </div>
+
+            <div className="pdp-disclosure-row">
+              <span className="pdp-disclosure-row__label">Shipping</span>
+              <span className="pdp-disclosure-row__value">Free over 500K VND</span>
+              <span className="pdp-disclosure-row__chevron"><ChevronRight /></span>
+            </div>
+
+            <div className="pdp-disclosure-row">
+              <span className="pdp-disclosure-row__label">Returns</span>
+              <span className="pdp-disclosure-row__value">30-day free returns</span>
+              <span className="pdp-disclosure-row__chevron"><ChevronRight /></span>
             </div>
           </div>
 
-          <div className="action-buttons">
-            <button className="add-to-cart-btn" onClick={handleAddToCart}>
-              🛒 Thêm vào giỏ hàng
+          <div className="pdp-quantity">
+            <span className="pdp-quantity__label">Quantity</span>
+            <div className="pdp-quantity__controls">
+              <button
+                className="pdp-quantity__btn"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                aria-label="Decrease quantity"
+              >
+                <svg width="12" height="2" viewBox="0 0 12 2" fill="currentColor">
+                  <rect width="12" height="2" />
+                </svg>
+              </button>
+              <input
+                type="number"
+                className="pdp-quantity__input"
+                value={quantity}
+                onChange={e => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                min="1"
+                aria-label="Quantity"
+              />
+              <button
+                className="pdp-quantity__btn"
+                onClick={() => setQuantity(quantity + 1)}
+                aria-label="Increase quantity"
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M6 1v10M1 6h10" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="pdp-ctas">
+            <button
+              className="pdp-cta-primary"
+              onClick={handleAddToCart}
+              disabled={!inStock}
+            >
+              <BagIcon />
+              Add to Bag
             </button>
-            <button className="buy-now-btn" onClick={handleAddToCart}>
-              Mua ngay
+            <button
+              className="pdp-cta-secondary"
+              onClick={handleBuyNow}
+              disabled={!inStock}
+            >
+              Buy Now
             </button>
           </div>
+
+          <div className="pdp-info__actions-row">
+            <button
+              className="pdp-action-link"
+              onClick={() => setWishlisted(w => !w)}
+              aria-label="Add to wishlist"
+            >
+              <HeartIcon filled={wishlisted} />
+              {wishlisted ? 'Wishlisted' : 'Wishlist'}
+            </button>
+            <button className="pdp-action-link" aria-label="Share">
+              <ShareIcon />
+              Share
+            </button>
+          </div>
+
+          {product.description && (
+            <div className="pdp-description">
+              <h3 className="pdp-description__title">About This Product</h3>
+              <p className="pdp-description__body">{product.description}</p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="footer">
-        <Link to="/home" className="logo-block">K-LABT</Link>
-        <div className="footer-links">
-          <div>
-            <h4>Shop</h4>
-            <Link to="/products">Sản phẩm</Link>
-            <Link to="/services">Dịch vụ</Link>
-            <Link to="/grooming">Grooming</Link>
+      <footer className="products-footer">
+        <div className="products-footer__inner">
+          <div className="products-footer__grid">
+            <div className="products-footer__brand">
+              <Link to="/home" className="products-footer__logo">K-LABT</Link>
+              <p className="products-footer__tagline">
+                Premium care products for your beloved pets. Quality you can trust.
+              </p>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Shop</h4>
+              <ul className="products-footer__links">
+                <li><Link to="/products">All Products</Link></li>
+                <li><Link to="/products?cat=1">Food</Link></li>
+                <li><Link to="/products?cat=2">Toys</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Services</h4>
+              <ul className="products-footer__links">
+                <li><Link to="/services">All Services</Link></li>
+                <li><Link to="/grooming">Grooming</Link></li>
+                <li><Link to="/doctor">Pet Doctor</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Pet Care</h4>
+              <ul className="products-footer__links">
+                <li><Link to="/pet-profile">Pet Profile</Link></li>
+                <li><Link to="/purchases">Purchases</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="products-footer__col-title">Help</h4>
+              <ul className="products-footer__links">
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Shipping</a></li>
+                <li><a href="#">Returns</a></li>
+              </ul>
+            </div>
           </div>
-          <div>
-            <h4>Pet Care</h4>
-            <Link to="/pet-profile">Pet Profile</Link>
-            <Link to="/health-record">Health Record</Link>
+          <div className="products-footer__bottom">
+            <p className="products-footer__copyright">© 2026 K-LABT. All rights reserved.</p>
+            <div className="products-footer__legal">
+              <a href="#">Privacy</a>
+              <a href="#">Terms</a>
+              <a href="#">Cookies</a>
+            </div>
           </div>
-          <div>
-            <h4>Help</h4>
-            <a href="#">Contact</a>
-            <a href="#">FAQ</a>
-          </div>
-          <div>
-            <h4>Follow Us</h4>
-            <a href="#">Facebook</a>
-            <a href="#">Instagram</a>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>© 2026 K-LABT. Made with ❤️ for your pets</p>
         </div>
       </footer>
     </main>

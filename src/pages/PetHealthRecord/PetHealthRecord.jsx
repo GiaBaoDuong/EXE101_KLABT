@@ -1,22 +1,14 @@
-import topImage from '../../assets/petHomepage1.jpg'
-import bottomImage from '../../assets/petHomepage6.jpg'
 import { Link } from 'react-router-dom'
-import AppHeader from '../../components/AppHeader/AppHeader'
+import SharedNav from '../../components/SharedNav/SharedNav'
 import './PetHealthRecord.css'
+
+const topImage = 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&q=80'
+const bottomImage = 'https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?w=400&q=80'
 
 function PetHealthRecord() {
   return (
     <main className="health-record-page">
-      <AppHeader
-        leftText="About"
-        nav={[
-          { label: 'Pet Profile', to: '/pet-profile' },
-          { label: 'Pet Health Record', to: '/health-record' },
-          { label: 'Grooming Booking', to: '/grooming' },
-        ]}
-        promoText="20% discount on healthcare and medical services is about to expire!"
-        cartCount={0}
-      />
+      <SharedNav cartCount={0} />
 
       <section className="hero-dashboard">
         <h2>Welcome back, Sarah</h2>
@@ -153,15 +145,9 @@ function PetHealthRecord() {
 
       {/* Bottom Navigation */}
       <div className="bottom-nav">
-        <Link to="/pet-profile" className="nav-tab">
-          Pet Profile
-        </Link>
-        <Link to="/health-record" className="nav-tab active">
-          Pet Health Record
-        </Link>
-        <Link to="/grooming" className="nav-tab">
-          Grooming Booking
-        </Link>
+        <Link to="/pet-profile" className="nav-tab">Pet Profile</Link>
+        <Link to="/health-record" className="nav-tab active">Pet Health Record</Link>
+        <Link to="/grooming" className="nav-tab">Grooming Booking</Link>
       </div>
     </main>
   )

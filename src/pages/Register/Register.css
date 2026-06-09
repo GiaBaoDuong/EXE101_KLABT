@@ -1,350 +1,355 @@
+/* === Register Page — Nike Design System === */
+
+/* --- Reset & Base --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .register-container {
   display: flex;
-  min-height: 100vh;
-  background: #fff;
+  height: 100vh;
+  width: 100vw;
   overflow: hidden;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #ffffff;
 }
 
-/* Left side - Hero */
+/* --- Left: Editorial Image Panel --- */
 .register-image-section {
   flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
   overflow: hidden;
-  padding: 60px;
+  background: #111111;
 }
 
-/* Paw decorations */
-.register-decoration {
+.register-image-section::after {
+  content: '';
   position: absolute;
   inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
   pointer-events: none;
 }
 
-.paw-bg {
+.register-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.register-image-overlay {
   position: absolute;
-  font-size: 120px;
-  opacity: 0.08;
-  color: white;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 48px 40px;
 }
 
-.paw-1 {
-  top: 5%;
-  left: 10%;
-  transform: rotate(-20deg);
+.register-title-overlay {
+  font-family: 'Anton', 'Impact', sans-serif;
+  font-size: clamp(36px, 4.5vw, 64px);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 14px;
+  -webkit-font-smoothing: antialiased;
 }
 
-.paw-2 {
-  top: 30%;
-  right: 5%;
-  transform: rotate(30deg);
+.register-subtitle-overlay {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0;
+  line-height: 1.5;
+  max-width: 340px;
 }
 
-.paw-3 {
-  bottom: 20%;
-  left: 5%;
-  transform: rotate(15deg);
-}
-
-.paw-4 {
-  bottom: 5%;
-  right: 15%;
-  transform: rotate(-25deg);
-}
-
-.register-hero-content {
-  text-align: center;
-  color: white;
-  max-width: 420px;
-  z-index: 1;
-}
-
-.hero-icon {
-  font-size: 80px;
-  margin-bottom: 25px;
-  animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
-}
-
-.register-hero-content h1 {
-  font-size: 42px;
-  font-weight: 700;
-  margin: 0 0 20px;
-  line-height: 1.2;
-}
-
-.register-hero-content p {
-  font-size: 16px;
-  line-height: 1.7;
-  opacity: 0.9;
-  margin: 0 0 35px;
-}
-
-.feature-list {
+/* --- Right: Form Panel --- */
+.register-form-section {
+  flex: 0 0 560px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  align-items: flex-start;
-  text-align: left;
-  margin-left: 40px;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.feature-icon {
-  font-size: 28px;
-}
-
-/* Right side - Form */
-.register-form-section {
-  flex: 1.2;
-  display: flex;
   align-items: center;
   justify-content: center;
-  background: #fafbfc;
-  padding: 40px;
+  background: #ffffff;
+  padding: 48px 64px;
+  position: relative;
+  overflow-y: auto;
 }
 
 .register-form-content {
   width: 100%;
-  max-width: 480px;
+  max-width: 420px;
 }
 
-.form-header {
-  text-align: center;
-  margin-bottom: 35px;
+.register-form-header {
+  margin-bottom: 36px;
 }
 
-.logo-badge {
-  width: 70px;
-  height: 70px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  font-size: 36px;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+.register-form-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #707072;
+  margin-bottom: 10px;
 }
 
-.form-header h2 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 8px;
+.register-form-title {
+  font-family: 'Anton', 'Impact', sans-serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #111111;
+  -webkit-font-smoothing: antialiased;
 }
 
-.form-header p {
-  font-size: 14px;
-  color: #666;
-  margin: 0;
+.register-form-subtitle {
+  font-size: 13px;
+  color: #707072;
+  margin-top: 12px;
+  line-height: 1.5;
 }
 
-/* Form */
+/* --- Form Elements --- */
 .register-form {
-  background: white;
-  padding: 35px;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f0f0f0;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  width: 100%;
 }
 
 .register-form-group {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
-.register-form-group label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.register-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.register-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: #111111;
   margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #444;
-}
-
-.label-icon {
-  font-size: 16px;
 }
 
 .register-input {
   width: 100%;
-  padding: 14px 16px;
-  border: 2px solid #e8e8e8;
-  border-radius: 12px;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  font-family: inherit;
-  box-sizing: border-box;
-  background: #fafafa;
-}
-
-.register-input:focus {
+  height: 48px;
+  padding: 0 16px;
+  border: 1.5px solid #cacacb;
+  border-radius: 24px;
+  background: #f5f5f5;
+  font-size: 15px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #111111;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   outline: none;
-  border-color: #667eea;
-  background: white;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .register-input::placeholder {
-  color: #aaa;
+  color: #9e9ea0;
+}
+
+.register-input:focus {
+  border-color: #111111;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.06);
 }
 
 .register-input:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
+  color: #9e9ea0;
 }
 
-/* Error */
+/* --- Error Message --- */
 .register-error {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
+  gap: 8px;
+  padding: 12px 16px;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
-  border: 1px solid #ffcaca;
-  border-radius: 12px;
-  color: #d32f2f;
-  font-size: 14px;
+  background: #f5f5f5;
+  border-left: 3px solid #d30005;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
   font-weight: 500;
+  color: #d30005;
 }
 
-.error-icon {
-  font-size: 18px;
+.register-error::before {
+  content: '!';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #d30005;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
-/* Terms */
-.terms-checkbox {
+/* --- Terms Checkbox --- */
+.register-terms {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin-bottom: 25px;
-  font-size: 13px;
-  color: #666;
+  margin-bottom: 20px;
+  padding: 0 4px;
 }
 
-.terms-checkbox input[type="checkbox"] {
+.register-terms input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  margin-top: 2px;
-  accent-color: #667eea;
+  margin-top: 1px;
+  accent-color: #111111;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.register-terms-label {
+  font-size: 12px;
+  color: #39393b;
+  line-height: 1.5;
   cursor: pointer;
 }
 
-.terms-checkbox label {
-  cursor: pointer;
-}
-
-.terms-checkbox a {
-  color: #667eea;
+.register-terms-label a {
+  color: #111111;
   text-decoration: none;
   font-weight: 500;
 }
 
-.terms-checkbox a:hover {
+.register-terms-label a:hover {
   text-decoration: underline;
 }
 
-/* Button */
+/* --- Primary Button (Nike Pill) --- */
 .register-button {
   width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  height: 48px;
+  padding: 0 32px;
+  background: #111111;
+  color: #ffffff;
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 9999px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  -webkit-font-smoothing: antialiased;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+  gap: 8px;
 }
 
 .register-button:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 35px rgba(102, 126, 234, 0.5);
+  transform: scale(0.98);
+  box-shadow: 0 4px 16px rgba(17, 17, 17, 0.2);
 }
 
 .register-button:active:not(:disabled) {
-  transform: translateY(0);
+  transform: scale(0.95);
+  opacity: 0.9;
 }
 
 .register-button:disabled {
-  opacity: 0.7;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
-.btn-icon {
-  font-size: 20px;
-}
-
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+/* --- Loading Spinner --- */
+.register-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: register-spin 0.7s linear infinite;
+  flex-shrink: 0;
 }
 
-@keyframes spin {
+@keyframes register-spin {
   to { transform: rotate(360deg); }
 }
 
-/* Footer */
+/* --- Footer Links --- */
 .register-footer {
-  margin-top: 25px;
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid #e5e5e5;
   text-align: center;
-  font-size: 14px;
-  color: #666;
+}
+
+.register-footer-text {
+  font-size: 13px;
+  color: #707072;
+  line-height: 1.5;
 }
 
 .register-link {
-  color: #667eea;
+  color: #111111;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
+  position: relative;
+}
+
+.register-link::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #111111;
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+  transform-origin: left;
+}
+
+.register-link:hover::after {
+  transform: scaleX(1);
 }
 
 .register-link:hover {
-  text-decoration: underline;
+  color: #111111;
 }
 
-/* Success Modal */
+/* --- Success Modal --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.25s ease;
 }
 
 @keyframes fadeIn {
@@ -353,116 +358,92 @@
 }
 
 .success-modal {
-  background: white;
-  padding: 50px;
+  background: #ffffff;
+  padding: 48px 40px;
   border-radius: 24px;
   text-align: center;
-  max-width: 400px;
+  max-width: 380px;
   width: 90%;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.4s ease;
+  animation: slideUp 0.3s ease;
 }
 
 @keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
+  from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
-.success-icon {
-  font-size: 70px;
-  margin-bottom: 20px;
-  animation: celebrate 0.6s ease;
+.success-modal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
 }
 
-@keyframes celebrate {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+.success-modal-icon svg {
+  color: #007d48;
 }
 
 .success-modal h3 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 10px;
+  font-family: 'Anton', 'Impact', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  color: #111111;
+  margin-bottom: 10px;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
 }
 
 .success-modal p {
-  font-size: 15px;
-  color: #666;
-  margin: 0 0 25px;
+  font-size: 13px;
+  color: #707072;
+  line-height: 1.5;
+  margin-bottom: 28px;
 }
 
-.redirect-loader {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.loader-dot {
-  width: 10px;
-  height: 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
-  animation: dotPulse 1.4s ease-in-out infinite;
-}
-
-.loader-dot:nth-child(2) { animation-delay: 0.2s; }
-.loader-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes dotPulse {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
-  40% { transform: scale(1); opacity: 1; }
-}
-
-/* Responsive */
+/* --- Responsive --- */
 @media (max-width: 900px) {
   .register-container {
     flex-direction: column;
+    height: auto;
+    min-height: 100vh;
   }
 
   .register-image-section {
-    flex: 0 0 auto;
-    padding: 40px 30px;
-    min-height: auto;
-  }
-
-  .register-hero-content h1 {
-    font-size: 32px;
-  }
-
-  .hero-icon {
-    font-size: 60px;
-  }
-
-  .feature-list {
-    margin-left: 0;
-    align-items: center;
+    flex: 0 0 45vh;
   }
 
   .register-form-section {
-    padding: 30px 20px;
+    flex: 1;
+    padding: 40px 32px;
+    justify-content: flex-start;
   }
 }
 
 @media (max-width: 600px) {
-  .form-row {
+  .register-form-row {
     grid-template-columns: 1fr;
+    gap: 0;
   }
 
-  .register-form {
-    padding: 25px;
+  .register-form-section {
+    padding: 32px 24px;
   }
 
-  .register-hero-content h1 {
-    font-size: 26px;
+  .register-form-title {
+    font-size: 36px;
   }
 
-  .register-hero-content p {
-    font-size: 14px;
+  .register-image-section {
+    flex: 0 0 35vh;
   }
 
-  .form-header h2 {
-    font-size: 24px;
+  .register-image-overlay {
+    padding: 32px 24px;
   }
 }
