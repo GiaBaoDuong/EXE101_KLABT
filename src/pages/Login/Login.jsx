@@ -64,7 +64,7 @@ function Login() {
       {/* Left: Editorial Hero */}
       <div className="login-image-section">
         <img
-          src="src/assets/login2.jpg"
+          src="../../src/assets/login2.jpg"
           alt="Happy pets and pet care"
           className="login-image"
         />

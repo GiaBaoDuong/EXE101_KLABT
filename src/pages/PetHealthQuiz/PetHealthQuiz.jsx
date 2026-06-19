@@ -9,7 +9,8 @@ import {
 import SharedNav from '../../components/SharedNav/SharedNav'
 import './PetHealthQuiz.css'
 
-const HERO_IMAGE = '../../src/assets/pethealthcheck.jpg'
+import pethealthcheck from '../../src/assets/pethealthcheck.jpg'
+const HERO_IMAGE = pethealthcheck
 
 /* Scroll Reveal Hook */
 function useScrollReveal(options = {}) {

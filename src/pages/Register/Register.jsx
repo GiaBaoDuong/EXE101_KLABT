@@ -84,7 +84,7 @@ function Register() {
       {/* Left: Editorial Hero */}
       <div className="register-image-section">
         <img
-          src="src/assets/register1.jpg"
+          src="../../src/assets/register1.jpg"
           alt="Happy pets and pet care"
           className="register-image"
         />
