@@ -4,8 +4,8 @@ import SharedNav from '../../components/SharedNav/SharedNav'
 import { useAuth } from '../../context/AuthContext'
 import { useNotification } from '../../context/NotificationContext'
 import { useState, useEffect, useRef, useCallback } from 'react';
-import petandpamper3 from '../../src/assets/petandpamper3.jpg'
-import pawandpamper from '../../src/assets/pawandpamper.png'
+import petandpamper3 from '../../assets/petandpamper3.jpg'
+import pawandpamper from '../../assets/pawandpamper.png'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 const HERO_IMAGE = petandpamper3

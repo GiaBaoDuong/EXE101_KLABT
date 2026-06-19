@@ -8,7 +8,7 @@ import {
 } from './quizData'
 import SharedNav from '../../components/SharedNav/SharedNav'
 import './PetHealthQuiz.css'
-import pethealthcheck from '../../src/assets/pethealthcheck.jpg'
+import pethealthcheck from '../../assets/pethealthcheck.jpg'
 const HERO_IMAGE = pethealthcheck
 
 /* Scroll Reveal Hook */
