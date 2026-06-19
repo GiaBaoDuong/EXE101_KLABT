@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import './Login.css'
+import login2 from '../../src/assets/login2.jpg'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
@@ -64,7 +65,7 @@ function Login() {
       {/* Left: Editorial Hero */}
       <div className="login-image-section">
         <img
-          src="../../src/assets/login2.jpg"
+          src={login2}
           alt="Happy pets and pet care"
           className="login-image"
         />

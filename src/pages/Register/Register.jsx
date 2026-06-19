@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './Register.css'
+import register1 from '../../src/assets/register1.jpg'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
@@ -84,7 +85,7 @@ function Register() {
       {/* Left: Editorial Hero */}
       <div className="register-image-section">
         <img
-          src="../../src/assets/register1.jpg"
+          src={register1}
           alt="Happy pets and pet care"
           className="register-image"
         />
