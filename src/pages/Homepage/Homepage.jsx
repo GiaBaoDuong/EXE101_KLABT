@@ -188,25 +188,25 @@ function Homepage() {
           </Link>
         </div>
         <div className="home-categories__grid reveal" ref={catGridRef}>
-          <Link to="/products?cat=walk" className="home-cat-card">
-            <img src={petHeroImage2} alt="Walk" className="home-cat-card__image" />
+          <Link to="/products?cat=1" className="home-cat-card">
+            <img src={petHeroImage2} alt="Food" className="home-cat-card__image" />
             <div className="home-cat-card__overlay" />
-            <span className="home-cat-card__label">Walk</span>
+            <span className="home-cat-card__label">Food</span>
           </Link>
-          <Link to="/products?cat=carry" className="home-cat-card">
-            <img src={petHeroImage3} alt="Carry" className="home-cat-card__image" />
+          <Link to="/products?cat=2" className="home-cat-card">
+            <img src={petHeroImage3} alt="Toys" className="home-cat-card__image" />
             <div className="home-cat-card__overlay" />
-            <span className="home-cat-card__label">Carry</span>
+            <span className="home-cat-card__label">Toys</span>
           </Link>
-          <Link to="/products?cat=play" className="home-cat-card">
-            <img src={petHeroImage4} alt="Play" className="home-cat-card__image" />
+          <Link to="/products?cat=3" className="home-cat-card">
+            <img src={petHeroImage4} alt="Grooming" className="home-cat-card__image" />
             <div className="home-cat-card__overlay" />
-            <span className="home-cat-card__label">Play</span>
+            <span className="home-cat-card__label">Grooming</span>
           </Link>
-          <Link to="/products?cat=live" className="home-cat-card">
-            <img src={petHeroImage5} alt="Live" className="home-cat-card__image" />
+          <Link to="/products?cat=4" className="home-cat-card">
+            <img src={petHeroImage5} alt="Health" className="home-cat-card__image" />
             <div className="home-cat-card__overlay" />
-            <span className="home-cat-card__label">Live</span>
+            <span className="home-cat-card__label">Health</span>
           </Link>
         </div>
       </section>

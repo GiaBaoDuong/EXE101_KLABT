@@ -64,11 +64,9 @@ function IconUser(props) {
 
 function IconBell(props) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
-      <path
-        d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9m-4.27 15a2.5 2.5 0 0 1-4.46 0H4.27Z"
-        fill="currentColor"
-      />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
     </svg>
   )
 }
@@ -278,11 +276,11 @@ export default function AppHeader({
                       </div>
                     ))
                   )}
-                  <div className="notif-footer">
-                    <button className="notif-view-all" onClick={() => { setShowNotifPanel(false); navigate('/notifications') }}>
-                      View all notifications
-                    </button>
-                  </div>
+                </div>
+                <div className="notif-footer">
+                  <button className="notif-view-all" onClick={() => { setShowNotifPanel(false); navigate('/notifications') }}>
+                    View all notifications
+                  </button>
                 </div>
               </div>
             )}

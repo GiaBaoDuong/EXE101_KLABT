@@ -7,8 +7,59 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
-const petHeroImage = 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1200&q=80'
-const petHeroImage2 = 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=800&q=80'
+const HERO_IMAGE = '../../src/assets/petandpamper3.jpg'
+const HERO_IMAGE2 = '../../src/assets/pawandpamper.png'
+
+/* Scroll Reveal Hook */
+function useScrollReveal(options = {}) {
+  const ref = useRef(null)
+  const isVisibleRef = useRef(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const animateCards = () => {
+      const cards = el.querySelectorAll('.pp-card:not(.is-visible), .testimonial-card:not(.is-visible)')
+      cards.forEach(card => card.classList.add('is-visible'))
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('is-visible')
+          isVisibleRef.current = true
+          animateCards()
+        }
+      },
+      { threshold: 0.1, ...options }
+    )
+
+    const mutationObserver = new MutationObserver(mutations => {
+      const hasNewCards = mutations.some(m =>
+        Array.from(m.addedNodes).some(n =>
+          n.nodeType === 1 && (n.matches('.pp-card') || n.matches('.testimonial-card'))
+        )
+      )
+      if (hasNewCards) {
+        if (isVisibleRef.current) {
+          setTimeout(animateCards, 80)
+        }
+      }
+    })
+
+    observer.observe(el)
+    mutationObserver.observe(el, { childList: true, subtree: true })
+
+    return () => {
+      observer.disconnect()
+      mutationObserver.disconnect()
+    }
+  }, [])
+
+  return ref
+}
+
 
 /* SVG Icons */
 const IconBathtub = () => (
@@ -84,6 +135,13 @@ function PetGrooming() {
     JSON.parse(localStorage.getItem('notified_bookings') || '[]')
   ))
 
+  // Scroll reveal refs
+  const featureIconsRef = useScrollReveal()
+  const servicesSectionRef = useScrollReveal()
+  const groomingTabsRef = useScrollReveal()
+  const bookingSectionRef = useScrollReveal()
+  const testimonialsRef = useScrollReveal()
+
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
   const [formData, setFormData] = useState({
@@ -104,8 +162,7 @@ function PetGrooming() {
     fetchServices()
     fetchBookings()
 
-    // Prevent browser's auto-scroll-on-focus animation — use scrollIntoViewIfNeeded(false)
-    // so it only scrolls if the field is truly out of view, without animation jump
+ 
     const bookingSection = document.querySelector('.booking-form-wrap')
     if (bookingSection) {
       bookingSection.addEventListener('focusin', (e) => {
@@ -194,7 +251,7 @@ function PetGrooming() {
     }
   }
 
-  const fetchBookingDetail = async (bookingId) => {
+  const fetchBookingDetail = async (bookingId) => { 
     setIsDetailModalOpen(true)
     setIsLoadingDetail(true)
     setSelectedBookingDetail(null)
@@ -307,26 +364,28 @@ function PetGrooming() {
     <main className="pet-grooming">
       <SharedNav cartCount={0} />
 
-      {/* Hero Banner Section */}
-      <section className="grooming-hero">
-        <div className="hero-image-wrapper">
-          <img src={petHeroImage} alt="Happy groomed dog" className="hero-dog-image" />
-        </div>
-        <div className="hero-overlay" />
-        <div className="hero-content">
-          <p className="hero-subtitle">Premium grooming service</p>
-          <h1 className="hero-title">Paw & Pamper</h1>
-          <button
-            className="hero-btn"
-            onClick={() => document.getElementById('booking').scrollIntoView({ behavior: 'smooth' })}
-          >
-            Book Now
-          </button>
+      {/* Campaign Hero */}
+      <section className="services-hero">
+        <img
+          src={HERO_IMAGE}
+          alt="Pet care service"
+          className="services-hero__bg"
+        />
+        <div className="services-hero__overlay" />
+        <div className="services-hero__content">
+          <p className="services-hero__eyebrow">Premium grooming service</p>
+          <h1 className="services-hero__title">Paw & Pamper</h1>
+          <p className="services-hero__sub">
+            Expert grooming for your beloved pet. Book online in seconds.
+          </p>
+          <Link to="/grooming" className="services-hero__cta">
+            Book a Service
+          </Link>
         </div>
       </section>
 
       {/* Feature Icons Section */}
-      <section className="feature-icons">
+      <section className="feature-icons" ref={featureIconsRef}>
         <div className="feature-icon-item">
           <div className="feature-circle"><IconBathtub /></div>
           <p>Premium Care</p>
@@ -342,7 +401,7 @@ function PetGrooming() {
       </section>
 
       {/* Services Section */}
-      <section className="services-section">
+      <section className="services-section" ref={servicesSectionRef}>
         <div className="section-header">
           <h2>Professional Services</h2>
         </div>
@@ -389,7 +448,7 @@ function PetGrooming() {
       </section>
 
       {/* Tab Switcher */}
-      <div className="grooming-tabs">
+      <div className="grooming-tabs" ref={groomingTabsRef}>
         <button
           className={`grooming-tab ${activeSection === 'book' ? 'active' : ''}`}
           onClick={() => setActiveSection('book')}
@@ -406,11 +465,11 @@ function PetGrooming() {
 
       {/* BOOKING FORM SECTION */}
       {activeSection === 'book' && (
-      <section id="booking" className="booking-section">
+      <section id="booking" className="booking-section" ref={bookingSectionRef}>
         {/* Left — Editorial Visual */}
         <div className="booking-editorial">
           <div className="booking-editorial__image-wrap">
-            <img src={petHeroImage2} alt="Pet grooming" />
+            <img src={HERO_IMAGE2} alt="Pet grooming" />
           </div>
           <div className="booking-editorial__overlay" />
           <div className="booking-editorial__content">
@@ -781,7 +840,7 @@ function PetGrooming() {
       )}
 
       {/* Testimonials Section */}
-      <section className="testimonials-section">
+      <section className="testimonials-section" ref={testimonialsRef}>
         <h2 className="reveal-header">What Pet Parents Say</h2>
         <div className="testimonials-grid">
           {testimonials.map((item, index) => (

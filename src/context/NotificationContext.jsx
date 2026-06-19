@@ -14,16 +14,26 @@ export const NotificationProvider = ({ children }) => {
     }
   })
 
-  const [unreadCount, setUnreadCount] = useState(() => {
+  // Clear old Vietnamese cached notifications on mount
+  useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
-      if (!stored) return 0
-      const arr = JSON.parse(stored)
-      return arr.filter(n => !n.read).length
+      if (stored) {
+        const arr = JSON.parse(stored)
+        const hasOldData = arr.some(n =>
+          typeof n.title === 'string' && /[ăàáảãạắằẳẵặẻèéẻẽẹỉìíỉĩịôồốỗổộợùúủũụưửừửữựỷỹỳđ]/i.test(n.title + n.message)
+        )
+        if (hasOldData) {
+          localStorage.removeItem(STORAGE_KEY)
+          setNotifications([])
+        }
+      }
     } catch {
-      return 0
+      // ignore
     }
-  })
+  }, [])
+
+  const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
     try {

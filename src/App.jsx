@@ -9,6 +9,7 @@ import Purchases from './pages/Purchases/Purchases'
 import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
 import PetGrooming from './pages/PetGrooming/PetGrooming'
+import PetHealthQuiz from './pages/PetHealthQuiz/PetHealthQuiz'
 import UserProfile from './pages/UserProfile/UserProfile'
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard'
 import Staff from './pages/Staff/Staff'
@@ -82,6 +83,8 @@ function App() {
         <Route path="/products" element={<PageLayout><Products /></PageLayout>} />
         <Route path="/products/:id" element={<PageLayout><ProductDetail /></PageLayout>} />
         <Route path="/services" element={<PageLayout><Services /></PageLayout>} />
+
+        <Route path="/pet-health-quiz" element={<PageLayout><PetHealthQuiz /></PageLayout>} />
 
         {/* Auth pages */}
         <Route

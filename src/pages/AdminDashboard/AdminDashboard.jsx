@@ -117,7 +117,7 @@ function AdminDashboard() {
   const [showServiceModal, setShowServiceModal] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
   const [serviceForm, setServiceForm] = useState({
-    name: '', description: '', duration: '', price: '', images: [], previewImages: [], isActive: true
+    name: '', description: '', duration: '', price: '', category: 1, images: [], previewImages: [], isActive: true
   })
   const serviceFileRef = useRef(null)
   const [pendingServiceBlobs, setPendingServiceBlobs] = useState([])
@@ -492,13 +492,14 @@ function AdminDashboard() {
         description: service.description || '',
         duration: service.durationMinutes?.toString() || service.duration?.toString().replace(/[^0-9]/g, '') || '',
         price: service.price?.toString() || '',
+        category: service.category ?? 1,
         images: service.images || [],
         previewImages: service.images || [],
         isActive: service.isActive ?? true
       })
     } else {
       setSelectedService(null)
-      setServiceForm({ name: '', description: '', duration: '', price: '', images: [], previewImages: [], isActive: true })
+      setServiceForm({ name: '', description: '', duration: '', price: '', category: 1, images: [], previewImages: [], isActive: true })
       setPendingServiceBlobs([])
     }
     setShowServiceModal(true)
@@ -534,6 +535,7 @@ function AdminDashboard() {
       description: serviceForm.description,
       durationMinutes: parseInt(serviceForm.duration) || 0,
       price: parseFloat(serviceForm.price) || 0,
+      category: parseInt(serviceForm.category) || 1,
       thumbnailUrl: uploadedUrls[0] || '',
       isActive: serviceForm.isActive,
       createdAt: selectedService?.createdAt || new Date().toISOString(),
@@ -1070,6 +1072,19 @@ function AdminDashboard() {
                     <label>Price (VND) *</label>
                     <input type="number" value={serviceForm.price} onChange={e => setServiceForm(p => ({ ...p, price: e.target.value }))} placeholder="e.g. 200000" required />
                   </div>
+                </div>
+
+                <div className="adm-form-group">
+                  <label>Category *</label>
+                  <select
+                    value={serviceForm.category}
+                    onChange={e => setServiceForm(p => ({ ...p, category: parseInt(e.target.value) }))}
+                    required
+                  >
+                    <option value={1}>Grooming</option>
+                    <option value={2}>Health</option>
+                    <option value={3}>Spa</option>
+                  </select>
                 </div>
 
                 <div className="adm-checkbox">

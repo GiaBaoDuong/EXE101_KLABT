@@ -2,6 +2,13 @@
    SHARED NAV — Consistent header across all pages
    ======================================== */
 
+/* Shared header wrapper — single sticky point */
+.sn-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
 /* Utility Bar */
 .sn-utility-bar {
   background: var(--color-ink);
@@ -48,9 +55,6 @@
 .sn-nav {
   background: var(--color-canvas);
   border-bottom: 1px solid var(--color-hairline-soft);
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 
 .sn-nav__inner {
@@ -151,7 +155,7 @@
 }
 
 /* ========================================
-   NOTIFICATION PANEL
+   NOTIFICATION PANEL — Nike flat chrome
    ======================================== */
 .sn-notif {
   position: relative;
@@ -159,90 +163,119 @@
 
 .sn-notif__badge {
   position: absolute;
-  top: 3px;
-  right: 3px;
-  min-width: 17px;
-  height: 17px;
-  border-radius: 999px;
-  background: #ef4444;
-  color: white;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: var(--rounded-full);
+  background: var(--color-ink);
+  color: var(--color-canvas);
   font-size: 10px;
   font-weight: 700;
   display: grid;
   place-items: center;
   line-height: 1;
   padding: 0 4px;
-  border: 2px solid var(--color-canvas);
 }
 
 .sn-notif__panel {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 4px);
   right: 0;
-  width: 380px;
+  width: 360px;
   background: var(--color-canvas);
-  border-radius: var(--rounded-lg);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  border-radius: var(--rounded-none);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
   z-index: 200;
   overflow: hidden;
-  animation: snDropdownSlide 0.2s ease;
+  animation: snDropdownSlide 0.18s ease;
   border: 1px solid var(--color-hairline);
 }
 
 @keyframes snDropdownSlide {
-  from { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .sn-notif__header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--color-hairline-soft);
+  justify-content: space-between;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--color-hairline);
 }
 
 .sn-notif__header h3 {
   margin: 0;
-  font-size: 15px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 500;
   color: var(--color-ink);
+  letter-spacing: 0.3px;
 }
 
 .sn-notif__mark-read {
   background: none;
   border: none;
+  font-family: var(--font-body-medium);
   font-size: 12px;
-  color: #667eea;
+  font-weight: 500;
+  color: var(--color-mute);
   cursor: pointer;
-  font-weight: 600;
-  font-family: var(--font-body);
+  padding: 4px 8px;
+  border-radius: var(--rounded-sm);
+  transition: color 0.15s, background 0.15s;
 }
 
-.sn-notif__mark-read:hover { text-decoration: underline; }
+.sn-notif__mark-read:hover {
+  color: var(--color-ink);
+  background: var(--color-soft-cloud);
+}
 
 .sn-notif__list {
-  max-height: 400px;
+  max-height: 380px;
   overflow-y: auto;
+}
+
+/* Scrollbar — webkit flat */
+.sn-notif__list::-webkit-scrollbar {
+  width: 4px;
+}
+.sn-notif__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sn-notif__list::-webkit-scrollbar-thumb {
+  background: var(--color-hairline);
+  border-radius: 999px;
 }
 
 .sn-notif__empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px;
-  color: var(--color-mute);
-  gap: var(--spacing-sm);
+  padding: 48px 20px;
+  gap: 10px;
 }
 
-.sn-notif__empty svg { width: 36px; height: 36px; opacity: 0.3; }
-.sn-notif__empty p { margin: 0; font-size: 13px; color: var(--color-mute); }
+.sn-notif__empty svg {
+  width: 40px;
+  height: 40px;
+  color: var(--color-hairline);
+}
 
+.sn-notif__empty p {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-mute);
+}
+
+/* Item — flat, hairline dividers */
 .sn-notif__item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 14px 20px;
+  gap: 14px;
+  padding: 16px 20px;
   cursor: pointer;
   border-bottom: 1px solid var(--color-hairline-soft);
   position: relative;
@@ -251,80 +284,103 @@
 
 .sn-notif__item:last-child { border-bottom: none; }
 .sn-notif__item:hover { background: var(--color-soft-cloud); }
-.sn-notif__item.unread { background: #f0f7ff; }
-.sn-notif__item.unread:hover { background: #e8f0fe; }
+.sn-notif__item.unread { background: var(--color-canvas); }
 
 .sn-notif__item-icon {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--rounded-full);
   background: var(--color-soft-cloud);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #667eea;
 }
 
-.sn-notif__item-icon svg { width: 16px; height: 16px; }
-.sn-notif__item-body { flex: 1; min-width: 0; }
+.sn-notif__item.unread .sn-notif__item-icon {
+  background: var(--color-ink);
+}
+
+.sn-notif__item-icon svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-charcoal);
+}
+
+.sn-notif__item.unread .sn-notif__item-icon svg {
+  color: var(--color-canvas);
+}
+
+.sn-notif__item-body {
+  flex: 1;
+  min-width: 0;
+}
 
 .sn-notif__item-title {
-  margin: 0 0 2px;
+  margin: 0 0 3px;
+  font-family: var(--font-body-medium);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.sn-notif__item.unread .sn-notif__item-title {
+  font-weight: 600;
+}
+
 .sn-notif__item-msg {
-  margin: 0 0 4px;
+  margin: 0 0 5px;
   font-size: 12px;
-  color: var(--color-charcoal);
-  line-height: 1.4;
+  color: var(--color-mute);
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  line-clamp: 2;
-  box-orient: vertical;
   overflow: hidden;
 }
 
-.sn-notif__item-time { font-size: 11px; color: var(--color-mute); }
+.sn-notif__item-time {
+  font-size: 11px;
+  color: var(--color-stone);
+}
 
+/* Dot — ink, top-right */
 .sn-notif__dot {
   position: absolute;
-  top: 18px;
+  top: 20px;
   right: 16px;
   width: 8px;
   height: 8px;
-  border-radius: 50%;
-  background: #667eea;
-  flex-shrink: 0;
+  border-radius: var(--rounded-full);
+  background: var(--color-ink);
 }
 
 .sn-notif__footer {
   padding: 8px 20px 12px;
-  border-top: 1px solid var(--color-hairline-soft);
+  border-top: 1px solid var(--color-hairline);
   text-align: center;
 }
 
 .sn-notif__view-all {
   background: none;
   border: none;
+  font-family: var(--font-body-medium);
   font-size: 13px;
-  font-weight: 600;
-  color: #667eea;
+  font-weight: 500;
+  color: var(--color-charcoal);
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background 0.15s;
-  font-family: var(--font-body);
+  padding: 8px 16px;
+  border-radius: var(--rounded-full);
+  transition: background 0.15s, color 0.15s;
 }
 
-.sn-notif__view-all:hover { background: #f0f7ff; }
+.sn-notif__view-all:hover {
+  background: var(--color-soft-cloud);
+  color: var(--color-ink);
+}
 
 /* ========================================
    USER DROPDOWN — Nike clean chrome

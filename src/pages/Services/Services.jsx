@@ -7,6 +7,13 @@ import SharedNav from '../../components/SharedNav/SharedNav'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
+const CATEGORIES = [
+  { id: 0, name: 'All' },
+  { id: 1, name: 'Grooming' },
+  { id: 2, name: 'Health' },
+  { id: 3, name: 'Spa' },
+]
+
 const BOOKING_STATUSES = {
   1: { label: 'Pending', color: '#f59e0b' },
   2: { label: 'Confirmed', color: '#3b82f6' },
@@ -89,6 +96,7 @@ function Services() {
   const navigate = useNavigate()
   const [services, setServices] = useState([])
   const [filteredServices, setFilteredServices] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
   const [isLoading, setIsLoading] = useState(true)
 
@@ -99,6 +107,10 @@ function Services() {
   useEffect(() => {
     let filtered = [...services]
 
+    if (selectedCategory !== 0) {
+      filtered = filtered.filter(s => s.category === selectedCategory)
+    }
+
     if (searchTerm) {
       filtered = filtered.filter(s =>
         s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -107,7 +119,7 @@ function Services() {
     }
 
     setFilteredServices(filtered)
-  }, [services, searchTerm])
+  }, [services, selectedCategory, searchTerm])
 
   const fetchServices = async () => {
     setIsLoading(true)
@@ -129,6 +141,11 @@ function Services() {
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0)
+  }
+
+  const getCategoryName = (id) => {
+    const cat = CATEGORIES.find(c => c.id === id)
+    return cat?.name || 'Other'
   }
 
   return (
@@ -159,7 +176,7 @@ function Services() {
       <nav className="services-subnav">
         <div className="services-subnav__inner">
           <span className="services-subnav__breadcrumb">
-            Home / Services <span>/ All</span>
+            Home / Services <span>/ {selectedCategory === 0 ? 'All' : getCategoryName(selectedCategory)}</span>
           </span>
           <div className="services-subnav__right">
             <span className="services-subnav__count">
@@ -168,6 +185,19 @@ function Services() {
           </div>
         </div>
       </nav>
+
+      {/* Category Filter */}
+      <div className="services-filter-bar">
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.id}
+            className={`filter-chip ${selectedCategory === cat.id ? 'is-active' : ''}`}
+            onClick={() => setSelectedCategory(cat.id)}
+          >
+            {cat.name}
+          </button>
+        ))}
+      </div>
 
       {/* Search */}
       <div className="services-search">
@@ -214,9 +244,9 @@ function Services() {
       ) : filteredServices.length === 0 ? (
         <div className="services-empty">
           <p className="services-empty__title">No Results</p>
-          <p className="services-empty__sub">Try adjusting your search to find what you're looking for.</p>
-          <button className="services-empty__action" onClick={() => setSearchTerm('')}>
-            Clear Search
+          <p className="services-empty__sub">Try adjusting your search or filter to find what you're looking for.</p>
+          <button className="services-empty__action" onClick={() => { setSearchTerm(''); setSelectedCategory(0) }}>
+            Clear Filters
           </button>
         </div>
       ) : (
@@ -242,7 +272,7 @@ function Services() {
                   <div className="pp-card__head">
                     <div>
                       <h3 className="pp-card__title">{service.name}</h3>
-                      <p className="pp-card__species">{service.category || 'Grooming'}</p>
+                      <p className="pp-card__species">{getCategoryName(service.category)}</p>
                     </div>
                   </div>
                   <p className="service-card__desc">{service.description}</p>

@@ -134,7 +134,7 @@ export default function SharedNav({ cartCount = 0 }) {
   }
 
   return (
-    <>
+    <div className="sn-header">
       {/* Utility Bar */}
       <div className="sn-utility-bar">
         <div className="sn-utility-bar__inner">
@@ -156,6 +156,7 @@ export default function SharedNav({ cartCount = 0 }) {
           <ul className="sn-nav__links">
             <li><Link to="/products">Products</Link></li>
             <li><Link to="/services">Services</Link></li>
+            <li><Link to="/pet-health-quiz">Health Check</Link></li>
             <li><Link to="/grooming">Grooming</Link></li>
             <li><Link to="/pet-profile">Pet Profile</Link></li>
             <li><Link to="/purchases">Purchases</Link></li>
@@ -291,6 +292,6 @@ export default function SharedNav({ cartCount = 0 }) {
           </div>
         </div>
       </nav>
-    </>
+    </div>
   )
 }
