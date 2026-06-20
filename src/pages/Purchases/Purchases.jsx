@@ -1,14 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import SharedNav from '../../components/SharedNav/SharedNav'
+import { getOrders } from '../../services/mockOrderService'
 import './Purchases.css'
 
 const TABS = ['All', 'Pending', 'Processing', 'Completed', 'Cancelled']
 
 const ORDER_STATUS = {
-  Pending: { label: 'Pending', color: 'orange' },
-  Processing: { label: 'Processing', color: 'blue' },
-  Completed: { label: 'Completed', color: 'green' },
-  Cancelled: { label: 'Cancelled', color: 'red' },
+  0: { label: 'Pending', color: 'orange' },
+  1: { label: 'Processing', color: 'blue' },
+  2: { label: 'Processing', color: 'blue' },
+  3: { label: 'Completed', color: 'green' },
+  4: { label: 'Cancelled', color: 'red' },
+}
+
+const STATUS_TAB_MAP = {
+  'Pending': [0],
+  'Processing': [1, 2],
+  'Completed': [3],
+  'Cancelled': [4],
 }
 
 const IconPackage = () => (
@@ -64,13 +74,25 @@ function formatDate(dateStr) {
 
 export default function Purchases() {
   const [activeTab, setActiveTab] = useState('All')
+  const [orders, setOrders] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  // TODO: Replace with real API data
-  const orders = []
+  useEffect(() => {
+    loadOrders()
+  }, [])
+
+  const loadOrders = async () => {
+    setIsLoading(true)
+    const res = await getOrders()
+    if (res.success) {
+      setOrders(res.data || [])
+    }
+    setIsLoading(false)
+  }
 
   const filtered = activeTab === 'All'
     ? orders
-    : orders.filter(o => o.status === activeTab)
+    : orders.filter(o => STATUS_TAB_MAP[activeTab]?.includes(o.status))
 
   return (
     <main className="pur-page">
@@ -96,9 +118,9 @@ export default function Purchases() {
               onClick={() => setActiveTab(tab)}
             >
               {tab}
-              {tab === 'Pending' && orders.filter(o => o.status === 'Pending').length > 0 && (
+              {tab === 'Pending' && orders.filter(o => o.status === 0).length > 0 && (
                 <span className="pur-tab__badge">
-                  {orders.filter(o => o.status === 'Pending').length}
+                  {orders.filter(o => o.status === 0).length}
                 </span>
               )}
             </button>
@@ -110,7 +132,17 @@ export default function Purchases() {
       <div className="pur-body">
         <div className="pur-body__inner">
 
-          {filtered.length === 0 ? (
+          {isLoading ? (
+            <div className="pur-loading">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="pur-skeleton-order">
+                  <div className="skeleton-line" style={{ height: 16, width: '40%' }} />
+                  <div className="skeleton-line" style={{ height: 80, width: '100%' }} />
+                  <div className="skeleton-line" style={{ height: 40, width: '60%' }} />
+                </div>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="pur-empty">
               <div className="pur-empty__icon">
                 <IconBox />
@@ -139,10 +171,6 @@ export default function Purchases() {
                     </div>
                     <div className="pur-order__right">
                       <span className={`pur-status pur-status--${ORDER_STATUS[order.status]?.color || 'gray'}`}>
-                        {order.status === 'Processing' && <IconChevron />}
-                        {order.status === 'Pending' && <IconClock />}
-                        {order.status === 'Completed' && <IconCheck />}
-                        {order.status === 'Cancelled' && <IconX />}
                         {ORDER_STATUS[order.status]?.label || order.status}
                       </span>
                     </div>
@@ -153,13 +181,13 @@ export default function Purchases() {
                     {(order.items || []).map((item, idx) => (
                       <div key={idx} className="pur-item">
                         <div className="pur-item__img">
-                          <img src={item.image || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=100&q=80'} alt={item.name} />
+                          <img src={item.image || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=100&q=80'} alt={item.productName} />
                         </div>
                         <div className="pur-item__info">
-                          <span className="pur-item__name">{item.name}</span>
+                          <span className="pur-item__name">{item.productName}</span>
                           <span className="pur-item__qty">Qty: {item.quantity}</span>
                         </div>
-                        <span className="pur-item__price">{formatPrice(item.price)}</span>
+                        <span className="pur-item__price">{formatPrice(item.unitPrice)}</span>
                       </div>
                     ))}
                   </div>
@@ -172,7 +200,7 @@ export default function Purchases() {
                     </div>
                     <div className="pur-order__total">
                       <span className="pur-order__total-label">Total</span>
-                      <span className="pur-order__total-value">{formatPrice(order.total)}</span>
+                      <span className="pur-order__total-value">{formatPrice(order.finalAmount)}</span>
                     </div>
                   </div>
                 </div>

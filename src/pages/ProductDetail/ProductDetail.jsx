@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import './ProductDetail.css'
 import SharedNav from '../../components/SharedNav/SharedNav'
+import { createOrder } from '../../services/orderService'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
@@ -49,6 +50,7 @@ function ProductDetail() {
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
   const [wishlisted, setWishlisted] = useState(false)
+  const [buyingNow, setBuyingNow] = useState(false)
 
   useEffect(() => {
     fetchProduct()
@@ -93,8 +95,24 @@ function ProductDetail() {
     alert(`Added ${quantity} × "${product.name}" to your bag.`)
   }
 
-  const handleBuyNow = () => {
-    navigate('/purchases')
+  const handleBuyNow = async () => {
+    if (!product || buyingNow) return
+    setBuyingNow(true)
+    try {
+      const productId = product.productId ?? product.id
+      const res = await createOrder({
+        items: [{ productId, quantity }],
+        shippingAddress: 'Dia chi giao hang mac dinh',
+      })
+      if (res.success) {
+        navigate(`/order-confirmation?orderId=${res.data.orderId}`)
+      } else {
+        alert(res.message || 'Tao don hang that bai')
+      }
+    } catch (e) {
+      alert('Co loi xay ra, vui long thu lai.')
+    }
+    setBuyingNow(false)
   }
 
   if (isLoading) {
@@ -275,9 +293,9 @@ function ProductDetail() {
             <button
               className="pdp-cta-secondary"
               onClick={handleBuyNow}
-              disabled={!inStock}
+              disabled={!inStock || buyingNow}
             >
-              Buy Now
+              {buyingNow ? 'Processing...' : 'Buy Now'}
             </button>
           </div>
 

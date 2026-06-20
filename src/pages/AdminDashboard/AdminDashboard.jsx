@@ -100,6 +100,7 @@ function AdminDashboard() {
   const [accounts, setAccounts] = useState([])
   const [showAccountModal, setShowAccountModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState({ type: null, item: null })
   const [selectedAccount, setSelectedAccount] = useState(null)
   const [accountForm, setAccountForm] = useState({
     email: '', fullName: '', phone: '', role: 'Customer', password: ''
@@ -276,15 +277,8 @@ function AdminDashboard() {
   }
 
   const handleDeleteProduct = async (product) => {
-    setSelectedProduct(product)
-    try {
-      await fetch(`${API_BASE_URL}/api/admin/products/${product.productId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${getToken()}` }
-      })
-      showSuccess('Product deleted!')
-      fetchProducts()
-    } catch (e) { console.log(e) }
+    setDeleteTarget({ type: 'product', item: product })
+    setShowDeleteModal(true)
   }
 
   const handleProductImageChange = (e) => {
@@ -557,14 +551,54 @@ function AdminDashboard() {
   }
 
   const handleDeleteService = async (service) => {
+    setDeleteTarget({ type: 'service', item: service })
+    setShowDeleteModal(true)
+  }
+
+  const confirmDelete = async () => {
+    const { type, item } = deleteTarget
     try {
-      await fetch(`${API_BASE_URL}/api/admin/services/${service.serviceId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${getToken()}` }
-      })
-      showSuccess('Service deleted!')
-      fetchServices()
+      if (type === 'account') {
+        await fetch(`${API_BASE_URL}/api/admin/accounts/${item.accountId || item.userId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${getToken()}` }
+        })
+        showSuccess('Account deleted!')
+        fetchAccounts()
+      } else if (type === 'product') {
+        await fetch(`${API_BASE_URL}/api/admin/products/${item.productId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${getToken()}` }
+        })
+        showSuccess('Product deleted!')
+        fetchProducts()
+      } else if (type === 'service') {
+        await fetch(`${API_BASE_URL}/api/admin/services/${item.serviceId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${getToken()}` }
+        })
+        showSuccess('Service deleted!')
+        fetchServices()
+      }
     } catch (e) { console.log(e) }
+    setShowDeleteModal(false)
+    setDeleteTarget({ type: null, item: null })
+  }
+
+  const getDeleteMessage = () => {
+    const { type, item } = deleteTarget
+    if (type === 'account') return item?.fullName || item?.email
+    if (type === 'product') return item?.name
+    if (type === 'service') return item?.name
+    return ''
+  }
+
+  const getDeleteTitle = () => {
+    const { type } = deleteTarget
+    if (type === 'account') return 'Delete Account'
+    if (type === 'product') return 'Delete Product'
+    if (type === 'service') return 'Delete Service'
+    return 'Confirm Delete'
   }
 
   const fetchProMembership = () => { setProPrice('99000') }
@@ -921,18 +955,18 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* Delete Modal */}
+      {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="adm-modal-overlay" onClick={() => setShowDeleteModal(false)}>
           <div className="adm-delete-modal" onClick={e => e.stopPropagation()}>
             <div className="adm-delete-icon">
               <IconTrash />
             </div>
-            <h3>Delete Account</h3>
-            <p>Are you sure you want to delete <strong>"{selectedAccount?.fullName || selectedAccount?.email}"</strong>?</p>
+            <h3>{getDeleteTitle()}</h3>
+            <p>Are you sure you want to delete <strong>"{getDeleteMessage()}"</strong>?</p>
             <div className="adm-delete-actions">
               <button className="adm-btn adm-btn--cancel" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-              <button className="adm-btn adm-btn--delete" onClick={handleDeleteAccount}>Delete</button>
+              <button className="adm-btn adm-btn--delete" onClick={confirmDelete}>Delete</button>
             </div>
           </div>
         </div>

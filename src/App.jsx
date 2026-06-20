@@ -15,11 +15,25 @@ import AdminDashboard from './pages/AdminDashboard/AdminDashboard'
 import Staff from './pages/Staff/Staff'
 import Doctor from './pages/Doctor/Doctor'
 import Notifications from './pages/Notifications/Notifications'
+import Checkout from './pages/Checkout/Checkout'
+import MyOrders from './pages/MyOrders/MyOrders'
+import OrderConfirmation from './pages/OrderConfirmation/OrderConfirmation'
 import SharedNav from './components/SharedNav/SharedNav'
 import Footer from './components/Footer/Footer'
 import { useAuth } from './context/AuthContext'
 import { useEffect } from 'react'
 import './App.css'
+
+/** Save current location before redirecting to login */
+function RequireAuth({ children }) {
+  const { isAuthenticated } = useAuth()
+  const location = useLocation()
+  if (!isAuthenticated) {
+    sessionStorage.setItem('loginRedirect', location.pathname + location.search)
+    return <Navigate to="/login" replace />
+  }
+  return children
+}
 
 /** Auto-scroll to top on every route change */
 function ScrollToTop() {
@@ -126,6 +140,18 @@ function App() {
         <Route
           path="/notifications"
           element={isAuthenticated ? <PageLayout><Notifications /></PageLayout> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/checkout"
+          element={<RequireAuth><PageLayout><Checkout /></PageLayout></RequireAuth>}
+        />
+        <Route
+          path="/order-confirmation"
+          element={<RequireAuth><OrderConfirmation /></RequireAuth>}
+        />
+        <Route
+          path="/my-orders"
+          element={isAuthenticated ? <PageLayout><MyOrders /></PageLayout> : <Navigate to="/login" />}
         />
         {/* Standalone — no footer */}
         <Route path="/login" element={<Login />} />

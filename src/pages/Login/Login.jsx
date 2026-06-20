@@ -40,15 +40,15 @@ function Login() {
         if (data.user?.role === 'Admin') {
           sessionStorage.setItem('adminToken', data.token)
           sessionStorage.setItem('adminUser', JSON.stringify(data.user))
-          navigate('/admin')
+          navigate(sessionStorage.getItem('loginRedirect') || '/admin')
         } else if (data.user?.role === 'Staff') {
           sessionStorage.setItem('staffToken', data.token)
           sessionStorage.setItem('staffUser', JSON.stringify(data.user))
-          navigate('/staff')
+          navigate(sessionStorage.getItem('loginRedirect') || '/staff')
         } else if (data.user?.role === 'Doctor') {
-          navigate('/doctor')
+          navigate(sessionStorage.getItem('loginRedirect') || '/doctor')
         } else {
-          navigate('/home')
+          navigate(sessionStorage.getItem('loginRedirect') || '/home')
         }
       } else {
         setError('Email or password is incorrect')
