@@ -3,6 +3,65 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
+// Product image catalog — keyed by productId
+// Populated lazily from /api/Product, falls back to hardcoded map
+let productImageCache = {}
+let cacheLoaded = false
+
+async function ensureProductCache() {
+  if (cacheLoaded) return
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/Product`)
+    if (res.ok) {
+      const products = await res.json()
+      products.forEach(p => {
+        productImageCache[p.productId] = p.thumbnailUrl || null
+      })
+    }
+  } catch { /* ignore — fallback to hardcoded map */ }
+  cacheLoaded = true
+}
+
+// Static fallback map (covers common productIds)
+const FALLBACK_IMAGE_MAP = {
+  1: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=200&q=80',
+  2: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=200&q=80',
+  3: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=200&q=80',
+  4: 'https://images.unsplash.com/photo-1591946614720-90a587da4a36?w=200&q=80',
+  5: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=200&q=80',
+  6: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&q=80',
+  7: 'https://images.unsplash.com/photo-1535294435445-d7249524ef2e?w=200&q=80',
+  8: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=200&q=80',
+  9: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=200&q=80',
+  10: 'https://images.unsplash.com/photo-1587764379873-97837921fd44?w=200&q=80',
+  11: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?w=200&q=80',
+  12: 'https://images.unsplash.com/photo-1598133894008-61f7fdb8cc3a?w=200&q=80',
+  13: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=200&q=80',
+  14: 'https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?w=200&q=80',
+  15: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=200&q=80',
+}
+
+function getProductImage(productId) {
+  return productImageCache[productId] || FALLBACK_IMAGE_MAP[productId] || null
+}
+
+// Enrich order items with product images
+export function enrichOrderWithImages(order) {
+  if (!order) return null
+  return {
+    ...order,
+    items: (order.items || []).map(item => ({
+      ...item,
+      image: getProductImage(item.productId),
+    })),
+  }
+}
+
+// Enrich array of orders
+export function enrichOrdersWithImages(orders) {
+  return (orders || []).map(enrichOrderWithImages)
+}
+
 // Helper: parse response, chấp nhận cả JSON lẫn plain text
 async function parseRes(res) {
   const text = await res.text()
@@ -26,9 +85,10 @@ async function apiFetch(path, options = {}) {
 // GET /api/Order - Lấy tất cả orders của user
 export async function getOrders() {
   try {
+    await ensureProductCache()
     const r = await apiFetch('/api/Order')
     if (!r.ok) return { success: false, message: r.data.message || r.data.raw || 'Failed to fetch orders' }
-    return { success: true, data: r.data }
+    return { success: true, data: enrichOrdersWithImages(r.data) }
   } catch (e) {
     return { success: false, message: e.message }
   }
@@ -37,9 +97,10 @@ export async function getOrders() {
 // GET /api/Order/{id} - Lấy chi tiết 1 order
 export async function getOrderById(orderId) {
   try {
+    await ensureProductCache()
     const r = await apiFetch(`/api/Order/${orderId}`)
     if (!r.ok) return { success: false, message: r.data.message || r.data.raw || 'Order not found' }
-    return { success: true, data: r.data }
+    return { success: true, data: enrichOrderWithImages(r.data) }
   } catch (e) {
     return { success: false, message: e.message }
   }

@@ -22,6 +22,7 @@
   position: relative;
   overflow: hidden;
   background: #111111;
+  animation: heroSlide 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .register-image-section::after {
@@ -41,6 +42,17 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  animation: heroZoom 8s ease-out forwards;
+}
+
+@keyframes heroSlide {
+  from { transform: translateX(-60px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes heroZoom {
+  from { transform: scale(1.06); }
+  to   { transform: scale(1); }
 }
 
 .register-image-overlay {
@@ -62,6 +74,7 @@
   color: #ffffff;
   margin-bottom: 14px;
   -webkit-font-smoothing: antialiased;
+  animation: heroTextReveal 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s both;
 }
 
 .register-subtitle-overlay {
@@ -72,6 +85,12 @@
   letter-spacing: 0;
   line-height: 1.5;
   max-width: 340px;
+  animation: heroTextReveal 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.65s both;
+}
+
+@keyframes heroTextReveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* --- Right: Form Panel --- */
@@ -85,6 +104,12 @@
   padding: 48px 64px;
   position: relative;
   overflow-y: auto;
+  animation: formPanelSlide 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s both;
+}
+
+@keyframes formPanelSlide {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
 }
 
 .register-form-content {
@@ -94,6 +119,7 @@
 
 .register-form-header {
   margin-bottom: 36px;
+  animation: formFadeUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s both;
 }
 
 .register-form-label {
@@ -127,10 +153,24 @@
 /* --- Form Elements --- */
 .register-form {
   width: 100%;
+  animation: formFadeUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.45s both;
 }
 
 .register-form-group {
   margin-bottom: 18px;
+  animation: formFadeUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.register-form-group:nth-child(1) { animation-delay: 0.55s; }
+.register-form-group:nth-child(2) { animation-delay: 0.65s; }
+.register-form-group:nth-child(3) { animation-delay: 0.70s; }
+.register-form-group:nth-child(4) { animation-delay: 0.75s; }
+.register-form-group:nth-child(5) { animation-delay: 0.80s; }
+.register-form-group:nth-child(6) { animation-delay: 0.85s; }
+
+@keyframes formFadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .register-form-row {
@@ -304,6 +344,7 @@
   padding-top: 28px;
   border-top: 1px solid #e5e5e5;
   text-align: center;
+  animation: formFadeUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.95s both;
 }
 
 .register-footer-text {

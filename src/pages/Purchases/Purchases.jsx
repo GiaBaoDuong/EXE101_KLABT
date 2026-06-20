@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SharedNav from '../../components/SharedNav/SharedNav'
-import { getOrders } from '../../services/mockOrderService'
+import { getOrders } from '../../services/orderService'
 import './Purchases.css'
 
 const TABS = ['All', 'Pending', 'Processing', 'Completed', 'Cancelled']
 
+// OrderStatus enum: 1=Pending, 2=Processing, 3=Completed, 4=Cancelled
 const ORDER_STATUS = {
-  0: { label: 'Pending', color: 'orange' },
-  1: { label: 'Processing', color: 'blue' },
+  1: { label: 'Pending', color: 'orange' },
   2: { label: 'Processing', color: 'blue' },
   3: { label: 'Completed', color: 'green' },
   4: { label: 'Cancelled', color: 'red' },
 }
 
 const STATUS_TAB_MAP = {
-  'Pending': [0],
-  'Processing': [1, 2],
+  'Pending': [1],
+  'Processing': [2],
   'Completed': [3],
   'Cancelled': [4],
 }
@@ -29,28 +29,10 @@ const IconPackage = () => (
   </svg>
 )
 
-const IconChevron = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="9 18 15 12 9 6"/>
-  </svg>
-)
-
 const IconClock = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10"/>
     <polyline points="12 6 12 12 16 14"/>
-  </svg>
-)
-
-const IconCheck = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>
-)
-
-const IconX = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
   </svg>
 )
 
@@ -73,6 +55,7 @@ function formatDate(dateStr) {
 }
 
 export default function Purchases() {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('All')
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -93,6 +76,8 @@ export default function Purchases() {
   const filtered = activeTab === 'All'
     ? orders
     : orders.filter(o => STATUS_TAB_MAP[activeTab]?.includes(o.status))
+
+  const pendingCount = orders.filter(o => o.status === 1).length
 
   return (
     <main className="pur-page">
@@ -118,10 +103,8 @@ export default function Purchases() {
               onClick={() => setActiveTab(tab)}
             >
               {tab}
-              {tab === 'Pending' && orders.filter(o => o.status === 0).length > 0 && (
-                <span className="pur-tab__badge">
-                  {orders.filter(o => o.status === 0).length}
-                </span>
+              {tab === 'Pending' && pendingCount > 0 && (
+                <span className="pur-tab__badge">{pendingCount}</span>
               )}
             </button>
           ))}
@@ -160,7 +143,12 @@ export default function Purchases() {
           ) : (
             <div className="pur-orders">
               {filtered.map(order => (
-                <div key={order.orderId} className="pur-order">
+                <div
+                  key={order.orderId}
+                  className="pur-order"
+                  onClick={() => navigate(`/order/${order.orderId}`)}
+                  style={{ cursor: 'pointer' }}
+                >
                   {/* Order Header */}
                   <div className="pur-order__header">
                     <div className="pur-order__meta">

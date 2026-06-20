@@ -291,6 +291,7 @@
 .up-identity__body {
   padding: 0 var(--spacing-xl) var(--spacing-xl);
   position: relative;
+  overflow: visible;
 }
 
 .up-identity__avatar-wrap {
@@ -298,7 +299,7 @@
   height: 80px;
   border-radius: 50%;
   background: var(--color-soft-cloud);
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   margin-top: -40px;
   border: 3px solid var(--color-canvas);
@@ -326,8 +327,8 @@
 
 .up-identity__change-avatar {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: -6px;
+  right: -6px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -338,11 +339,15 @@
   justify-content: center;
   cursor: pointer;
   transition: transform 0.2s ease;
-  font-size: 12px;
+  font-size: 18px;
   color: var(--color-canvas);
+  line-height: 1;
+  z-index: 10;
 }
 
-.up-identity__change-avatar:hover { transform: scale(1.1); }
+.up-identity__change-avatar:hover {
+  transform: scale(1.1);
+}
 
 .up-identity__name {
   font-family: var(--font-display);

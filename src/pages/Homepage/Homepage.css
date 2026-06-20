@@ -753,11 +753,11 @@
 }
 
 .home-split-banner--pink .home-split-banner__content {
-  background: linear-gradient(135deg, #f8d8ea 0%, #fce8f4 100%);
+  background: var(--color-pink);
 }
 
 .home-split-banner--yellow .home-split-banner__content {
-  background: #ffd500;
+  background: var(--color-yellow);
 }
 
 .home-split-banner__eyebrow {
@@ -768,11 +768,28 @@
   margin-bottom: var(--spacing-lg);
 }
 
+.home-split-banner--ink .home-split-banner__eyebrow {
+  color: var(--color-mute);
+}
+
+.home-split-banner--ink .home-split-banner__title {
+  color: var(--color-ink);
+}
+
+.home-split-banner--ink .home-split-banner__sub {
+  color: var(--color-charcoal);
+}
+
 .home-split-banner__eyebrow--light {
-  color: var(--color-hairline);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .home-split-banner__eyebrow--dark {
+  color: var(--color-charcoal);
+}
+
+.home-split-banner--yellow .home-split-banner__eyebrow,
+.home-split-banner--pink .home-split-banner__eyebrow {
   color: var(--color-mute);
 }
 
@@ -792,6 +809,14 @@
 
 .home-split-banner__title--dark {
   color: var(--color-ink);
+}
+
+.home-split-banner--pink .home-split-banner__title {
+  color: #1a1a1a;
+}
+
+.home-split-banner--pink .home-split-banner__sub {
+  color: #555555;
 }
 
 .home-split-banner__sub {
@@ -828,13 +853,19 @@
   transform: scale(0.97);
 }
 
+.home-split-banner--pink .home-split-banner__cta {
+  background: var(--color-ink);
+  color: var(--color-canvas);
+}
+
 .home-split-banner--yellow .home-split-banner__cta {
   background: var(--color-ink);
   color: var(--color-canvas);
 }
 
 .home-split-banner--ink .home-split-banner__cta {
-  background: var(--color-canvas);
+  background: var(--color-ink);
+  color: var(--color-canvas);
 }
 
 /* ========================================

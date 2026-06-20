@@ -128,7 +128,7 @@ function Checkout() {
           clearInterval(autoCheckRef.current)
           setPhase('COMPLETED')
           showToast('Thanh toán thành công!', 'success')
-          setTimeout(() => navigateRef.current?.('/purchases'), 1500)
+          setTimeout(() => navigateRef.current?.('/purchases'), 5000)
         }
       }
     }
@@ -419,33 +419,6 @@ function Checkout() {
           {error && <div className="checkout-error" style={{marginBottom: '12px'}}>{error}</div>}
           <button className="btn btn-primary btn-check-payment" onClick={handleCheckStatus} disabled={checkingPayment}>
             {checkingPayment ? 'Đang kiểm tra...' : 'Kiểm tra thanh toán'}
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => {
-              const paymentCode = payment?.content || payment?.code || payment?.paymentCode
-              const debugPayload = {
-                code: paymentCode,
-                content: payment?.content || paymentCode,
-                transferAmount: order?.finalAmount || Number(amount) || 0,
-                accountNumber: payment?.accountNumber || '',
-                transactionDate: new Date().toISOString(),
-                gateway: 'SePay',
-                transferType: 'in',
-                description: `Thanh toan don hang ${paymentCode}`,
-              }
-              console.group('=== DEBUG PAYMENT ===')
-              console.log('payment object:', payment)
-              console.log('order object:', order)
-              console.log('paymentCode:', paymentCode)
-              console.log('orderId:', order?.orderId || order?.OrderId || orderIdFromUrl)
-              console.log('webhook payload sẽ gửi:', debugPayload)
-              console.groupEnd()
-              alert(`Debug:\norderId: ${order?.orderId || order?.OrderId || orderIdFromUrl}\npaymentCode: ${paymentCode}\ntransferAmount: ${order?.finalAmount || Number(amount) || 0}`)
-            }}
-            style={{marginTop: '8px', fontSize: '12px'}}
-          >
-            Debug Log
           </button>
         </div>
       </div>

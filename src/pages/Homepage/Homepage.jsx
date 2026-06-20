@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import groomingImg from '../../assets/990a6d84-3759-4280-af46-bb8217d2f8ea.jpg'
 import '../Homepage/Homepage.css'
 import SharedNav from '../../components/SharedNav/SharedNav'
 import { useAuth } from '../../context/AuthContext'
@@ -199,7 +200,7 @@ function Homepage() {
             <span className="home-cat-card__label">Toys</span>
           </Link>
           <Link to="/products?cat=3" className="home-cat-card">
-            <img src={petHeroImage4} alt="Grooming" className="home-cat-card__image" />
+            <img src={groomingImg} alt="Grooming" className="home-cat-card__image" />
             <div className="home-cat-card__overlay" />
             <span className="home-cat-card__label">Grooming</span>
           </Link>
@@ -279,7 +280,7 @@ function Homepage() {
         <div className="home-split-banner__image">
           <img src={petHomepage7} alt="Grooming services" />
         </div>
-        <div className="home-split-banner__content home-split-banner--ink">
+        <div className="home-split-banner__content home-split-banner--pink">
           <p className="home-split-banner__eyebrow home-split-banner__eyebrow--light">Services</p>
           <h2 className="home-split-banner__title home-split-banner__title--light">Pet Grooming</h2>
           <p className="home-split-banner__sub home-split-banner__sub--light">Book a professional grooming session for your pet today. Happy pet, happy life.</p>

@@ -6,9 +6,25 @@ import {
   getStatusLabel,
   getPaymentStatusLabel,
   getOrderTypeLabel,
-} from '../../services/mockOrderService'
+} from '../../services/orderService'
 import SharedNav from '../../components/SharedNav/SharedNav'
 import './MyOrders.css'
+
+// OrderStatus: 1=Pending, 2=Processing, 3=Completed, 4=Cancelled
+const ORDER_STATUS = {
+  1: { label: 'Chờ xác nhận', color: 'pending' },
+  2: { label: 'Đang xử lý', color: 'processing' },
+  3: { label: 'Đã hoàn thành', color: 'completed' },
+  4: { label: 'Đã hủy', color: 'cancelled' },
+}
+
+// PaymentStatus: 1=Unpaid, 2=Paid, 3=Refunded, 4=Failed
+const PAYMENT_STATUS = {
+  1: { label: 'Chưa thanh toán', color: 'unpaid' },
+  2: { label: 'Đã thanh toán', color: 'paid' },
+  3: { label: 'Đã hoàn tiền', color: 'refunded' },
+  4: { label: 'Thất bại', color: 'failed' },
+}
 
 function MyOrders() {
   const navigate = useNavigate()
@@ -27,7 +43,7 @@ function MyOrders() {
     setError('')
     const res = await getOrders()
     if (res.success) {
-      setOrders(res.data)
+      setOrders(res.data || [])
     } else {
       setError(res.message || 'Lỗi tải đơn hàng')
     }
@@ -45,20 +61,18 @@ function MyOrders() {
     })
   }
 
-  const getStatusBadgeClass = (s) => {
-    return { 1: 'pending', 2: 'processing', 3: 'completed', 4: 'cancelled' }[s] || 'pending'
+  const handleOrderClick = (order) => {
+    navigate(`/order/${order.orderId}`)
   }
 
-  const getPaymentBadgeClass = (s) => {
-    return { 1: 'unpaid', 2: 'paid', 3: 'refunded', 4: 'failed' }[s] || 'unpaid'
+  const handlePay = (e, order) => {
+    e.stopPropagation()
+    navigate(`/checkout?orderId=${order.orderId}`)
   }
 
-  const handlePay = (order) => {
-    navigate(`/order-confirmation?orderId=${order.orderId}`)
-  }
-
-  const handleCancel = async (order) => {
-    if (!window.confirm(`Bạn có chắc muốn hủy đơn ${order.orderCode}?`)) return
+  const handleCancel = async (e, order) => {
+    e.stopPropagation()
+    if (!window.confirm(`Bạn có chắc muốn hủy đơn ${order.orderCode || order.orderId}?`)) return
     setActionLoading(order.orderId)
     const res = await cancelOrder(order.orderId)
     if (res.success) {
@@ -90,10 +104,9 @@ function MyOrders() {
         <div className="orders-filter">
           {[
             { v: 'all', label: 'Tất cả' },
-            { v: '0', label: 'Chờ xác nhận' },
-            { v: '1', label: 'Đã xác nhận' },
-            { v: '2', label: 'Đang giao' },
-            { v: '3', label: 'Đã giao' },
+            { v: '1', label: 'Chờ xác nhận' },
+            { v: '2', label: 'Đang xử lý' },
+            { v: '3', label: 'Đã hoàn thành' },
             { v: '4', label: 'Đã hủy' },
           ].map(f => (
             <button
@@ -118,24 +131,29 @@ function MyOrders() {
         ) : (
           <div className="orders-list">
             {filteredOrders.map(order => (
-              <div key={order.orderId} className="order-card">
+              <div
+                key={order.orderId}
+                className="order-card"
+                onClick={() => handleOrderClick(order)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="order-card-header">
                   <div>
-                    <span className="order-code">{order.orderCode}</span>
+                    <span className="order-code">{order.orderCode || `Order #${order.orderId}`}</span>
                     <span className="order-date">{formatDate(order.createdAt)}</span>
                   </div>
                   <div className="order-badges">
-                    <span className={`badge badge-${getStatusBadgeClass(order.status)}`}>
-                      {getStatusLabel(order.status)}
+                    <span className={`badge badge-${ORDER_STATUS[order.status]?.color || 'pending'}`}>
+                      {ORDER_STATUS[order.status]?.label || getStatusLabel(order.status)}
                     </span>
-                    <span className={`badge badge-${getPaymentBadgeClass(order.paymentStatus)}`}>
-                      {getPaymentStatusLabel(order.paymentStatus)}
+                    <span className={`badge badge-${PAYMENT_STATUS[order.paymentStatus]?.color || 'unpaid'}`}>
+                      {PAYMENT_STATUS[order.paymentStatus]?.label || getPaymentStatusLabel(order.paymentStatus)}
                     </span>
                   </div>
                 </div>
 
                 <div className="order-card-items">
-                  {order.items.map(item => (
+                  {(order.items || []).map(item => (
                     <div key={item.orderItemId} className="order-item-row">
                       <div className="item-left">
                         <span className="item-name">{item.productName}</span>
@@ -150,7 +168,7 @@ function MyOrders() {
 
                 <div className="order-card-footer">
                   <div className="order-address">
-                    <span className="meta-label">📍 Giao đến:</span> {order.shippingAddress}
+                    <span className="meta-label">📍 Giao đến:</span> {order.shippingAddress || '—'}
                   </div>
                   <div className="order-total">
                     <span className="meta-label">Loại:</span> {getOrderTypeLabel(order.orderType)}
@@ -163,25 +181,25 @@ function MyOrders() {
                   </div>
                 </div>
 
-                <div className="order-card-actions">
-                  {order.status === 0 && order.paymentStatus === 0 && (
+                <div className="order-card-actions" onClick={e => e.stopPropagation()}>
+                  {order.status === 1 && order.paymentStatus === 1 && (
                     <>
                       <button
                         className="btn-action btn-pay"
-                        onClick={() => handlePay(order)}
+                        onClick={(e) => handlePay(e, order)}
                       >
                         💳 Thanh toán ngay
                       </button>
                       <button
                         className="btn-action btn-cancel"
-                        onClick={() => handleCancel(order)}
+                        onClick={(e) => handleCancel(e, order)}
                         disabled={actionLoading === order.orderId}
                       >
                         {actionLoading === order.orderId ? 'Đang hủy...' : '✕ Hủy đơn'}
                       </button>
                     </>
                   )}
-                  {order.status !== 0 && (
+                  {order.status !== 1 && (
                     <span className="action-locked">Đơn hàng đã xử lý, không thể thay đổi</span>
                   )}
                 </div>

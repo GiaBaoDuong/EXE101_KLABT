@@ -17,6 +17,7 @@ import Doctor from './pages/Doctor/Doctor'
 import Notifications from './pages/Notifications/Notifications'
 import Checkout from './pages/Checkout/Checkout'
 import MyOrders from './pages/MyOrders/MyOrders'
+import OrderDetail from './pages/OrderDetail/OrderDetail'
 import OrderConfirmation from './pages/OrderConfirmation/OrderConfirmation'
 import SharedNav from './components/SharedNav/SharedNav'
 import Footer from './components/Footer/Footer'
@@ -147,11 +148,15 @@ function App() {
         />
         <Route
           path="/order-confirmation"
-          element={<RequireAuth><OrderConfirmation /></RequireAuth>}
+          element={<RequireAuth><PageLayout><OrderConfirmation /></PageLayout></RequireAuth>}
         />
         <Route
           path="/my-orders"
           element={isAuthenticated ? <PageLayout><MyOrders /></PageLayout> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/order/:id"
+          element={isAuthenticated ? <PageLayout><OrderDetail /></PageLayout> : <Navigate to="/login" />}
         />
         {/* Standalone — no footer */}
         <Route path="/login" element={<Login />} />
