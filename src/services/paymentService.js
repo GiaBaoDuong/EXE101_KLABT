@@ -52,6 +52,7 @@ export async function createPayment({ orderId, bookingId, bankCode = 'MB' }) {
 export async function simulateSepayWebhook(payload) {
   try {
     const token = localStorage.getItem('token')
+    console.log('token hien tai:', token ? `${token.substring(0, 20)}...` : 'NULL')
     const res = await fetch(`${API_BASE_URL}/api/Payment/sepay-webhook`, {
       method: 'POST',
       headers: {
