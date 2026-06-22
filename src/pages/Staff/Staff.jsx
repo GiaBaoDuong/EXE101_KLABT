@@ -362,7 +362,7 @@ function Staff() {
                         <td>{formatDate(b.startTime || b.bookingDate)}</td>
                         <td className="cell-price">{formatPrice(b.totalPrice)}</td>
                         <td>
-                          <span className="status-badge" style={{ backgroundColor: getStatusInfo(b.status, BOOKING_STATUSES).color }}>
+                          <span className="status-badge">
                             {getStatusInfo(b.status, BOOKING_STATUSES).label}
                           </span>
                         </td>
@@ -488,7 +488,7 @@ function Staff() {
                         <td className="cell-price">{formatPrice(o.totalAmount || o.total)}</td>
                         <td>{formatDate(o.orderDate || o.date)}</td>
                         <td>
-                          <span className="status-badge" style={{ backgroundColor: getStatusInfo(o.status, ORDER_STATUSES).color }}>
+                          <span className="status-badge">
                             {getStatusInfo(o.status, ORDER_STATUSES).label}
                           </span>
                         </td>
@@ -537,11 +537,11 @@ function Staff() {
                 </div>
                 <div className="detail-item">
                   <label>Total</label>
-                  <span style={{ color: '#22c55e', fontWeight: 700 }}>{formatPrice(selectedBooking.totalPrice)}</span>
+                  <span>{formatPrice(selectedBooking.totalPrice)}</span>
                 </div>
                 <div className="detail-item">
                   <label>Status</label>
-                  <span className="status-badge" style={{ backgroundColor: getStatusInfo(selectedBooking.status, BOOKING_STATUSES).color }}>
+                  <span className="status-badge">
                     {getStatusInfo(selectedBooking.status, BOOKING_STATUSES).label}
                   </span>
                 </div>

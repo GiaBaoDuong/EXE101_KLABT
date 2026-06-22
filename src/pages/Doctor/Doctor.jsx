@@ -302,7 +302,6 @@ function Doctor() {
                     </div>
                     <span
                       className="dbc-status"
-                      style={{ color: status.color, background: `${status.color}20` }}
                     >
                       {status.label}
                     </span>
@@ -429,7 +428,7 @@ function Doctor() {
                 {(() => {
                   const s = getStatusInfo(selectedBooking.status)
                   return (
-                    <span className="dm-status-badge" style={{ color: s.color, background: `${s.color}20` }}>
+                    <span className="dm-status-badge">
                       {s.label}
                     </span>
                   )
