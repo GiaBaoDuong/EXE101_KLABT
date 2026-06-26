@@ -274,12 +274,14 @@
   font-weight: 600;
   letter-spacing: 3px;
   text-transform: uppercase;
+  overflow: hidden;
+  animation: fadeIn 0.6s ease forwards;
 }
 
-.home-promo-bar span {
-  opacity: 0.6;
-  font-weight: 400;
-  margin-right: var(--spacing-md);
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 }
 
 /* ========================================
@@ -494,6 +496,82 @@
   color: var(--color-ink);
   letter-spacing: -0.3px;
   margin-top: var(--spacing-sm);
+}
+
+.home-product-card__quick-add {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  padding: 10px;
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.15s ease;
+  z-index: 2;
+}
+
+.home-product-card:hover .home-product-card__quick-add {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.home-product-card__quick-add:hover {
+  background: #333;
+}
+
+.home-product-card__quick-add:active {
+  transform: scale(0.97);
+}
+
+/* --- Shimmer Skeleton --- */
+.home-product-card--skeleton {
+  background: var(--color-canvas);
+  overflow: hidden;
+  border: 1px solid var(--color-hairline-soft);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.home-product-card--skeleton .home-product-card__image-wrap {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(90deg, var(--color-soft-cloud) 25%, var(--color-hairline-soft) 50%, var(--color-soft-cloud) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.home-product-card--skeleton .home-product-card__body {
+  padding: var(--spacing-lg) 0 0;
+}
+
+.home-product-card__skeleton-name {
+  height: 14px;
+  width: 75%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--color-soft-cloud) 25%, var(--color-hairline-soft) 50%, var(--color-soft-cloud) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  margin-bottom: var(--spacing-sm);
+}
+
+.home-product-card__skeleton-price {
+  height: 16px;
+  width: 40%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--color-soft-cloud) 25%, var(--color-hairline-soft) 50%, var(--color-soft-cloud) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
 }
 
 /* ========================================
@@ -1293,20 +1371,41 @@
   margin-top: 0;
 }
 
-.home-welcome__icon {
+.home-welcome__avatar {
   width: 36px;
   height: 36px;
-  background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  animation: avatarPulse 2s ease-in-out infinite, avatarFloat 3s ease-in-out infinite;
 }
 
-.home-welcome__icon svg {
-  width: 18px;
-  height: 18px;
+.home-welcome__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-welcome__avatar-initials {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+@keyframes avatarPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15); }
+  50%       { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.05); }
+}
+
+@keyframes avatarFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
 }
 
 .home-welcome__text {
@@ -1698,10 +1797,6 @@
 .home-member-band.is-visible .home-member-item:nth-child(4) { opacity: 1; transform: none; transition-delay: 240ms; }
 
 /* --- Promo Bar — Marquee --- */
-.home-promo-bar {
-  overflow: hidden;
-}
-
 .home-promo-bar-inner {
   display: inline-block;
   white-space: nowrap;

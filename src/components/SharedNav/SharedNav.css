@@ -97,6 +97,23 @@
   letter-spacing: 0.3px;
   transition: color 0.15s;
   white-space: nowrap;
+  position: relative;
+}
+
+.sn-nav__links li a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-ink);
+  transition: width 0.25s ease;
+}
+
+.sn-nav__links li a:hover::after,
+.sn-nav__links li a.active::after {
+  width: 100%;
 }
 
 .sn-nav__links li a:hover,
@@ -176,6 +193,13 @@
   place-items: center;
   line-height: 1;
   padding: 0 4px;
+  animation: badgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  0%   { transform: scale(0); }
+  70%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .sn-notif__panel {

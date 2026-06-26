@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import './Products.css'
 import SharedNav from '../../components/SharedNav/SharedNav'
 
@@ -17,7 +17,11 @@ const CATEGORIES = [
 function Products() {
   const [products, setProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
-  const [selectedCategory, setSelectedCategory] = useState(0)
+  const [searchParams] = useSearchParams()
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    const cat = searchParams.get('cat')
+    return cat ? parseInt(cat, 10) : 0
+  })
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState('name')
   const [isLoading, setIsLoading] = useState(true)

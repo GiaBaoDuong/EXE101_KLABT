@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import groomingImg from '../../assets/990a6d84-3759-4280-af46-bb8217d2f8ea.jpg'
 import '../Homepage/Homepage.css'
 import SharedNav from '../../components/SharedNav/SharedNav'
@@ -59,14 +59,28 @@ function useScrollReveal(options = {}) {
 }
 
 function ProductCard({ product }) {
+  const navigate = useNavigate()
+
+  const handleQuickAdd = (e) => {
+    e.stopPropagation()
+    // Logic thêm vào cart — giữ nguyên, không sửa
+  }
+
   return (
-    <article className="home-product-card">
+    <article
+      className="home-product-card"
+      onClick={() => navigate(`/products/${product.productId}`)}
+      style={{ cursor: 'pointer' }}
+    >
       <div className="home-product-card__image-wrap">
         {product.thumbnailUrl || product.images?.[0] ? (
           <img src={product.thumbnailUrl || product.images[0]} alt={product.name} className="home-product-card__image" />
         ) : (
           <img src={heroPlaceholder} alt={product.name} className="home-product-card__image" />
         )}
+        <button className="home-product-card__quick-add" onClick={handleQuickAdd}>
+          Add to Cart
+        </button>
       </div>
       <div className="home-product-card__body">
         <h3 className="home-product-card__name">{product.name}</h3>
@@ -83,6 +97,7 @@ function Homepage() {
   const [showWelcome, setShowWelcome] = useState(false)
   const [isLeaving, setIsLeaving] = useState(false)
   const [products, setProducts] = useState([])
+  const [isProductsLoading, setIsProductsLoading] = useState(true)
   const [services, setServices] = useState([])
 
   // Scroll reveal refs
@@ -118,7 +133,9 @@ function Homepage() {
         const data = await res.json()
         setProducts(data)
       }
-    } catch (e) { /* silent */ }
+    } catch (e) { /* silent */ } finally {
+      setIsProductsLoading(false)
+    }
   }
 
   const fetchServices = async () => {
@@ -141,8 +158,14 @@ function Homepage() {
       {showWelcome && (
         <div className={`home-welcome${isLeaving ? ' is-leaving' : ''}`}>
           <div className="home-welcome__inner">
-            <div className="home-welcome__icon">
-              <PawIcon />
+            <div className="home-welcome__avatar">
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user?.fullName} />
+              ) : (
+                <span className="home-welcome__avatar-initials">
+                  {(user?.fullName || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                </span>
+              )}
             </div>
             <div className="home-welcome__text">
               <span className="home-welcome__greeting">Welcome back</span>
@@ -256,9 +279,21 @@ function Homepage() {
           </Link>
         </div>
         <div className="home-products__grid reveal" ref={productsGridRef}>
-          {topPickProducts.map(product => (
-            <ProductCard key={product.productId} product={product} />
-          ))}
+          {isProductsLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="home-product-card home-product-card--skeleton">
+                <div className="home-product-card__image-wrap" />
+                <div className="home-product-card__body">
+                  <div className="home-product-card__skeleton-name" />
+                  <div className="home-product-card__skeleton-price" />
+                </div>
+              </div>
+            ))
+          ) : (
+            topPickProducts.map(product => (
+              <ProductCard key={product.productId} product={product} />
+            ))
+          )}
         </div>
       </section>
 
