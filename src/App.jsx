@@ -10,6 +10,7 @@ import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
 import PetGrooming from './pages/PetGrooming/PetGrooming'
 import PetHealthQuiz from './pages/PetHealthQuiz/PetHealthQuiz'
+import PetHealthQuizResult from './pages/PetHealthQuiz/PetHealthQuizResult'
 import UserProfile from './pages/UserProfile/UserProfile'
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard'
 import Staff from './pages/Staff/Staff'
@@ -100,6 +101,7 @@ function App() {
         <Route path="/services" element={<PageLayout><Services /></PageLayout>} />
 
         <Route path="/pet-health-quiz" element={<PageLayout><PetHealthQuiz /></PageLayout>} />
+        <Route path="/pet-health-quiz/result" element={<PageLayout><PetHealthQuizResult /></PageLayout>} />
 
         {/* Auth pages */}
         <Route

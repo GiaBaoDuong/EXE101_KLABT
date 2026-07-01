@@ -76,13 +76,80 @@ export default function SharedNav({ cartCount = 0 }) {
   const navigate = useNavigate()
   const [showNotifPanel, setShowNotifPanel] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState({ products: [], services: [] })
+  const [isSearching, setIsSearching] = useState(false)
   const [userBookings, setUserBookings] = useState([])
   const notifRef = useRef(null)
   const userRef = useRef(null)
+  const searchInputRef = useRef(null)
 
   useEffect(() => {
     if (showUserDropdown) fetchUserBookings()
   }, [showUserDropdown])
+
+  useEffect(() => {
+    if (showSearch && searchInputRef.current) {
+      searchInputRef.current.focus()
+    }
+  }, [showSearch])
+
+  useEffect(() => {
+    if (!showSearch) return
+    function onKey(e) { if (e.key === 'Escape') closeSearch() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [showSearch])
+
+  const closeSearch = () => {
+    setShowSearch(false)
+    setSearchQuery('')
+    setSearchResults({ products: [], services: [] })
+  }
+
+  useEffect(() => {
+    const q = searchQuery.trim().toLowerCase()
+    if (q.length < 2) {
+      setSearchResults({ products: [], services: [] })
+      setIsSearching(false)
+      return
+    }
+    let cancelled = false
+    setIsSearching(true)
+
+    const token = localStorage.getItem('token')
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
+    Promise.all([
+      fetch(`${API_BASE_URL}/api/Product`, { headers }).then(r => r.ok ? r.json() : []),
+      fetch(`${API_BASE_URL}/api/Service`, { headers }).then(r => r.ok ? r.json() : []),
+    ])
+      .then(([products, services]) => {
+        if (cancelled) return
+        const matchedProducts = (Array.isArray(products) ? products : [])
+          .filter(p =>
+            p.name?.toLowerCase().includes(q) ||
+            p.brand?.toLowerCase().includes(q)
+          )
+          .slice(0, 5)
+        const matchedServices = (Array.isArray(services) ? services : [])
+          .filter(s =>
+            s.name?.toLowerCase().includes(q) ||
+            s.description?.toLowerCase().includes(q)
+          )
+          .slice(0, 5)
+        setSearchResults({ products: matchedProducts, services: matchedServices })
+      })
+      .catch(() => {
+        if (!cancelled) setSearchResults({ products: [], services: [] })
+      })
+      .finally(() => {
+        if (!cancelled) setIsSearching(false)
+      })
+
+    return () => { cancelled = true }
+  }, [searchQuery])
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -163,7 +230,7 @@ export default function SharedNav({ cartCount = 0 }) {
           </ul>
 
           <div className="sn-nav__actions">
-            <button className="sn-icon-btn" aria-label="Search"><SearchIcon /></button>
+            <button className="sn-icon-btn" aria-label="Search" onClick={() => setShowSearch(true)}><SearchIcon /></button>
             <button className="sn-icon-btn" aria-label="Wishlist"><HeartIcon /></button>
 
             {/* Bell Notification */}
@@ -292,6 +359,105 @@ export default function SharedNav({ cartCount = 0 }) {
           </div>
         </div>
       </nav>
+
+      {/* Search Modal Overlay */}
+      {showSearch && (
+        <div className="sn-search-overlay" onClick={closeSearch}>
+          <div className="sn-search-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="sn-search-modal__input-wrap">
+              <SearchIcon />
+              <input
+                ref={searchInputRef}
+                type="text"
+                className="sn-search-modal__input"
+                placeholder="Search products & services…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button className="sn-search-modal__close" onClick={closeSearch} aria-label="Close">
+                <IconX />
+              </button>
+            </div>
+
+            <div className="sn-search-modal__body">
+              {searchQuery.trim().length < 2 && (
+                <div className="sn-search-modal__hint">
+                  <p>Type at least 2 characters to search across products and services.</p>
+                </div>
+              )}
+
+              {searchQuery.trim().length >= 2 && isSearching && (
+                <div className="sn-search-modal__loading">Searching…</div>
+              )}
+
+              {searchQuery.trim().length >= 2 && !isSearching &&
+                searchResults.products.length === 0 && searchResults.services.length === 0 && (
+                <div className="sn-search-modal__empty">
+                  <p>No results found for "<strong>{searchQuery}</strong>"</p>
+                </div>
+              )}
+
+              {searchResults.products.length > 0 && (
+                <div className="sn-search-modal__section">
+                  <h4 className="sn-search-modal__section-title">Products</h4>
+                  <div className="sn-search-modal__list">
+                    {searchResults.products.map(p => (
+                      <div
+                        key={p.productId}
+                        className="sn-search-modal__item"
+                        onClick={() => { closeSearch(); navigate(`/products/${p.productId}`) }}
+                      >
+                        <div className="sn-search-modal__item-image">
+                          {(p.thumbnailUrl || p.images?.[0]) ? (
+                            <img src={p.thumbnailUrl || p.images[0]} alt={p.name} />
+                          ) : (
+                            <span>🐾</span>
+                          )}
+                        </div>
+                        <div className="sn-search-modal__item-body">
+                          <span className="sn-search-modal__item-name">{p.name}</span>
+                          {p.brand && <span className="sn-search-modal__item-sub">{p.brand}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {searchResults.services.length > 0 && (
+                <div className="sn-search-modal__section">
+                  <h4 className="sn-search-modal__section-title">Services</h4>
+                  <div className="sn-search-modal__list">
+                    {searchResults.services.map(s => (
+                      <div
+                        key={s.serviceId}
+                        className="sn-search-modal__item"
+                        onClick={() => { closeSearch(); navigate('/services') }}
+                      >
+                        <div className="sn-search-modal__item-image sn-search-modal__item-image--service">
+                          {(s.imageUrl || s.thumbnailUrl || s.images?.[0]) ? (
+                            <img src={s.imageUrl || s.thumbnailUrl || s.images[0]} alt={s.name} />
+                          ) : (
+                            <span>✨</span>
+                          )}
+                        </div>
+                        <div className="sn-search-modal__item-body">
+                          <span className="sn-search-modal__item-name">{s.name}</span>
+                          {s.description && (
+                            <span className="sn-search-modal__item-sub">
+                              {s.description.length > 60 ? `${s.description.slice(0, 60)}…` : s.description}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

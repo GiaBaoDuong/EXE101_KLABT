@@ -1,15 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   QUIZ_CATEGORIES,
   MOCK_PRODUCTS,
   calculateQuizResult,
   getRecommendedProductsByTags,
 } from './quizData'
+import { useAuth } from '../../context/AuthContext'
 import SharedNav from '../../components/SharedNav/SharedNav'
+import { QUIZ_ICONS } from './quizShared'
 import './PetHealthQuiz.css'
 import pethealthcheck from '../../assets/pethealthcheck.jpg'
 const HERO_IMAGE = pethealthcheck
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
 /* Scroll Reveal Hook */
 function useScrollReveal(options = {}) {
@@ -52,52 +56,7 @@ function useScrollReveal(options = {}) {
 }
 
 /** Icon map */
-const ICONS = {
-  brain: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 4.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0-1.32 4.24 3 3 0 0 0 .34 5.58 2.5 2.5 0 0 0 2.96 3.08 2.5 2.5 0 0 0 4.91.05L12 20V4.5Z"/>
-      <path d="M12 4.5a2.5 2.5 0 0 1 4.96-.46 2.5 2.5 0 0 1 1.98 3 2.5 2.5 0 0 1 1.32 4.24 3 3 0 0 1-.34 5.58 2.5 2.5 0 0 1-2.96 3.08 2.5 2.5 0 0 1-4.91.05L12 20V4.5Z"/>
-      <path d="M12 4.5V20"/><path d="M12 12c-3 0-6 2-6 6"/><path d="M12 12c3 0 6 2 6 6"/>
-    </svg>
-  ),
-  stomach: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7Z"/>
-      <circle cx="12" cy="9" r="2"/>
-    </svg>
-  ),
-  paw: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/>
-      <circle cx="20" cy="16" r="2"/><circle cx="4" cy="16" r="2"/>
-      <path d="M12 10c-3 0-6 3-6 6v2h12v-2c0-3-3-6-6-6Z"/>
-    </svg>
-  ),
-  bone: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 10c.7-.7 1.69 0 2.5 0a2.5 2.5 0 1 0 0-5 .5.5 0 0 1-.5-.5 2.5 2.5 0 1 0-5 0c0 1.68.65 3.21 1.69 4.33"/>
-      <path d="M7 10c-.7-.7-1.69 0-2.5 0a2.5 2.5 0 0 1 0 5 .5.5 0 0 0 .5.5 2.5 2.5 0 1 0 5 0c0-1.68-.65-3.21-1.69-4.33"/>
-      <path d="M8.5 14.5c1.17 0 2-.5 2-2s-.83-2-2-2-2 .5-2 2 .83 2 2 2Z"/>
-      <path d="M15.5 14.5c1.17 0 2-.5 2-2s-.83-2-2-2-2 .5-2 2 .83 2 2 2Z"/>
-    </svg>
-  ),
-  lungs: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 4C8 4 5 8 5 12v3c0 4 3 7 7 7s7-3 7-7v-3c0-4-3-8-7-8Z"/>
-      <path d="M9 12h6"/><path d="M12 8v8"/>
-      <path d="M9 12V8c0-1.66 1.34-3 3-3"/>
-      <path d="M15 12V8c0-1.66-1.34-3-3-3"/>
-    </svg>
-  ),
-}
-
-/** Severity colors */
-const SEVERITY_COLORS = {
-  low: '#007d48',
-  medium: '#b45309',
-  high: '#c2410c',
-  critical: '#b91c1c',
-}
+const ICONS = QUIZ_ICONS
 
 /** Category card */
 function CategoryCard({ category, onStart }) {
@@ -168,9 +127,10 @@ function OptionButton({ option, selected, onSelect }) {
 }
 
 /** Quiz runner */
-function QuizRunner({ category, onBack, onComplete }) {
+function QuizRunner({ category, onBack, onComplete, isSubmitting }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState([])
+  const [isExiting, setIsExiting] = useState(false)
 
   const question = category.questions[currentIndex]
   const currentAnswer = answers.find(a => a.questionId === question.id)
@@ -191,13 +151,21 @@ function QuizRunner({ category, onBack, onComplete }) {
 
   const handleNext = () => {
     if (currentIndex < totalQuestions - 1) {
-      setCurrentIndex(i => i + 1)
+      setIsExiting(true)
+      setTimeout(() => {
+        setCurrentIndex(i => i + 1)
+        setIsExiting(false)
+      }, 200)
     }
   }
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(i => i - 1)
+      setIsExiting(true)
+      setTimeout(() => {
+        setCurrentIndex(i => i - 1)
+        setIsExiting(false)
+      }, 200)
     }
   }
 
@@ -217,7 +185,7 @@ function QuizRunner({ category, onBack, onComplete }) {
     <div className="quiz-runner">
       <StepIndicator current={currentIndex + 1} total={totalQuestions} />
 
-      <div className="quiz-runner__question-wrap">
+      <div className={`quiz-runner__question-wrap ${isExiting ? 'exit' : ''}`}>
         <p className="quiz-runner__question-num">Question {currentIndex + 1}</p>
         <h2 className="quiz-runner__question-text">{question.questionText}</h2>
 
@@ -249,7 +217,7 @@ function QuizRunner({ category, onBack, onComplete }) {
           <button
             className="quiz-nav-btn quiz-nav-btn--submit"
             onClick={handleSubmit}
-            disabled={!canProceed}
+            disabled={!canProceed || isSubmitting}
           >
             See Results
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -273,177 +241,227 @@ function QuizRunner({ category, onBack, onComplete }) {
   )
 }
 
-/** Result page */
-function QuizResult({ quizData, onRestart, onViewProducts }) {
-  const { category, result, recommended } = quizData
-  const severityColor = SEVERITY_COLORS[result.severity] || '#111'
-
-  const formatPrice = (price) =>
-    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
-
-  const scorePercent = result.scorePercent
-  const circumference = 2 * Math.PI * 72
-  const dashOffset = circumference - (scorePercent / 100) * circumference
-
-  return (
-    <div className="quiz-result">
-      {/* Header */}
-      <div className="quiz-result__header">
-        <div className="quiz-result__cat-info">
-          <span className="quiz-result__cat-icon">
-            {ICONS[category.icon] || ICONS.paw}
-          </span>
-          <div>
-            <p className="quiz-result__cat-label">Assessment Complete</p>
-            <h2 className="quiz-result__cat-title">{category.title}</h2>
-          </div>
-        </div>
-        <button className="quiz-result__restart-btn" onClick={onRestart}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-            <path d="M3 3v5h5"/>
-          </svg>
-          Retake
-        </button>
-      </div>
-
-      {/* Score section */}
-      <div className="quiz-result__score-section">
-        <div className="quiz-result__score-ring-wrap">
-          <svg className="quiz-result__score-ring" viewBox="0 0 160 160">
-            <circle
-              className="quiz-result__score-track"
-              cx="80" cy="80" r="72"
-              fill="none" strokeWidth="8"
-            />
-            <circle
-              className="quiz-result__score-fill"
-              cx="80" cy="80" r="72"
-              fill="none"
-              strokeWidth="8"
-              strokeDasharray={2 * Math.PI * 72}
-              strokeDashoffset={dashOffset}
-              strokeLinecap="round"
-              style={{ stroke: severityColor }}
-            />
-          </svg>
-          <div className="quiz-result__score-inner">
-            <span className="quiz-result__score-pct" style={{ color: severityColor }}>
-              {scorePercent}%
-            </span>
-            <span className="quiz-result__score-label">
-              {result.totalScore}/{result.maxScore}
-            </span>
-          </div>
-        </div>
-
-        <div className="quiz-result__score-meta">
-          <div className="quiz-result__level-badge">
-            <span className="quiz-result__level-dot" style={{ background: severityColor }} />
-            <span className="quiz-result__level-text">{result.level}</span>
-          </div>
-          <p className="quiz-result__condition-label">Health Status</p>
-          <h3 className="quiz-result__condition-text">{result.summary}</h3>
-        </div>
-      </div>
-
-      {/* Info rows */}
-      <div className="quiz-result__body">
-        <div className="quiz-result__row">
-          <div className="quiz-result__row-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-            </svg>
-          </div>
-          <div className="quiz-result__row-content">
-            <p className="quiz-result__row-label">Care Recommendations</p>
-            <p className="quiz-result__row-text">{result.advice}</p>
-          </div>
-        </div>
-
-        {(result.severity === 'high' || result.severity === 'critical') && (
-          <div className="quiz-result__disclaimer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 8v4M12 16h.01"/>
-            </svg>
-            <p>
-              This is an initial screening tool for reference only, <strong>not an official medical diagnosis</strong>.
-              Please take your pet to a veterinarian for an accurate evaluation.
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Recommended products */}
-      {recommended.length > 0 && (
-        <div className="quiz-result__products">
-          <h3 className="quiz-result__products-title">Recommended Products</h3>
-          <div className="quiz-result__products-grid">
-            {recommended.map(product => (
-              <div key={product.id} className="quiz-product-card">
-                <div className="quiz-product-card__image">
-                  <img src={product.image} alt={product.name} />
-                </div>
-                <div className="quiz-product-card__body">
-                  <p className="quiz-product-card__name">{product.name}</p>
-                  <p className="quiz-product-card__reason">{product.reason}</p>
-                  <p className="quiz-product-card__price">{formatPrice(product.price)}</p>
-                  <Link to={`/products/${product.id}`} className="quiz-product-card__btn">
-                    View Details
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {onViewProducts && (
-            <button className="quiz-result__view-all" onClick={onViewProducts}>
-              View All Products
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="quiz-result__actions">
-        <button className="quiz-action-btn quiz-action-btn--secondary" onClick={onRestart}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-            <path d="M3 3v5h5"/>
-          </svg>
-          Retake Quiz
-        </button>
-        <Link to="/products" className="quiz-action-btn quiz-action-btn--primary">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18M16 10a4 4 0 0 1-8 0"/>
-          </svg>
-          Browse Products
-        </Link>
-      </div>
-    </div>
-  )
-}
-
 /** Main page */
 export default function PetHealthQuiz() {
-  const [view, setView] = useState('categories') // categories | quiz | result
+  const navigate = useNavigate()
+  const { user, token } = useAuth()
+  const [view, setView] = useState('categories') // categories | quiz
   const [selectedCategory, setSelectedCategory] = useState(null)
-  const [quizData, setQuizData] = useState(null)
   const [categoriesRef, animateCategories] = useScrollReveal()
+
+  const [submitState, setSubmitState] = useState(null) // null | 'submitting' | 'done' | 'error'
+  const [submitError, setSubmitError] = useState('')
+  const [pendingQuizData, setPendingQuizData] = useState(null)
+
+  const [pets, setPets] = useState([])
+  const [selectedPet, setSelectedPet] = useState(null)
+  const [showPetList, setShowPetList] = useState(false)
+  const [petLoading, setPetLoading] = useState(true)
+
+  useEffect(() => {
+    if (user?.userId && token) {
+      fetchPets()
+    } else {
+      setPetLoading(false)
+    }
+  }, [user, token])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showPetList && !event.target.closest('.pq-selector') && !event.target.closest('.pq-pet-list')) {
+        setShowPetList(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showPetList])
+
+  const fetchPets = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Pet/user/${user.userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      if (response.ok) {
+        const data = await response.json()
+        const petList = Array.isArray(data) ? data : (data ? [data] : [])
+        setPets(petList)
+        if (petList.length > 0) {
+          if (!selectedPet || !petList.find(p => p.petId === selectedPet.petId)) {
+            setSelectedPet(petList[0])
+          }
+        } else {
+          setSelectedPet(null)
+        }
+      }
+    } catch (err) {
+      console.log('Error fetching pets')
+    } finally {
+      setPetLoading(false)
+    }
+  }
+
+  const getInitials = (name) => {
+    if (!name) return 'P'
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+
+  const handleSelectPet = (pet) => {
+    setSelectedPet(pet)
+    setShowPetList(false)
+  }
 
   const handleStart = (category) => {
     setSelectedCategory(category)
     setView('quiz')
   }
 
+  const handleExitQuiz = () => {
+    window.location.href = '/pet-health-quiz'
+  }
+
+  const TAG_TO_CATEGORIES = {
+    toy: [2], comfort: [2], 'stress-relief': [2], calming: [2],
+    probiotic: [1], digestive: [1], food: [1],
+    'skin-care': [3], shampoo: [3], allergy: [3],
+    joint: [4], mobility: [4], 'pain-relief': [4],
+    respiratory: [4], vitamin: [4], energy: [4], immunity: [4],
+    supplement: [4],
+  }
+
+  const getCategoryIdsFromTags = (tags) => {
+    const ids = new Set()
+    ;(tags || []).forEach(tag => {
+      const cats = TAG_TO_CATEGORIES[tag]
+      if (cats) cats.forEach(id => ids.add(id))
+    })
+    return ids
+  }
+
+  const fetchRecommendedProducts = async (categoryTags) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/Product`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+      if (!res.ok) return []
+      const allProducts = await res.json()
+      const catIds = getCategoryIdsFromTags(categoryTags)
+      if (catIds.size === 0) return []
+
+      return allProducts
+        .filter(p => catIds.has(p.category))
+        .slice(0, 6)
+        .map(p => ({
+          id: String(p.productId),
+          name: p.name,
+          image: p.thumbnailUrl || p.images?.[0] || '',
+          price: p.price,
+          category: p.category !== undefined && p.category !== null ? String(p.category) : '',
+          reason: `Recommended for ${(categoryTags || []).join(', ')} needs`,
+        }))
+    } catch {
+      return []
+    }
+  }
+
+  const buildAssessmentPayload = (data, realRecommended) => {
+    const tagSet = new Set()
+    if (Array.isArray(data.category?.recommendedProductTags)) {
+      data.category.recommendedProductTags.forEach(t => tagSet.add(t))
+    }
+    ;(realRecommended || []).forEach(p => {
+      if (p.category) tagSet.add(p.category)
+    })
+
+    return {
+      petId: selectedPet?.petId ?? 0,
+      quizCategoryId: data.category?.id ?? '',
+      quizCategoryTitle: data.category?.title ?? '',
+      answers: data.answers.map(a => ({
+        questionId: a.questionId,
+        questionText: a.questionText,
+        selectedOptionLabel: a.selectedOptionLabel,
+        score: a.score,
+      })),
+      totalScore: data.result.totalScore,
+      maxScore: data.result.maxScore,
+      scorePercent: data.result.scorePercent,
+      result: {
+        level: data.result.level,
+        severity: data.result.severity,
+        summary: data.result.summary,
+        advice: data.result.advice,
+      },
+      recommendedProductTags: Array.from(tagSet),
+      recommendedProducts: (realRecommended || []).map(p => ({
+        id: String(p.id),
+        name: p.name,
+        image: p.image,
+        price: p.price,
+        category: p.category !== undefined && p.category !== null ? String(p.category) : '',
+        reason: p.reason,
+      })),
+    }
+  }
+
+  const submitAssessment = async (data) => {
+    setSubmitState('submitting')
+    setSubmitError('')
+    const categoryTags = data.category?.recommendedProductTags || []
+
+    const [realRecommended] = await Promise.all([
+      fetchRecommendedProducts(categoryTags),
+    ])
+
+    const dataWithRealProducts = { ...data, recommended: realRecommended }
+    setPendingQuizData(dataWithRealProducts)
+
+    const payload = buildAssessmentPayload(data, realRecommended)
+    console.log('Assessment payload:', JSON.stringify(payload, null, 2))
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/PetHealthAssessment`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        let errBody = ''
+        try { errBody = await res.text() } catch {}
+        console.error('Assessment API error body:', errBody)
+        throw new Error(`HTTP ${res.status}: ${errBody}`)
+      }
+      setSubmitState('done')
+    } catch (err) {
+      console.error('Failed to save assessment:', err)
+      setSubmitError('Unable to save your result right now. Showing result anyway.')
+      setSubmitState('error')
+    }
+  }
+
+  const closePopupAndShowResult = () => {
+    const data = pendingQuizData
+    setSubmitState(null)
+    setSubmitError('')
+    setPendingQuizData(null)
+    if (data) navigate('/pet-health-quiz/result', { state: { quizData: data } })
+  }
+
+  const closePopupOnly = () => {
+    setSubmitState(null)
+    setSubmitError('')
+    setPendingQuizData(null)
+  }
+
   const handleComplete = (data) => {
-    setQuizData(data)
-    setView('result')
+    submitAssessment(data)
   }
 
   const handleRestart = () => {
-    setQuizData(null)
     setSelectedCategory(null)
     setView('categories')
   }
@@ -466,6 +484,59 @@ export default function PetHealthQuiz() {
           </p>
         </div>
       </section>
+
+      {/* Pet Selector (giống PetProfile) */}
+      {!petLoading && pets.length > 0 && (
+        <div className="pq-selector-wrap">
+          <span className="pq-selector-label">Pet for this check</span>
+          <div className="pq-selector">
+            <button className="pq-selector-btn" onClick={() => setShowPetList(!showPetList)}>
+              {selectedPet?.avatarUrl ? (
+                <img src={selectedPet.avatarUrl} alt="" className="pq-selector-avatar" />
+              ) : (
+                <div className="pq-selector-avatar-placeholder">{getInitials(selectedPet?.name)}</div>
+              )}
+              <div className="pq-selector-info">
+                <span className="pq-selector-name">{selectedPet?.name || 'Select Pet'}</span>
+                <span className="pq-selector-species">{selectedPet?.species || ''}</span>
+              </div>
+              <span className="pq-selector-arrow">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </span>
+            </button>
+            {showPetList && (
+              <div className="pq-pet-list">
+                {pets.map((pet) => (
+                  <div
+                    key={pet.petId}
+                    className={`pq-pet-list-item ${selectedPet?.petId === pet.petId ? 'active' : ''}`}
+                    onClick={() => handleSelectPet(pet)}
+                  >
+                    {pet.avatarUrl ? (
+                      <img src={pet.avatarUrl} alt="" className="pq-pet-list-avatar" />
+                    ) : (
+                      <div className="pq-pet-list-avatar-placeholder">{getInitials(pet.name)}</div>
+                    )}
+                    <div className="pq-pet-list-info">
+                      <span className="pq-pet-list-name">{pet.name}</span>
+                      <span className="pq-pet-list-species">{pet.species}</span>
+                    </div>
+                    {selectedPet?.petId === pet.petId && (
+                      <span className="pq-pet-list-check">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <section className="quiz-content">
@@ -498,7 +569,7 @@ export default function PetHealthQuiz() {
                   <h2 className="quiz-content__cat-title">{selectedCategory.title}</h2>
                 </div>
               </div>
-              <button className="quiz-runner__exit" onClick={handleRestart}>
+              <button className="quiz-runner__exit" onClick={handleExitQuiz}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"/>
                   <line x1="6" y1="6" x2="18" y2="18"/>
@@ -510,20 +581,60 @@ export default function PetHealthQuiz() {
               category={selectedCategory}
               onBack={handleRestart}
               onComplete={handleComplete}
-            />
-          </div>
-        )}
-
-        {view === 'result' && quizData && (
-          <div className="quiz-content__inner">
-            <QuizResult
-              quizData={quizData}
-              onRestart={handleRestart}
-              onViewProducts={() => {}}
+              isSubmitting={submitState === 'submitting'}
             />
           </div>
         )}
       </section>
+
+      {/* Submit status popup */}
+      {submitState && (
+        <div className="pq-modal-overlay" onClick={submitState === 'submitting' ? undefined : closePopupOnly}>
+          <div className="pq-done-modal" onClick={(e) => e.stopPropagation()}>
+            {submitState === 'submitting' && (
+              <>
+                <div className="pq-done-modal__spinner" />
+                <h3>Saving your result…</h3>
+                <p>Please wait a moment while we save your health check to your pet's history.</p>
+              </>
+            )}
+
+            {submitState === 'done' && (
+              <>
+                <div className="pq-done-modal__check">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <h3>Quiz completed!</h3>
+                <p>Your health check has been saved to <strong>{selectedPet?.name || 'your pet'}'s</strong> history.</p>
+                <button className="pq-done-modal__btn" onClick={closePopupAndShowResult}>
+                  View Result
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {submitState === 'error' && (
+              <>
+                <div className="pq-done-modal__warn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4M12 16h.01" />
+                  </svg>
+                </div>
+                <h3>Couldn't save result</h3>
+                <p>{submitError}</p>
+                <button className="pq-done-modal__btn" onClick={closePopupAndShowResult}>
+                  Continue to Result
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
     </>
   )

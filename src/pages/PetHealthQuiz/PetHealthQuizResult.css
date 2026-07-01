@@ -1,0 +1,103 @@
+/* ========================================
+   PET HEALTH QUIZ RESULT — standalone page
+   ======================================== */
+
+.quiz-result-page {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.quiz-result-page__content {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: var(--spacing-section) var(--spacing-section);
+}
+
+/* Reuse the same .quiz-result wrapper styles but add a small top entrance animation */
+.quiz-result-page .quiz-result {
+  animation: quizResultFadeIn 0.4s ease-out;
+}
+
+@keyframes quizResultFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Empty state */
+.quiz-result-page--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px var(--spacing-section);
+}
+
+.quiz-result-empty {
+  text-align: center;
+  background: var(--color-soft-cloud);
+  padding: 80px var(--spacing-xl);
+  border-radius: var(--rounded-sm);
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.quiz-result-empty h2 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.quiz-result-empty p {
+  font-size: 14px;
+  color: var(--color-mute);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.quiz-result-empty__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin-top: var(--spacing-md);
+  height: 48px;
+  padding: 0 28px;
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  border: none;
+  border-radius: var(--rounded-full);
+  font-family: var(--font-body-medium);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.quiz-result-empty__btn:hover { transform: scale(0.97); }
+.quiz-result-empty__btn:active { transform: scale(0.5); opacity: 0.5; }
+
+@media (max-width: 767px) {
+  .quiz-result-page__content {
+    padding: var(--spacing-lg);
+  }
+
+  .quiz-result-page--empty {
+    padding: var(--spacing-lg);
+  }
+
+  .quiz-result-empty {
+    padding: 56px var(--spacing-lg);
+  }
+
+  .quiz-result-empty h2 {
+    font-size: 24px;
+  }
+}
