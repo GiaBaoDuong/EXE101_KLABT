@@ -69,9 +69,6 @@ function Products() {
     return cat ? parseInt(cat, 10) : 0
   })
   const [searchTerm, setSearchTerm] = useState('')
-  const debouncedSearchTerm = useDebounce(searchTerm, 400)
-  const debouncedSearchTermFast = useDebounce(searchTerm, 150)
-  const [searchMode, setSearchMode] = useState('instant') // 'instant' | 'debounced' | 'prefix' | 'hybrid'
   const [sortBy, setSortBy] = useState('name')
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
@@ -87,20 +84,7 @@ function Products() {
       filtered = filtered.filter(p => p.category === selectedCategory)
     }
 
-    // Active search strategy — driven by searchMode
-    // 1) instant   → no debounce
-    // 2) debounced → 150ms debounce
-    // 3) prefix    → startsWith only
-    // 4) hybrid    → contains + sort startsWith first
-    if (searchMode === 'instant') {
-      filtered = searchInstant(searchTerm, filtered)
-    } else if (searchMode === 'debounced') {
-      filtered = searchDebounced(debouncedSearchTermFast, filtered)
-    } else if (searchMode === 'prefix') {
-      filtered = searchPrefix(debouncedSearchTermFast, filtered)
-    } else {
-      filtered = searchHybrid(debouncedSearchTermFast, filtered)
-    }
+    filtered = searchInstant(searchTerm, filtered)
 
     filtered.sort((a, b) => {
       if (sortBy === 'price-low') return (a.price || 0) - (b.price || 0)
@@ -109,7 +93,7 @@ function Products() {
     })
 
     setFilteredProducts(filtered)
-  }, [products, selectedCategory, debouncedSearchTermFast, searchMode, sortBy])
+  }, [products, selectedCategory, searchTerm, sortBy])
 
   const fetchProducts = async () => {
     setIsLoading(true)
@@ -138,7 +122,7 @@ function Products() {
     return cat?.name || 'Other'
   }
 
-  const activeQuery = (searchMode === 'instant' ? searchTerm : debouncedSearchTermFast || '').trim()
+  const activeQuery = searchTerm.trim()
   const highlightStyle = {
     backgroundColor: '#fff3a0',
     color: '#b8860b',
