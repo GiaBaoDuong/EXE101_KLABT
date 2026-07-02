@@ -89,12 +89,27 @@
   margin-bottom: 16px;
 }
 
-.orders-loading,
-.orders-empty {
+.orders-loading {
   text-align: center;
-  padding: 60px 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-card-skeleton {
   background: #fff;
   border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid #e5e5e5;
+}
+
+.orders-list--virtual .order-card {
+  margin-bottom: 0;
+}
   color: #6e6e73;
 }
 

@@ -8,6 +8,8 @@ import {
   getOrderTypeLabel,
 } from '../../services/orderService'
 import SharedNav from '../../components/SharedNav/SharedNav'
+import VirtualList from '../../components/VirtualList/VirtualList'
+import { Skeleton, SkeletonText } from '../../components/Skeleton/Skeleton'
 import './MyOrders.css'
 
 // OrderStatus: 1=Pending, 2=Processing, 3=Completed, 4=Cancelled
@@ -87,6 +89,82 @@ function MyOrders() {
     ? orders
     : orders.filter(o => o.status === Number(filter))
 
+  const renderOrderCard = (order) => (
+    <div
+      key={order.orderId}
+      className="order-card"
+      onClick={() => handleOrderClick(order)}
+      style={{ cursor: 'pointer' }}
+    >
+      <div className="order-card-header">
+        <div>
+          <span className="order-code">{order.orderCode || `Order #${order.orderId}`}</span>
+          <span className="order-date">{formatDate(order.createdAt)}</span>
+        </div>
+        <div className="order-badges">
+          <span className={`badge badge-${ORDER_STATUS[order.status]?.color || 'pending'}`}>
+            {ORDER_STATUS[order.status]?.label || getStatusLabel(order.status)}
+          </span>
+          <span className={`badge badge-${PAYMENT_STATUS[order.paymentStatus]?.color || 'unpaid'}`}>
+            {PAYMENT_STATUS[order.paymentStatus]?.label || getPaymentStatusLabel(order.paymentStatus)}
+          </span>
+        </div>
+      </div>
+
+      <div className="order-card-items">
+        {(order.items || []).map(item => (
+          <div key={item.orderItemId} className="order-item-row">
+            <div className="item-left">
+              <span className="item-name">{item.productName}</span>
+              <span className="item-meta">
+                {formatMoney(item.unitPrice)} × {item.quantity}
+              </span>
+            </div>
+            <span className="item-subtotal">{formatMoney(item.subTotal)}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="order-card-footer">
+        <div className="order-address">
+          <span className="meta-label">📍 Giao đến:</span> {order.shippingAddress || '—'}
+        </div>
+        <div className="order-total">
+          <span className="meta-label">Loại:</span> {getOrderTypeLabel(order.orderType)}
+          {order.discountAmount > 0 && (
+            <span className="discount-info"> (giảm {formatMoney(order.discountAmount)})</span>
+          )}
+          <div className="total-amount">
+            Tổng: <strong>{formatMoney(order.finalAmount)}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div className="order-card-actions" onClick={e => e.stopPropagation()}>
+        {order.status === 1 && order.paymentStatus === 1 && (
+          <>
+            <button
+              className="btn-action btn-pay"
+              onClick={(e) => handlePay(e, order)}
+            >
+              💳 Thanh toán ngay
+            </button>
+            <button
+              className="btn-action btn-cancel"
+              onClick={(e) => handleCancel(e, order)}
+              disabled={actionLoading === order.orderId}
+            >
+              {actionLoading === order.orderId ? 'Đang hủy...' : '✕ Hủy đơn'}
+            </button>
+          </>
+        )}
+        {order.status !== 1 && (
+          <span className="action-locked">Đơn hàng đã xử lý, không thể thay đổi</span>
+        )}
+      </div>
+    </div>
+  )
+
   return (
     <div className="orders-page">
       <SharedNav />
@@ -122,89 +200,31 @@ function MyOrders() {
         {error && <div className="orders-error">{error}</div>}
 
         {loading ? (
-          <div className="orders-loading">Đang tải đơn hàng...</div>
+          <div className="orders-loading">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="order-card-skeleton">
+                <Skeleton height="20px" width="60%" radius="4px" />
+                <SkeletonText lines={3} />
+                <Skeleton height="24px" width="40%" radius="4px" />
+              </div>
+            ))}
+          </div>
         ) : filteredOrders.length === 0 ? (
           <div className="orders-empty">
             <div className="empty-icon">📦</div>
             <p>Chưa có đơn hàng nào</p>
           </div>
+        ) : filteredOrders.length > 20 ? (
+          <VirtualList
+            items={filteredOrders}
+            itemHeight={280}
+            height={600}
+            renderItem={renderOrderCard}
+            className="orders-list orders-list--virtual"
+          />
         ) : (
           <div className="orders-list">
-            {filteredOrders.map(order => (
-              <div
-                key={order.orderId}
-                className="order-card"
-                onClick={() => handleOrderClick(order)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="order-card-header">
-                  <div>
-                    <span className="order-code">{order.orderCode || `Order #${order.orderId}`}</span>
-                    <span className="order-date">{formatDate(order.createdAt)}</span>
-                  </div>
-                  <div className="order-badges">
-                    <span className={`badge badge-${ORDER_STATUS[order.status]?.color || 'pending'}`}>
-                      {ORDER_STATUS[order.status]?.label || getStatusLabel(order.status)}
-                    </span>
-                    <span className={`badge badge-${PAYMENT_STATUS[order.paymentStatus]?.color || 'unpaid'}`}>
-                      {PAYMENT_STATUS[order.paymentStatus]?.label || getPaymentStatusLabel(order.paymentStatus)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="order-card-items">
-                  {(order.items || []).map(item => (
-                    <div key={item.orderItemId} className="order-item-row">
-                      <div className="item-left">
-                        <span className="item-name">{item.productName}</span>
-                        <span className="item-meta">
-                          {formatMoney(item.unitPrice)} × {item.quantity}
-                        </span>
-                      </div>
-                      <span className="item-subtotal">{formatMoney(item.subTotal)}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="order-card-footer">
-                  <div className="order-address">
-                    <span className="meta-label">📍 Giao đến:</span> {order.shippingAddress || '—'}
-                  </div>
-                  <div className="order-total">
-                    <span className="meta-label">Loại:</span> {getOrderTypeLabel(order.orderType)}
-                    {order.discountAmount > 0 && (
-                      <span className="discount-info"> (giảm {formatMoney(order.discountAmount)})</span>
-                    )}
-                    <div className="total-amount">
-                      Tổng: <strong>{formatMoney(order.finalAmount)}</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="order-card-actions" onClick={e => e.stopPropagation()}>
-                  {order.status === 1 && order.paymentStatus === 1 && (
-                    <>
-                      <button
-                        className="btn-action btn-pay"
-                        onClick={(e) => handlePay(e, order)}
-                      >
-                        💳 Thanh toán ngay
-                      </button>
-                      <button
-                        className="btn-action btn-cancel"
-                        onClick={(e) => handleCancel(e, order)}
-                        disabled={actionLoading === order.orderId}
-                      >
-                        {actionLoading === order.orderId ? 'Đang hủy...' : '✕ Hủy đơn'}
-                      </button>
-                    </>
-                  )}
-                  {order.status !== 1 && (
-                    <span className="action-locked">Đơn hàng đã xử lý, không thể thay đổi</span>
-                  )}
-                </div>
-              </div>
-            ))}
+            {filteredOrders.map(order => renderOrderCard(order))}
           </div>
         )}
       </div>

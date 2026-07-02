@@ -240,6 +240,64 @@
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 var(--spacing-section) var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px;
+  background: #fff;
+  border: 1px solid var(--color-hairline, #e5e5e5);
+  border-radius: 999px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-mode-pill:hover,
+.search-mode-pill:focus-within {
+  border-color: var(--color-ink, #333);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-mode-pill__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-mute, #888);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.search-mode-pill__select {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink, #333);
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.search-mode-pill__select option {
+  background: #fff;
+  color: var(--color-ink, #333);
+}
+
+@media (max-width: 600px) {
+  .products-search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-mode-pill {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .search-pill {
@@ -361,6 +419,15 @@
   display: block;
 }
 
+.product-card__image.lazy-image {
+  position: absolute;
+  inset: 0;
+}
+
+.product-card__image.lazy-image .lazy-image__img {
+  transition: opacity 0.3s ease, transform 0.4s ease;
+}
+
 .product-card:hover .product-card__image {
   transform: scale(1.04);
 }
@@ -417,6 +484,15 @@
   font-size: 12px;
   color: var(--color-mute);
   font-weight: 400;
+}
+
+/* highlight từ khóa search */
+.hl {
+  background-color: #fff3a0;
+  color: #b8860b;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
 }
 
 .product-card__price-row {

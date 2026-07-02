@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import SharedNav from '../../components/SharedNav/SharedNav'
+import { SkeletonGrid } from '../../components/Skeleton/Skeleton'
 import './PetHealthRecord.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
@@ -141,8 +142,7 @@ function PetHealthRecord() {
       <main className="pet-health-record-page">
         <SharedNav cartCount={0} />
         <div className="phr-loading">
-          <div className="loading-spinner"></div>
-          <p>Loading...</p>
+          <SkeletonGrid count={6} cardHeight="200px" />
         </div>
       </main>
     )

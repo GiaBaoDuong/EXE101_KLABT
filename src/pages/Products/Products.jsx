@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import './Products.css'
 import SharedNav from '../../components/SharedNav/SharedNav'
+import { SkeletonGrid } from '../../components/Skeleton/Skeleton'
+import LazyImage from '../../components/LazyImage/LazyImage'
+import { useDebounce } from '../../hooks/performanceHooks'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
@@ -14,6 +17,49 @@ const CATEGORIES = [
   { id: 5, name: 'Accessories', icon: null },
 ]
 
+/* ===================== Search strategies (4 modes) =====================
+ * 1) instant   — dùng searchTerm trực tiếp, không debounce
+ * 2) debounced — dùng useDebounce(term, 150-200ms)
+ * 3) prefix    — chỉ match ký tự đầu (startsWith)
+ * 4) hybrid    — contains + ưu tiên startsWith lên đầu (recommended)
+ * ===================================================================== */
+const matchesContains = (p, q) =>
+  p.name?.toLowerCase().includes(q) || p.brand?.toLowerCase().includes(q)
+
+const matchesPrefix = (p, q) =>
+  p.name?.toLowerCase().startsWith(q) || p.brand?.toLowerCase().startsWith(q)
+
+const searchInstant = (term, list) => {
+  if (!term) return list
+  const q = term.toLowerCase()
+  return list.filter(p => matchesContains(p, q))
+}
+
+const searchDebounced = (term, list) => {
+  if (!term) return list
+  const q = term.toLowerCase()
+  return list.filter(p => matchesContains(p, q))
+}
+
+const searchPrefix = (term, list) => {
+  if (!term) return list
+  const q = term.toLowerCase()
+  return list.filter(p => matchesPrefix(p, q))
+}
+
+const searchHybrid = (term, list) => {
+  if (!term) return list
+  const q = term.toLowerCase()
+  const matched = list.filter(p => matchesContains(p, q))
+  return matched.sort((a, b) => {
+    const aStart = matchesPrefix(a, q)
+    const bStart = matchesPrefix(b, q)
+    if (aStart && !bStart) return -1
+    if (!aStart && bStart) return 1
+    return 0
+  })
+}
+
 function Products() {
   const [products, setProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
@@ -23,6 +69,9 @@ function Products() {
     return cat ? parseInt(cat, 10) : 0
   })
   const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearchTerm = useDebounce(searchTerm, 400)
+  const debouncedSearchTermFast = useDebounce(searchTerm, 150)
+  const [searchMode, setSearchMode] = useState('instant') // 'instant' | 'debounced' | 'prefix' | 'hybrid'
   const [sortBy, setSortBy] = useState('name')
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
@@ -38,11 +87,19 @@ function Products() {
       filtered = filtered.filter(p => p.category === selectedCategory)
     }
 
-    if (searchTerm) {
-      filtered = filtered.filter(p =>
-        p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.brand?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    // Active search strategy — driven by searchMode
+    // 1) instant   → no debounce
+    // 2) debounced → 150ms debounce
+    // 3) prefix    → startsWith only
+    // 4) hybrid    → contains + sort startsWith first
+    if (searchMode === 'instant') {
+      filtered = searchInstant(searchTerm, filtered)
+    } else if (searchMode === 'debounced') {
+      filtered = searchDebounced(debouncedSearchTermFast, filtered)
+    } else if (searchMode === 'prefix') {
+      filtered = searchPrefix(debouncedSearchTermFast, filtered)
+    } else {
+      filtered = searchHybrid(debouncedSearchTermFast, filtered)
     }
 
     filtered.sort((a, b) => {
@@ -52,7 +109,7 @@ function Products() {
     })
 
     setFilteredProducts(filtered)
-  }, [products, selectedCategory, searchTerm, sortBy])
+  }, [products, selectedCategory, debouncedSearchTermFast, searchMode, sortBy])
 
   const fetchProducts = async () => {
     setIsLoading(true)
@@ -79,6 +136,29 @@ function Products() {
   const getCategoryName = (id) => {
     const cat = CATEGORIES.find(c => c.id === id)
     return cat?.name || 'Other'
+  }
+
+  const activeQuery = (searchMode === 'instant' ? searchTerm : debouncedSearchTermFast || '').trim()
+  const highlightStyle = {
+    backgroundColor: '#fff3a0',
+    color: '#b8860b',
+    fontWeight: '700',
+    borderRadius: '2px',
+    boxShadow: '0 0 0 2px #fff3a0',
+  }
+  const highlightMatch = (text) => {
+    if (!activeQuery || !text) return text
+    const q = activeQuery.toLowerCase()
+    const lower = text.toLowerCase()
+    const idx = lower.indexOf(q)
+    if (idx === -1) return text
+    return (
+      <>
+        {text.slice(0, idx)}
+        <span style={highlightStyle}>{text.slice(idx, idx + q.length)}</span>
+        {text.slice(idx + q.length)}
+      </>
+    )
   }
 
   return (
@@ -173,20 +253,7 @@ function Products() {
       {/* Products Grid */}
       <div id="shop">
         {isLoading ? (
-          <div className="products-loading">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column' }}>
-                <div className="skeleton-card__image" />
-                <div className="skeleton-card__body">
-                  <div className="skeleton-line skeleton-line--sm" />
-                  <div className="skeleton-line skeleton-line--lg" />
-                  <div className="skeleton-line skeleton-line--md" />
-                  <div className="skeleton-line skeleton-line--price" />
-                  <div className="skeleton-line skeleton-line--btn" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <SkeletonGrid count={6} cardHeight="380px" />
         ) : filteredProducts.length === 0 ? (
           <div className="products-empty">
             <p className="products-empty__title">No Results</p>
@@ -206,11 +273,10 @@ function Products() {
                 >
                   <div className="product-card__image-wrap">
                     {product.thumbnailUrl || product.images?.[0] ? (
-                      <img
+                      <LazyImage
                         src={product.thumbnailUrl || product.images[0]}
                         alt={product.name}
                         className="product-card__image"
-                        loading="lazy"
                       />
                     ) : (
                       <div className="product-card__placeholder">🐾</div>
@@ -219,9 +285,9 @@ function Products() {
                   </div>
                   <div className="product-card__body">
                     <span className="product-card__category">{getCategoryName(product.category)}</span>
-                    <h3 className="product-card__name">{product.name}</h3>
+                    <h3 className="product-card__name">{highlightMatch(product.name)}</h3>
                     {product.brand && (
-                      <span className="product-card__brand">{product.brand}</span>
+                      <span className="product-card__brand">{highlightMatch(product.brand)}</span>
                     )}
                     <div className="product-card__price-row">
                       <span className="product-card__price">{formatPrice(product.price)}</span>

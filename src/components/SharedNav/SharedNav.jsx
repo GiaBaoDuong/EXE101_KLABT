@@ -110,7 +110,7 @@ export default function SharedNav({ cartCount = 0 }) {
 
   useEffect(() => {
     const q = searchQuery.trim().toLowerCase()
-    if (q.length < 2) {
+    if (q.length < 1) {
       setSearchResults({ products: [], services: [] })
       setIsSearching(false)
       return
@@ -380,17 +380,17 @@ export default function SharedNav({ cartCount = 0 }) {
             </div>
 
             <div className="sn-search-modal__body">
-              {searchQuery.trim().length < 2 && (
+              {searchQuery.trim().length < 1 && (
                 <div className="sn-search-modal__hint">
-                  <p>Type at least 2 characters to search across products and services.</p>
+                  <p>Type at least 1 character to search across products and services.</p>
                 </div>
               )}
 
-              {searchQuery.trim().length >= 2 && isSearching && (
+              {searchQuery.trim().length >= 1 && isSearching && (
                 <div className="sn-search-modal__loading">Searching…</div>
               )}
 
-              {searchQuery.trim().length >= 2 && !isSearching &&
+              {searchQuery.trim().length >= 1 && !isSearching &&
                 searchResults.products.length === 0 && searchResults.services.length === 0 && (
                 <div className="sn-search-modal__empty">
                   <p>No results found for "<strong>{searchQuery}</strong>"</p>

@@ -1,0 +1,39 @@
+.virtual-list {
+  overflow-y: auto;
+  position: relative;
+  contain: strict;
+}
+
+.virtual-list__inner {
+  position: relative;
+  width: 100%;
+}
+
+.virtual-list__items {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  will-change: transform;
+}
+
+.virtual-list__item {
+  width: 100%;
+}
+
+.virtual-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.virtual-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.virtual-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.virtual-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
