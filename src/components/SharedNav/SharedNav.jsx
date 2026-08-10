@@ -225,6 +225,7 @@ export default function SharedNav({ cartCount = 0 }) {
             <li><Link to="/services">Services</Link></li>
             <li><Link to="/pet-health-quiz">Health Check</Link></li>
             <li><Link to="/grooming">Grooming</Link></li>
+            <li><Link to="/health">Health</Link></li>
             <li><Link to="/pet-profile">Pet Profile</Link></li>
             <li><Link to="/purchases">Purchases</Link></li>
           </ul>

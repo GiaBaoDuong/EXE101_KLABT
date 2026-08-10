@@ -9,6 +9,7 @@ import Purchases from './pages/Purchases/Purchases'
 import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
 import PetGrooming from './pages/PetGrooming/PetGrooming'
+import PetHealth from './pages/PetHealth/PetHealth'
 import PetHealthQuiz from './pages/PetHealthQuiz/PetHealthQuiz'
 import PetHealthQuizResult from './pages/PetHealthQuiz/PetHealthQuizResult'
 import UserProfile from './pages/UserProfile/UserProfile'
@@ -123,6 +124,10 @@ function App() {
         <Route
           path="/grooming"
           element={isAuthenticated ? <PageLayout><PetGrooming /></PageLayout> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/health"
+          element={isAuthenticated ? <PageLayout><PetHealth /></PageLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/user-profile"

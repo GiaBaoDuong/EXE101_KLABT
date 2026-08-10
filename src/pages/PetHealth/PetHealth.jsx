@@ -1,20 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
-import '../PetGrooming/PetGrooming.css'
+import './PetHealth.css'
 import SharedNav from '../../components/SharedNav/SharedNav'
 import { useAuth } from '../../context/AuthContext'
 import { useNotification } from '../../context/NotificationContext'
-import { useState, useEffect, useRef, useCallback } from 'react';
-import petandpamper3 from '../../assets/petandpamper3.jpg'
-import pawandpamper from '../../assets/pawandpamper.png'
+import { useState, useEffect, useRef } from 'react';
+import healthHeroImg from '../../assets/pethealthbooked.jpg'
+import healthFormImg from '../../assets/petformed.png'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
-
-// Hình ảnh cho trang Grooming
-const IMAGES = {
-  hero: petandpamper3,
-  form: pawandpamper,
-}
-// =================================
 
 // Scroll Reveal Hook
 function useScrollReveal(options = {}) {
@@ -66,7 +59,6 @@ function useScrollReveal(options = {}) {
   return ref
 }
 
-
 /* SVG Icons */
 const IconBathtub = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -104,52 +96,36 @@ const IconStar = () => (
 const testimonials = [
   {
     name: 'Sarah M.',
-    text: 'My golden retriever looks amazing every time! The team is so patient and caring.',
+    text: 'My pet received excellent health care! The vets are so caring and professional.',
     rating: 5,
   },
   {
     name: 'John D.',
-    text: 'Best grooming service in town. My Shih Tzu always comes back looking like a star.',
+    text: 'Best veterinary service in town. They caught my dog\'s issue early and treated it perfectly.',
     rating: 5,
   },
   {
     name: 'Emily R.',
-    text: 'They truly understand how to handle nervous pets. Highly recommend!',
+    text: 'They truly understand how to handle pets gently. Highly recommend for health checkups!',
     rating: 5,
   },
 ]
 
-const CATEGORY_CONFIG = {
-  1: {
-    eyebrow: 'Premium grooming service',
-    title: 'Paw & Pamper',
-    sub: 'Expert grooming for your beloved pet. Book online in seconds.',
-    cta: 'Book a Service',
-    editorialEyebrow: 'Grooming Session',
-    editorialTitle: 'Professional Pet Grooming',
-    editorialSub: 'Our certified groomers give your pet the care and attention they deserve.',
-    serviceSelect: 'Select service',
-    servicePlaceholder: 'Choose a grooming service',
-    emptyText: 'Book a grooming session for your pet now!',
-    navLabel: 'Grooming Booking',
-  },
-  2: {
-    eyebrow: 'Pet spa service',
-    title: 'Pet Spa',
-    sub: 'Relaxing spa treatments for your pet. Book online in seconds.',
-    cta: 'Book a Spa',
-    editorialEyebrow: 'Spa Session',
-    editorialTitle: 'Luxury Pet Spa',
-    editorialSub: 'Give your pet the relaxing spa experience they deserve.',
-    serviceSelect: 'Select spa service',
-    servicePlaceholder: 'Choose a spa service',
-    emptyText: 'Book a spa session for your pet now!',
-    navLabel: 'Spa Booking',
-  },
+const cfg = {
+  eyebrow: 'Pet health checkup',
+  title: 'Pet Health',
+  sub: 'Professional veterinary care for your pet. Book online in seconds.',
+  cta: 'Book a Checkup',
+  editorialEyebrow: 'Health Checkup',
+  editorialTitle: 'Expert Veterinary Care',
+  editorialSub: 'Our experienced vets keep your pet healthy and happy.',
+  serviceSelect: 'Select health service',
+  servicePlaceholder: 'Choose a health service',
+  emptyText: 'Book a health checkup for your pet now!',
+  navLabel: 'Health Booking',
 }
 
-function PetGrooming() {
-  const cfg = CATEGORY_CONFIG[1]
+function PetHealth() {
   const { user, token } = useAuth()
   const { addNotification } = useNotification()
   const navigate = useNavigate()
@@ -166,19 +142,10 @@ function PetGrooming() {
   const [selectedBookingDetail, setSelectedBookingDetail] = useState(null)
   const [isLoadingDetail, setIsLoadingDetail] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState('book') // 'book' | 'history'
+  const [activeSection, setActiveSection] = useState('book')
 
-  // Reset section on mount
-  useEffect(() => {
-    setActiveSection('book')
-    // Force visibility after a short delay to let DOM render
-    setTimeout(() => {
-      const el = document.getElementById('booking')
-      if (el) el.classList.add('is-visible')
-    }, 50)
-  }, [])
   const notifiedBookingsRef = useRef(new Set(
-    JSON.parse(localStorage.getItem('notified_bookings') || '[]')
+    JSON.parse(localStorage.getItem('notified_bookings_health') || '[]')
   ))
 
   // Scroll reveal refs
@@ -197,6 +164,14 @@ function PetGrooming() {
   })
 
   useEffect(() => {
+    setActiveSection('book')
+    setTimeout(() => {
+      const el = document.getElementById('booking')
+      if (el) el.classList.add('is-visible')
+    }, 50)
+  }, [])
+
+  useEffect(() => {
     if (sessionStorage.getItem('scrollToBooking') === '1') {
       sessionStorage.removeItem('scrollToBooking')
       setTimeout(() => {
@@ -208,7 +183,6 @@ function PetGrooming() {
     fetchServices()
     fetchBookings()
 
- 
     const bookingSection = document.querySelector('.booking-form-wrap')
     if (bookingSection) {
       bookingSection.addEventListener('focusin', (e) => {
@@ -247,8 +221,8 @@ function PetGrooming() {
       const res = await fetch(`${API_BASE_URL}/api/Service`)
       if (res.ok) {
         const data = await res.json()
-        // Grooming category = 1
-        setServices(Array.isArray(data) ? data.filter(s => s.category === 1) : [])
+        // Health category = 2
+        setServices(Array.isArray(data) ? data.filter(s => s.category === 2) : [])
       }
     } catch (e) {
       console.log('Failed to fetch services')
@@ -271,21 +245,21 @@ function PetGrooming() {
           const key = `${b.bookingId}`
           if (b.status === 2 && !notifiedBookingsRef.current.has(`${key}_2`)) {
             notifiedBookingsRef.current.add(`${key}_2`)
-            localStorage.setItem('notified_bookings', JSON.stringify([...notifiedBookingsRef.current]))
+            localStorage.setItem('notified_bookings_health', JSON.stringify([...notifiedBookingsRef.current]))
             addNotification({
               type: 'booking_confirmed',
               title: 'Booking confirmed!',
               message: `Booking #${b.bookingCode || b.bookingId} has been confirmed.`,
-              link: '/grooming',
+              link: '/health',
             })
           } else if (b.status === 5 && !notifiedBookingsRef.current.has(`${key}_5`)) {
             notifiedBookingsRef.current.add(`${key}_5`)
-            localStorage.setItem('notified_bookings', JSON.stringify([...notifiedBookingsRef.current]))
+            localStorage.setItem('notified_bookings_health', JSON.stringify([...notifiedBookingsRef.current]))
             addNotification({
               type: 'booking_rejected',
               title: 'Booking rejected',
               message: `Booking #${b.bookingCode || b.bookingId} has been rejected.`,
-              link: '/grooming',
+              link: '/health',
             })
           }
         })
@@ -408,14 +382,14 @@ function PetGrooming() {
   }
 
   return (
-    <main className="pet-grooming">
+    <main className="pet-health">
       <SharedNav cartCount={0} />
 
       {/* Campaign Hero */}
       <section className="services-hero">
         <img
-          src={IMAGES.hero}
-          alt="Pet care service"
+          src={healthHeroImg}
+          alt="Pet health service"
           className="services-hero__bg"
         />
         <div className="services-hero__overlay" />
@@ -423,7 +397,7 @@ function PetGrooming() {
           <p className="services-hero__eyebrow">{cfg.eyebrow}</p>
           <h1 className="services-hero__title">{cfg.title}</h1>
           <p className="services-hero__sub">{cfg.sub}</p>
-          <Link to="/grooming" className="services-hero__cta">{cfg.cta}</Link>
+          <Link to="/health" className="services-hero__cta">{cfg.cta}</Link>
         </div>
       </section>
 
@@ -446,13 +420,13 @@ function PetGrooming() {
       {/* Services Section */}
       <section className="services-section" ref={servicesSectionRef}>
         <div className="section-header">
-          <h2>Professional Services</h2>
+          <h2>Health Services</h2>
         </div>
         <div className="services-grid">
           {isLoadingServices ? (
             <p style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--color-mute)' }}>Loading services...</p>
           ) : services.length === 0 ? (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--color-mute)' }}>No services available</p>
+            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--color-mute)' }}>No health services available</p>
           ) : services.map(service => (
             <div key={service.serviceId} className="pp-card service-card">
               <div className="pp-card__image-wrap">
@@ -468,7 +442,7 @@ function PetGrooming() {
                 <div className="pp-card__head">
                   <div>
                     <h3 className="pp-card__title">{service.name}</h3>
-                    <p className="pp-card__species">{service.category || 'Grooming'}</p>
+                    <p className="pp-card__species">Health</p>
                   </div>
                 </div>
                 <p className="service-card__desc">{service.description}</p>
@@ -518,7 +492,7 @@ function PetGrooming() {
         {/* Left — Editorial Visual */}
         <div className="booking-editorial">
           <div className="booking-editorial__image-wrap">
-            <img src={IMAGES.form} alt="Pet grooming" />
+            <img src={healthFormImg} alt="Pet health" />
           </div>
           <div className="booking-editorial__overlay" />
           <div className="booking-editorial__content">
@@ -581,7 +555,7 @@ function PetGrooming() {
                       required
                       className="booking-field__select"
                     >
-                      <option value="">Select service</option>
+                      <option value="">Select health service</option>
                       {services.map(s => (
                         <option key={s.serviceId} value={s.serviceId}>{s.name}</option>
                       ))}
@@ -756,7 +730,7 @@ function PetGrooming() {
 
             <div className="bdm-content">
               <div className="bdm-section">
-                <h3 className="bdm-section-title">&#128054; Pet Information</h3>
+                <h3 className="bdm-section-title">🐶 Pet Information</h3>
                 <div className="bdm-grid">
                   <div className="bdm-field">
                     <span className="bdm-field-label">Pet Name</span>
@@ -766,7 +740,7 @@ function PetGrooming() {
               </div>
 
               <div className="bdm-section">
-                <h3 className="bdm-section-title">&#128197; Booking Information</h3>
+                <h3 className="bdm-section-title">📅 Booking Information</h3>
                 <div className="bdm-grid">
                   <div className="bdm-field">
                     <span className="bdm-field-label">Date</span>
@@ -797,7 +771,7 @@ function PetGrooming() {
 
               {selectedBookingDetail.services?.length > 0 && (
                 <div className="bdm-section">
-                  <h3 className="bdm-section-title">&#127770; Booked Services</h3>
+                  <h3 className="bdm-section-title">🌯 Booked Services</h3>
                   <div className="bdm-services">
                     {selectedBookingDetail.services.map((s, i) => (
                       <div key={i} className="bdm-service-row">
@@ -916,7 +890,7 @@ function PetGrooming() {
         <Link to="/health-record" className="nav-tab">
           Pet Health Record
         </Link>
-        <Link to="/grooming" className="nav-tab active">
+        <Link to="/health" className="nav-tab active">
           {cfg.navLabel}
         </Link>
       </div>
@@ -925,4 +899,4 @@ function PetGrooming() {
   )
 }
 
-export default PetGrooming
+export default PetHealth
