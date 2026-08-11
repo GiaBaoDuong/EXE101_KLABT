@@ -106,6 +106,42 @@ export async function getOrderById(orderId) {
   }
 }
 
+// GET /api/Booking/{id} - Lấy chi tiết 1 booking
+export async function getBookingById(bookingId) {
+  try {
+    const r = await apiFetch(`/api/Booking/${bookingId}`)
+    if (!r.ok) return { success: false, message: r.data.message || r.data.raw || 'Booking not found' }
+    return { success: true, data: r.data }
+  } catch (e) {
+    return { success: false, message: e.message }
+  }
+}
+
+// GET /api/Booking - Lấy tất cả bookings của user (BE tự parse userId từ JWT)
+export async function getMyBookings() {
+  try {
+    const r = await apiFetch('/api/Booking')
+    if (!r.ok) return { success: false, message: r.data.message || r.data.raw || 'Failed to fetch bookings' }
+    return { success: true, data: r.data || [] }
+  } catch (e) {
+    return { success: false, message: e.message }
+  }
+}
+
+// DELETE /api/Booking/{id} - Hủy booking
+export async function cancelBooking(bookingId) {
+  try {
+    const r = await apiFetch(`/api/Booking/${bookingId}`, { method: 'DELETE' })
+    if (!r.ok) {
+      const data = r.data
+      return { success: false, message: (data && (data.message || data.raw)) || 'Failed to cancel booking' }
+    }
+    return { success: true, message: 'Booking cancelled' }
+  } catch (e) {
+    return { success: false, message: e.message }
+  }
+}
+
 // POST /api/Order - Tạo order mới
 export async function createOrder(orderData) {
   try {
@@ -161,3 +197,16 @@ export const ORDER_TYPE = { 1: 'Product', 2: 'Service', 3: 'Mixed' }
 export function getStatusLabel(s) { return ORDER_STATUS[s] || `Unknown(${s})` }
 export function getPaymentStatusLabel(s) { return PAYMENT_STATUS[s] || `Unknown(${s})` }
 export function getOrderTypeLabel(s) { return ORDER_TYPE[s] || `Unknown(${s})` }
+
+// Booking status (1-5)
+export const BOOKING_STATUS = { 1: 'Pending', 2: 'Confirmed', 3: 'InProgress', 4: 'Completed', 5: 'Cancelled' }
+export function getBookingStatusLabel(s) { return BOOKING_STATUS[s] || `Unknown(${s})` }
+
+// Booking status config (label tieng Viet + mau - dung cho Purchases + BookingDetail)
+export const BOOKING_STATUS_CONFIG = {
+  1: { label: 'Chờ thanh toán', bg: '#fff3e0', color: '#e65100' },
+  2: { label: 'Đã xác nhận',    bg: '#e3f2fd', color: '#0d47a1' },
+  3: { label: 'Đang thực hiện', bg: '#ede7f6', color: '#4527a0' },
+  4: { label: 'Hoàn thành',     bg: '#e8f5e9', color: '#1b5e20' },
+  5: { label: 'Đã hủy',         bg: '#fce4ec', color: '#b71c1c' },
+}

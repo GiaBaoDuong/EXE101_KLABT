@@ -61,10 +61,9 @@ function Staff() {
       }
 
       if (activeTab === TABS.BOOKINGS) {
-        const [bRes, dRes, aRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/staff/BookingManagement`, { headers }),
-          fetch(`${API_BASE_URL}/api/staff/BookingManagement/available-doctors`, { headers }),
-          fetch(`${API_BASE_URL}/api/admin/accounts`, { headers }),
+        const [bRes, dRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/staff/BookingManagement?status=1`, { headers }),
+          fetch(`${API_BASE_URL}/api/staff/BookingManagement/doctors`, { headers }),
         ])
         if (bRes.ok) {
           const bData = await bRes.json()
@@ -73,14 +72,6 @@ function Staff() {
         if (dRes.ok) {
           const dData = await dRes.json()
           setDoctors(Array.isArray(dData) ? dData : dData.data || [])
-        }
-        if (aRes.ok) {
-          const aData = await aRes.json()
-          const allAccounts = Array.isArray(aData) ? aData : aData.data || []
-          const filteredDoctors = allAccounts.filter(a => a.role === 3)
-          if (filteredDoctors.length > 0) {
-            setDoctors(filteredDoctors)
-          }
         }
       } else if (activeTab === TABS.FEEDBACKS) {
         const res = await fetch(`${API_BASE_URL}/api/staff/feedbacks`, { headers })
@@ -176,10 +167,14 @@ function Staff() {
         body: JSON.stringify({ doctorId: parseInt(selectedBookingDoctor) }),
       })
       if (res.ok) {
-        setBookings(prev => prev.map(b => b.bookingId === bookingId ? { ...b, doctorId: parseInt(selectedBookingDoctor) } : b))
+        const result = await res.json()
+        setBookings(prev => prev.map(b => b.bookingId === bookingId ? { ...b, doctorId: parseInt(selectedBookingDoctor), status: 2, conversationId: result.conversationId } : b))
         setSelectedBooking(null)
         setSelectedBookingDoctor('')
         alert('Doctor assigned successfully!')
+        if (result.conversationId) {
+          console.log('Chat room created with conversationId:', result.conversationId)
+        }
       } else {
         alert('Failed to assign doctor.')
       }
@@ -551,31 +546,33 @@ function Staff() {
                 </div>
               </div>
 
-              {/* Assign Doctor */}
-              <div className="assign-doctor-section">
-                <h4>Assign Doctor</h4>
-                <div className="assign-doctor-row">
-                  <select
-                    value={selectedBookingDoctor}
-                    onChange={e => setSelectedBookingDoctor(e.target.value)}
-                    className="form-select"
-                  >
-                    <option value="">-- Select Doctor --</option>
-                    {doctors.map(d => (
-                      <option key={d.userId || d.doctorId} value={d.userId || d.doctorId}>
-                        {d.fullName || d.name || `Dr. #${d.userId || d.doctorId}`}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    className="btn-assign"
-                    onClick={() => handleAssignDoctor(selectedBooking.bookingId)}
-                    disabled={!selectedBookingDoctor}
-                  >
-                    Assign
-                  </button>
+              {/* Assign Doctor - only show for Pending bookings */}
+              {selectedBooking.status === 1 && (
+                <div className="assign-doctor-section">
+                  <h4>Assign Doctor</h4>
+                  <div className="assign-doctor-row">
+                    <select
+                      value={selectedBookingDoctor}
+                      onChange={e => setSelectedBookingDoctor(e.target.value)}
+                      className="form-select"
+                    >
+                      <option value="">-- Select Doctor --</option>
+                      {doctors.map(d => (
+                        <option key={d.userId || d.doctorId} value={d.userId || d.doctorId}>
+                          {d.fullName || d.name || `Dr. #${d.userId || d.doctorId}`}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      className="btn-assign"
+                      onClick={() => handleAssignDoctor(selectedBooking.bookingId)}
+                      disabled={!selectedBookingDoctor}
+                    >
+                      Assign
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setSelectedBooking(null)}>Close</button>

@@ -1,0 +1,545 @@
+/* ============================================================
+   BOOKING DETAIL — Nike commerce design system
+   ----------------------------------------------------------------
+   Extreme typographic contrast:
+   - display-campaign (96px Bebas Neue) — hero lockup only
+   - heading-xl (32px) — metric values, total
+   - heading-md (16px) — labels (caption-md weight + size)
+   - body-md (16px) — body copy
+   - caption-sm (12px) — eyebrows, sub-text
+   ============================================================ */
+
+.bkd-page {
+  background: #ffffff;
+  min-height: 100vh;
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #111111;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bkd-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px 96px;
+}
+
+/* ============================================================
+   BACK BUTTON — circular icon button (40px)
+   ============================================================ */
+.bkd-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #111111;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  cursor: pointer;
+  margin: 24px 0 40px;
+  transition: background 0.15s;
+  font-family: inherit;
+  padding: 0;
+}
+.bkd-back:hover { background: #e5e5e5; }
+
+/* ============================================================
+   HERO LOCKUP — extreme contrast between tiers
+   ============================================================ */
+.bkd-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 0 0 40px;
+  border-bottom: 2px solid #111111;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+
+.bkd-hero__content {
+  flex: 1;
+  min-width: 280px;
+}
+
+.bkd-hero__eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #707072;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.bkd-hero__title {
+  font-family: 'Bebas Neue', 'Helvetica Neue', Impact, sans-serif;
+  font-size: clamp(56px, 9vw, 96px);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #111111;
+  margin: 0 0 20px;
+}
+
+.bkd-hero__subtitle {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #707072;
+  margin: 0;
+}
+
+.bkd-hero__highlight {
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: 0;
+}
+
+.bkd-hero__sep {
+  color: #cacacb;
+  margin: 0 4px;
+}
+
+/* ============================================================
+   STATUS PILL — colored semantic badge with dot
+   ============================================================ */
+.bkd-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.bkd-status-pill__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   METRICS — 3 large summary cards on soft-cloud
+   STRONG HIERARCHY:
+   - label: 11px bold uppercase tracking
+   - value: 24px bold (massive vs label)
+   - sub:   13px muted
+   ============================================================ */
+.bkd-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 56px;
+}
+
+.bkd-metric {
+  background: #f5f5f5;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.bkd-metric__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: #ffffff;
+  color: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.bkd-metric__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #9e9ea0;
+  line-height: 1.5;
+}
+
+.bkd-metric__value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111111;
+  letter-spacing: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.bkd-metric__sub {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #707072;
+}
+
+/* ============================================================
+   BLOCK HEADER — section title with count badge
+   ============================================================ */
+.bkd-block {
+  margin-bottom: 56px;
+}
+
+.bkd-block__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #111111;
+  margin-bottom: 24px;
+}
+
+.bkd-block__title {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111111;
+  letter-spacing: -0.2px;
+  margin: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.bkd-block__count {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #707072;
+}
+
+/* ============================================================
+   SERVICES — strong contrast: big index + name vs small meta
+   ============================================================ */
+.bkd-services {
+  display: flex;
+  flex-direction: column;
+}
+
+.bkd-service {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+.bkd-services .bkd-service:last-child { border-bottom: none; }
+
+.bkd-service__index {
+  font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1;
+  color: #cacacb;
+  width: 56px;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+
+.bkd-service__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bkd-service__name {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #111111;
+  letter-spacing: 0;
+}
+
+.bkd-service__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #707072;
+  line-height: 1.5;
+}
+
+.bkd-service__price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111111;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* ============================================================
+   NOTES
+   ============================================================ */
+.bkd-notes {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #111111;
+  margin: 0;
+  padding: 24px;
+  background: #f5f5f5;
+  border-left: 3px solid #111111;
+}
+
+/* ============================================================
+   TOTAL — full-bleed ink block, big number
+   ============================================================ */
+.bkd-total {
+  background: #111111;
+  color: #ffffff;
+  padding: 40px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 56px;
+}
+
+.bkd-total__left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bkd-total__label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #cacacb;
+}
+
+.bkd-total__sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: #9e9ea0;
+}
+
+.bkd-total__value {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* ============================================================
+   INFO — disclosure rows
+   ============================================================ */
+.bkd-info {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 48px;
+  border-top: 1px solid #cacacb;
+}
+
+.bkd-info__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid #cacacb;
+}
+
+.bkd-info__label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #9e9ea0;
+}
+
+.bkd-info__value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111111;
+  text-align: right;
+  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bkd-info__value--bold {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 14px;
+}
+
+.bkd-info__value--ok {
+  color: #007d48;
+  font-weight: 700;
+}
+
+/* ============================================================
+   ACTIONS — pill CTAs (rounded-lg, no shadow)
+   ============================================================ */
+.bkd-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bkd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  height: 48px;
+  border-radius: 30px;
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, opacity 0.15s;
+  border: none;
+  min-width: 200px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bkd-btn-primary {
+  background: #111111;
+  color: #ffffff;
+}
+.bkd-btn-primary:hover { background: #39393b; }
+.bkd-btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+.bkd-btn-primary:disabled { background: #cacacb; cursor: not-allowed; }
+
+.bkd-btn-secondary {
+  background: #f5f5f5;
+  color: #111111;
+}
+.bkd-btn-secondary:hover { background: #e5e5e5; }
+.bkd-btn-secondary:active { transform: scale(0.98); opacity: 0.9; }
+.bkd-btn-secondary:disabled { color: #9e9ea0; cursor: not-allowed; }
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+.bkd-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 0;
+}
+
+.bkd-spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e5e5e5;
+  border-top-color: #111111;
+  border-radius: 50%;
+  animation: bkd-spin 0.8s linear infinite;
+}
+
+@keyframes bkd-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+.bkd-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  gap: 24px;
+  text-align: center;
+}
+
+.bkd-error h3 {
+  font-size: 18px;
+  font-weight: 500;
+  color: #707072;
+  margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1023px) {
+  .bkd-metrics {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 599px) {
+  .bkd-container { padding: 0 16px 64px; }
+
+  .bkd-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+
+  .bkd-hero__title {
+    font-size: 48px;
+  }
+
+  .bkd-total {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 28px 20px;
+  }
+
+  .bkd-total__value {
+    font-size: 32px;
+  }
+
+  .bkd-metric {
+    padding: 24px 20px;
+  }
+
+  .bkd-service__index {
+    font-size: 28px;
+    width: 44px;
+  }
+
+  .bkd-service {
+    gap: 16px;
+    padding: 20px 0;
+  }
+
+  .bkd-service__name,
+  .bkd-service__price {
+    font-size: 16px;
+  }
+
+  .bkd-block__title {
+    font-size: 18px;
+  }
+
+  .bkd-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .bkd-actions {
+    flex-direction: column;
+  }
+}

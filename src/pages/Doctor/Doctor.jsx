@@ -2,21 +2,65 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Doctor.css'
 import { useAuth } from '../../context/AuthContext'
-import SharedNav from '../../components/SharedNav/SharedNav'
+import { getDoctorBookings, updateBookingStatus, completeBooking } from '../../services/mockDoctorService'
 
+const USE_MOCK = false
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
 
 const BOOKING_STATUSES = {
-  1: { label: 'Pending', color: '#f59e0b' },
-  2: { label: 'Confirmed', color: '#3b82f6' },
-  3: { label: 'In Progress', color: '#8b5cf6' },
-  4: { label: 'Completed', color: '#22c55e' },
-  5: { label: 'Cancelled', color: '#ef4444' },
+  1: { label: 'Pending', bg: '#f5f5f5', color: '#111111' },
+  2: { label: 'Confirmed', bg: '#111111', color: '#ffffff' },
+  3: { label: 'In Progress', bg: '#111111', color: '#ffffff' },
+  4: { label: 'Completed', bg: '#111111', color: '#ffffff' },
+  5: { label: 'Cancelled', bg: '#f5f5f5', color: '#111111' },
 }
 
 const TABS = {
   MY_BOOKINGS: 'my-bookings',
   COMPLETED: 'completed',
+}
+
+// Toast Notification Component
+function Toast({ message, type = 'success', onClose }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 3500)
+    return () => clearTimeout(timer)
+  }, [onClose])
+
+  const icons = {
+    success: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    ),
+    error: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="15" y1="9" x2="9" y2="15"/>
+        <line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+    ),
+    info: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+    ),
+  }
+
+  return (
+    <div className={`doc-toast doc-toast--${type}`}>
+      <span className="doc-toast__icon">{icons[type]}</span>
+      <span className="doc-toast__message">{message}</span>
+      <button className="doc-toast__close" onClick={onClose}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  )
 }
 
 function Doctor() {
@@ -28,14 +72,19 @@ function Doctor() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [toast, setToast] = useState(null)
   const { logout, user } = useAuth()
   const navigate = useNavigate()
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type })
+  }
 
   useEffect(() => {
     fetchMyBookings()
   }, [activeTab])
 
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
   const authHeaders = {
     'Content-Type': 'application/json',
     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
@@ -44,15 +93,22 @@ function Doctor() {
   const fetchMyBookings = async () => {
     setIsLoading(true)
     try {
-      const res = await fetch(`${API_BASE_URL}/api/doctor/my-bookings`, {
-        headers: authHeaders,
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setBookings(Array.isArray(data) ? data : data.data || [])
+      let data
+      if (USE_MOCK) {
+        const res = await getDoctorBookings()
+        data = res.data || []
       } else {
-        console.error('Failed to fetch bookings:', res.status)
+        const res = await fetch(`${API_BASE_URL}/api/doctor/my-bookings`, {
+          headers: authHeaders,
+        })
+        if (res.ok) {
+          data = await res.json()
+        } else {
+          console.error('Failed to fetch bookings:', res.status)
+          data = []
+        }
       }
+      setBookings(Array.isArray(data) ? data : data.data || [])
     } catch (e) {
       console.error('Failed to fetch bookings:', e)
     } finally {
@@ -63,27 +119,49 @@ function Doctor() {
   const handleUpdateStatus = async (bookingId, newStatus) => {
     setIsSubmitting(true)
     try {
-      const res = await fetch(`${API_BASE_URL}/api/doctor/bookings/${bookingId}/status`, {
-        method: 'PUT',
-        headers: authHeaders,
-        body: JSON.stringify({ status: newStatus }),
-      })
-      if (res.ok) {
-        setBookings(prev => prev.map(b =>
-          b.bookingId === bookingId ? { ...b, status: newStatus } : b
-        ))
-        if (selectedBooking?.bookingId === bookingId) {
-          setSelectedBooking(prev => ({ ...prev, status: newStatus }))
+      let res
+      if (USE_MOCK) {
+        res = await updateBookingStatus(bookingId, newStatus)
+        if (res.success) {
+          setBookings(prev => prev.map(b =>
+            b.bookingId === bookingId ? { ...b, status: newStatus } : b
+          ))
+          if (selectedBooking?.bookingId === bookingId) {
+            setSelectedBooking(prev => ({ ...prev, status: newStatus }))
+          }
+          setSelectedBooking(null)
+          showToast('Status updated successfully!', 'success')
+        } else {
+          showToast(res.message || 'Update failed', 'error')
         }
-        setSelectedBooking(null)
-        alert('Status updated successfully!')
       } else {
-        const errData = await res.json().catch(() => ({}))
-        alert(`Update failed: ${errData.message || res.status}`)
+        res = await fetch(`${API_BASE_URL}/api/doctor/bookings/${bookingId}/status`, {
+          method: 'PUT',
+          headers: authHeaders,
+          body: JSON.stringify({ status: newStatus }),
+        })
+        if (res.ok) {
+          setBookings(prev => prev.map(b =>
+            b.bookingId === bookingId ? { ...b, status: newStatus } : b
+          ))
+          if (selectedBooking?.bookingId === bookingId) {
+            setSelectedBooking(prev => ({ ...prev, status: newStatus }))
+          }
+          setSelectedBooking(null)
+          showToast('Status updated successfully!', 'success')
+        } else {
+          let errData = {}
+          try {
+            errData = await res.json()
+          } catch {
+            errData = { message: res.statusText || 'Update failed' }
+          }
+          showToast(errData.message || 'Update failed', 'error')
+        }
       }
     } catch (e) {
       console.error('Failed to update status:', e)
-      alert('An error occurred while updating.')
+      showToast('An error occurred while updating.', 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -91,34 +169,67 @@ function Doctor() {
 
   const handleCompleteBooking = async (bookingId) => {
     if (!medicalNote.trim()) {
-      alert('Please enter medical notes.')
+      showToast('Please enter medical notes.', 'info')
       return
     }
     setIsSubmitting(true)
     try {
-      const res = await fetch(`${API_BASE_URL}/api/doctor/bookings/${bookingId}/complete`, {
-        method: 'POST',
-        headers: authHeaders,
-        body: JSON.stringify({ medicalNote }),
-      })
-      if (res.ok) {
-        setBookings(prev => prev.map(b =>
-          b.bookingId === bookingId ? { ...b, status: 4 } : b
-        ))
-        if (selectedBooking?.bookingId === bookingId) {
-          setSelectedBooking(prev => ({ ...prev, status: 4 }))
+      let res
+      if (USE_MOCK) {
+        res = await completeBooking(bookingId, medicalNote)
+        if (res.success) {
+          setBookings(prev => prev.map(b =>
+            b.bookingId === bookingId ? { ...b, status: 4, medicalNote } : b
+          ))
+          if (selectedBooking?.bookingId === bookingId) {
+            setSelectedBooking(prev => ({ ...prev, status: 4, medicalNote }))
+          }
+          setSelectedBooking(null)
+          setMedicalNote('')
+          showToast('Appointment completed successfully!', 'success')
+          fetchMyBookings()
+        } else {
+          showToast(res.message || 'Completion failed', 'error')
         }
-        setSelectedBooking(null)
-        setMedicalNote('')
-        alert('Appointment completed successfully!')
-        fetchMyBookings()
       } else {
-        const errData = await res.json().catch(() => ({}))
-        alert(`Completion failed: ${errData.message || res.status}`)
+        res = await fetch(`${API_BASE_URL}/api/doctor/bookings/${bookingId}/complete`, {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({ note: medicalNote }),
+        })
+        if (res.ok) {
+          let result = {}
+          try {
+            result = await res.json()
+          } catch {
+            result = { message: 'Appointment completed successfully!' }
+          }
+          setBookings(prev => prev.map(b =>
+            b.bookingId === bookingId ? { ...b, status: 4, medicalNote } : b
+          ))
+          if (selectedBooking?.bookingId === bookingId) {
+            setSelectedBooking(prev => ({ ...prev, status: 4, medicalNote }))
+          }
+          setSelectedBooking(null)
+          setMedicalNote('')
+          showToast('Appointment completed successfully!', 'success')
+          fetchMyBookings()
+          if (result.conversationId) {
+            console.log('Conversation created with ID:', result.conversationId)
+          }
+        } else {
+          let errData = {}
+          try {
+            errData = await res.json()
+          } catch {
+            errData = { message: res.statusText || 'Completion failed' }
+          }
+          showToast(errData.message || 'Completion failed', 'error')
+        }
       }
     } catch (e) {
       console.error('Failed to complete booking:', e)
-      alert('An error occurred while completing.')
+      showToast('An error occurred while completing.', 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -142,7 +253,7 @@ function Doctor() {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0)
   }
 
-  const getStatusInfo = (status) => BOOKING_STATUSES[status] || { label: 'Unknown', color: '#999' }
+  const getStatusInfo = (status) => BOOKING_STATUSES[status] || { label: 'Unknown', bg: '#f5f5f5', color: '#111111' }
 
   const getServiceNames = (services) => {
     if (!services || services.length === 0) return '-'
@@ -165,17 +276,25 @@ function Doctor() {
 
   const pendingCount = bookings.filter(b => b.status === 2).length
   const inProgressCount = bookings.filter(b => b.status === 3).length
+  const completedCount = bookings.filter(b => b.status === 4).length
 
   const displayedBookings = activeTab === TABS.MY_BOOKINGS ? myBookings : completedBookings
 
   return (
     <div className="doctor-dashboard">
-      <SharedNav cartCount={0} />
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
 
       {/* Sidebar */}
       <aside className="doctor-sidebar">
         <div className="sidebar-header">
-          <div className="sidebar-logo">&#128137; Doctor</div>
+          <div className="sidebar-logo">K-LABT</div>
           <div className="sidebar-user">
             <span className="sidebar-user-name">{user?.fullName || user?.name || 'Doctor'}</span>
             <span className="sidebar-user-role">Veterinarian</span>
@@ -187,7 +306,12 @@ function Doctor() {
             className={`nav-item ${activeTab === TABS.MY_BOOKINGS ? 'active' : ''}`}
             onClick={() => setActiveTab(TABS.MY_BOOKINGS)}
           >
-            <span className="nav-icon">&#128197;</span>
+            <svg className="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
             <span>My Appointments</span>
             {pendingCount + inProgressCount > 0 && (
               <span className="nav-badge">{pendingCount + inProgressCount}</span>
@@ -197,17 +321,29 @@ function Doctor() {
             className={`nav-item ${activeTab === TABS.COMPLETED ? 'active' : ''}`}
             onClick={() => setActiveTab(TABS.COMPLETED)}
           >
-            <span className="nav-icon">&#9989;</span>
-            <span>Completed History</span>
+            <svg className="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <span>Completed</span>
           </button>
         </nav>
 
         <div className="sidebar-footer">
           <button className="sidebar-btn-home" onClick={() => navigate('/home')}>
-            &#127968; Back to Home
+            <svg className="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>Back to Home</span>
           </button>
           <button className="sidebar-btn-logout" onClick={handleLogout}>
-            &#128682; Log out
+            <svg className="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span>Log out</span>
           </button>
         </div>
       </aside>
@@ -216,60 +352,66 @@ function Doctor() {
       <main className="doctor-main">
         <header className="doctor-header">
           <h1 className="doctor-title">
-            {activeTab === TABS.MY_BOOKINGS ? 'My Appointments' : 'Completed History'}
+            {activeTab === TABS.MY_BOOKINGS ? 'My Appointments' : 'Completed'}
           </h1>
           <div className="header-stats">
             {pendingCount > 0 && (
-              <div className="stat-chip stat-pending">
+              <div className="stat-chip">
                 <span className="stat-dot"></span>
-                Pending: {pendingCount}
+                <span>{pendingCount} Confirmed</span>
               </div>
             )}
             {inProgressCount > 0 && (
-              <div className="stat-chip stat-inprogress">
+              <div className="stat-chip">
                 <span className="stat-dot"></span>
-                In Progress: {inProgressCount}
+                <span>{inProgressCount} In Progress</span>
               </div>
             )}
           </div>
         </header>
 
+        {/* Stats Cards */}
+        <div className="doctor-stats-row">
+          <div className="doc-stat-card">
+            <div className="doc-stat-num">{pendingCount}</div>
+            <div className="doc-stat-label">Confirmed</div>
+          </div>
+          <div className="doc-stat-card">
+            <div className="doc-stat-num">{inProgressCount}</div>
+            <div className="doc-stat-label">In Progress</div>
+          </div>
+          <div className="doc-stat-card">
+            <div className="doc-stat-num">{completedCount}</div>
+            <div className="doc-stat-label">Completed</div>
+          </div>
+        </div>
+
         {/* Search & Filter */}
         <div className="doctor-toolbar">
-          <input
-            type="text"
-            className="doctor-search"
-            placeholder="Search booking ID, pet name, customer..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          <div className="search-wrapper">
+            <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              type="text"
+              className="doctor-search"
+              placeholder="Search booking ID, pet name, customer..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
           <select
-            className="doctor-filter"
+            className={`doctor-filter ${statusFilter !== 'all' ? 'active' : ''}`}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="all">All statuses</option>
+            <option value="all">All Status</option>
             <option value="2">Confirmed</option>
             <option value="3">In Progress</option>
             <option value="4">Completed</option>
             <option value="5">Cancelled</option>
           </select>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="doctor-stats-row">
-          <div className="doc-stat-card doc-stat-pending">
-            <div className="doc-stat-num">{pendingCount}</div>
-            <div className="doc-stat-label">Pending</div>
-          </div>
-          <div className="doc-stat-card doc-stat-inprogress">
-            <div className="doc-stat-num">{inProgressCount}</div>
-            <div className="doc-stat-label">In Progress</div>
-          </div>
-          <div className="doc-stat-card doc-stat-completed">
-            <div className="doc-stat-num">{bookings.filter(b => b.status === 4).length}</div>
-            <div className="doc-stat-label">Completed</div>
-          </div>
         </div>
 
         {/* Booking List */}
@@ -280,7 +422,13 @@ function Doctor() {
           </div>
         ) : displayedBookings.length === 0 ? (
           <div className="doctor-empty">
-            <div className="doctor-empty-icon">&#128218;</div>
+            <svg className="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
             <p className="doctor-empty-title">
               {activeTab === TABS.MY_BOOKINGS ? 'No appointments yet' : 'No completed appointments yet'}
             </p>
@@ -302,42 +450,33 @@ function Doctor() {
                     </div>
                     <span
                       className="dbc-status"
+                      style={{ backgroundColor: status.bg, color: status.color }}
                     >
                       {status.label}
                     </span>
                   </div>
 
                   <div className="dbc-body">
-                    <div className="dbc-row">
-                      <span className="dbc-icon">&#128054;</span>
-                      <div className="dbc-info">
-                        <span className="dbc-info-label">Pet</span>
-                        <span className="dbc-info-value">{booking.petName || '-'}</span>
+                    <div className="dbc-grid">
+                      <div className="dbc-item">
+                        <span className="dbc-item-label">Pet</span>
+                        <span className="dbc-item-value">{booking.petName || '-'}</span>
                       </div>
-                    </div>
-                    <div className="dbc-row">
-                      <span className="dbc-icon">&#128100;</span>
-                      <div className="dbc-info">
-                        <span className="dbc-info-label">Customer</span>
-                        <span className="dbc-info-value">{booking.customerName || '-'}</span>
+                      <div className="dbc-item">
+                        <span className="dbc-item-label">Customer</span>
+                        <span className="dbc-item-value">{booking.customerName || '-'}</span>
                       </div>
-                    </div>
-                    <div className="dbc-row">
-                      <span className="dbc-icon">&#128197;</span>
-                      <div className="dbc-info">
-                        <span className="dbc-info-label">Date</span>
-                        <span className="dbc-info-value">
+                      <div className="dbc-item">
+                        <span className="dbc-item-label">Date</span>
+                        <span className="dbc-item-value">
                           {booking.bookingDate
                             ? new Date(booking.bookingDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
                             : '-'}
                         </span>
                       </div>
-                    </div>
-                    <div className="dbc-row">
-                      <span className="dbc-icon">&#128339;</span>
-                      <div className="dbc-info">
-                        <span className="dbc-info-label">Time</span>
-                        <span className="dbc-info-value">
+                      <div className="dbc-item">
+                        <span className="dbc-item-label">Time</span>
+                        <span className="dbc-item-value">
                           {booking.startTime
                             ? new Date(booking.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
                             : '-'}
@@ -356,14 +495,14 @@ function Doctor() {
 
                   {booking.medicalNote && (
                     <div className="dbc-medical-note">
-                      <span className="dbc-note-label">&#128221; Medical notes:</span>
+                      <span className="dbc-note-label">Medical Notes</span>
                       <span className="dbc-note-text">{booking.medicalNote}</span>
                     </div>
                   )}
 
                   <div className="dbc-footer">
                     <span className="dbc-price">{formatPrice(booking.totalPrice)}</span>
-                    <span className="dbc-view-detail">Details &#8250;</span>
+                    <span className="dbc-view-detail">View Details</span>
                   </div>
                 </div>
               )
@@ -378,71 +517,85 @@ function Doctor() {
           <div className="doctor-modal" onClick={e => e.stopPropagation()}>
             <div className="dm-header">
               <h3 className="dm-title">Appointment Details</h3>
-              <button className="dm-close" onClick={() => setSelectedBooking(null)}>&times;</button>
+              <button className="dm-close" onClick={() => setSelectedBooking(null)}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
             </div>
 
             <div className="dm-body">
-              <div className="dm-row">
-                <span className="dm-label">Booking ID</span>
-                <span className="dm-value">#{selectedBooking.bookingCode || selectedBooking.bookingId}</span>
-              </div>
-              <div className="dm-row">
-                <span className="dm-label">Pet</span>
-                <span className="dm-value">{selectedBooking.petName || '-'}</span>
-              </div>
-              <div className="dm-row">
-                <span className="dm-label">Customer</span>
-                <span className="dm-value">{selectedBooking.customerName || '-'}</span>
-              </div>
-              <div className="dm-row">
-                <span className="dm-label">Date</span>
-                <span className="dm-value">
-                  {selectedBooking.bookingDate
-                    ? new Date(selectedBooking.bookingDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                    : '-'}
-                </span>
-              </div>
-              <div className="dm-row">
-                <span className="dm-label">Time</span>
-                <span className="dm-value">
-                  {selectedBooking.startTime
-                    ? new Date(selectedBooking.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-                    : '-'}
-                </span>
-              </div>
-              <div className="dm-row">
-                <span className="dm-label">Service</span>
-                <span className="dm-value">{getServiceNames(selectedBooking.services)}</span>
-              </div>
-              <div className="dm-row">
-                <span className="dm-label">Total</span>
-                <span className="dm-value dm-price">{formatPrice(selectedBooking.totalPrice)}</span>
-              </div>
-              <div className="dm-row">
-                <span className="dm-label">Customer Notes</span>
-                <span className="dm-value">{selectedBooking.note || '-'}</span>
+              <div className="dm-section">
+                <span className="dm-section-label">Booking Information</span>
+                <div className="dm-row">
+                  <span className="dm-label">Booking ID</span>
+                  <span className="dm-value">#{selectedBooking.bookingCode || selectedBooking.bookingId}</span>
+                </div>
+                <div className="dm-row">
+                  <span className="dm-label">Pet</span>
+                  <span className="dm-value">{selectedBooking.petName || '-'}</span>
+                </div>
+                <div className="dm-row">
+                  <span className="dm-label">Customer</span>
+                  <span className="dm-value">{selectedBooking.customerName || '-'}</span>
+                </div>
+                <div className="dm-row">
+                  <span className="dm-label">Date</span>
+                  <span className="dm-value">
+                    {selectedBooking.bookingDate
+                      ? new Date(selectedBooking.bookingDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                      : '-'}
+                  </span>
+                </div>
+                <div className="dm-row">
+                  <span className="dm-label">Time</span>
+                  <span className="dm-value">
+                    {selectedBooking.startTime
+                      ? new Date(selectedBooking.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+                      : '-'}
+                  </span>
+                </div>
               </div>
 
-              <div className="dm-status-bar">
-                <span className="dm-status-label">Status:</span>
-                {(() => {
-                  const s = getStatusInfo(selectedBooking.status)
-                  return (
-                    <span className="dm-status-badge">
-                      {s.label}
-                    </span>
-                  )
-                })()}
+              <div className="dm-section">
+                <span className="dm-section-label">Service Details</span>
+                <div className="dm-row">
+                  <span className="dm-label">Service</span>
+                  <span className="dm-value">{getServiceNames(selectedBooking.services)}</span>
+                </div>
+                <div className="dm-row">
+                  <span className="dm-label">Total</span>
+                  <span className="dm-value dm-price">{formatPrice(selectedBooking.totalPrice)}</span>
+                </div>
+                <div className="dm-row">
+                  <span className="dm-label">Customer Notes</span>
+                  <span className="dm-value">{selectedBooking.note || '-'}</span>
+                </div>
+              </div>
+
+              <div className="dm-section">
+                <div className="dm-status-row">
+                  <span className="dm-label">Status</span>
+                  {(() => {
+                    const s = getStatusInfo(selectedBooking.status)
+                    return (
+                      <span className="dm-status-badge" style={{ backgroundColor: s.bg, color: s.color }}>
+                        {s.label}
+                      </span>
+                    )
+                  })()}
+                </div>
               </div>
 
               {/* Medical Note - for completing */}
               {selectedBooking.status === 3 && (
                 <div className="dm-medical-section">
-                  <label className="dm-note-label">&#128221; Medical Notes</label>
+                  <span className="dm-section-label">Diagnosis & Notes</span>
                   <textarea
                     className="dm-note-input"
                     rows={4}
-                    placeholder="Enter medical notes, diagnosis, prescriptions..."
+                    placeholder="Enter diagnosis, prescriptions, follow-up instructions..."
                     value={medicalNote}
                     onChange={(e) => setMedicalNote(e.target.value)}
                   />
@@ -452,7 +605,7 @@ function Doctor() {
               {/* Show medical note if already completed */}
               {selectedBooking.status === 4 && selectedBooking.medicalNote && (
                 <div className="dm-medical-section">
-                  <label className="dm-note-label">&#128221; Medical Notes</label>
+                  <span className="dm-section-label">Medical Notes</span>
                   <div className="dm-note-readonly">{selectedBooking.medicalNote}</div>
                 </div>
               )}
@@ -461,24 +614,24 @@ function Doctor() {
             <div className="dm-actions">
               {selectedBooking.status === 2 && (
                 <button
-                  className="dm-btn dm-btn-start"
+                  className="dm-btn dm-btn-primary"
                   onClick={() => handleUpdateStatus(selectedBooking.bookingId, 3)}
                   disabled={isSubmitting}
                 >
-                  &#9654; Start Exam
+                  Start Exam
                 </button>
               )}
               {selectedBooking.status === 3 && (
                 <button
-                  className="dm-btn dm-btn-complete"
+                  className="dm-btn dm-btn-primary"
                   onClick={() => handleCompleteBooking(selectedBooking.bookingId)}
                   disabled={isSubmitting}
                 >
-                  &#9989; Complete & Save Notes
+                  Complete & Save
                 </button>
               )}
               <button
-                className="dm-btn dm-btn-cancel"
+                className="dm-btn dm-btn-secondary"
                 onClick={() => setSelectedBooking(null)}
               >
                 Close

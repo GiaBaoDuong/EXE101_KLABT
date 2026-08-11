@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { createPayment, checkPaymentStatus, simulateSepayWebhook } from '../../services/paymentService'
-import { getOrderById, getStatusLabel, getPaymentStatusLabel, getOrderTypeLabel } from '../../services/orderService'
+import { getOrderById, getBookingById, getStatusLabel, getPaymentStatusLabel, getOrderTypeLabel } from '../../services/orderService'
 import SharedNav from '../../components/SharedNav/SharedNav'
 import './Checkout.css'
 
@@ -31,6 +31,10 @@ function Checkout() {
   const [searchParams] = useSearchParams()
   const orderIdFromUrl = searchParams.get('orderId')
   const bookingIdFromUrl = searchParams.get('bookingId')
+  // simulate=1 -> auto-simulate SePay webhook moi 10s (chi dung cho dev/test).
+  // Mac dinh Product bật (ProductDetail navigate), Booking tu tat (BookingConfirmation navigate) -> can SePay that.
+  const simulateParam = searchParams.get('simulate')
+  const simulateAuto = simulateParam === '1' || (!!orderIdFromUrl && simulateParam !== '0' && !bookingIdFromUrl)
   const mode = orderIdFromUrl || bookingIdFromUrl ? 'embedded' : 'dev'
 
   const [orderId, setOrderId] = useState(orderIdFromUrl || '')
@@ -42,6 +46,7 @@ function Checkout() {
   })
   const [payment, setPayment] = useState(null)
   const [order, setOrder] = useState(null)
+  const [booking, setBooking] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [countdown, setCountdown] = useState(900)
@@ -56,7 +61,7 @@ function Checkout() {
   const showToast = (message, type = 'info') => setToast({ message, type })
   const formatMoney = (v) => new Intl.NumberFormat('vi-VN').format(v) + ' VND'
 
-  // Load order details
+  // Load order / booking details when arriving from OrderConfirmation or BookingConfirmation
   useEffect(() => {
     if (orderIdFromUrl) {
       getOrderById(orderIdFromUrl).then(res => {
@@ -66,16 +71,27 @@ function Checkout() {
           setAmount(res.data.finalAmount)
         }
       })
+    } else if (bookingIdFromUrl) {
+      getBookingById(bookingIdFromUrl).then(res => {
+        if (res.success) {
+          setBooking(res.data)
+          setBookingId(String(res.data.bookingId || res.data.BookingId))
+          setAmount(res.data.totalPrice || res.data.TotalPrice || 0)
+        }
+      })
     }
-  }, [orderIdFromUrl])
+  }, [orderIdFromUrl, bookingIdFromUrl])
 
-  // Auto-create payment QR when coming from Buy Now
+  // Auto-create payment QR when coming from Buy Now / Booking
   useEffect(() => {
-    if (mode === 'embedded' && orderIdFromUrl && orderId && phase === 'idle') {
+    if (mode !== 'embedded' || phase !== 'idle') return
+    if (orderIdFromUrl && orderId) {
+      handleCreatePayment()
+    } else if (bookingIdFromUrl && bookingId) {
       handleCreatePayment()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId])
+  }, [orderId, bookingId])
 
   // Countdown timer
   useEffect(() => {
@@ -96,19 +112,20 @@ function Checkout() {
     return () => clearInterval(countdownRef.current)
   }, [phase])
 
-  // Auto-check: goi webhook kich hoat SePay roi lay lai order moi 10s
+  // Auto-check: kiem tra thanh toan SePay (cho ca Order va Booking)
+  // Chung ta chi simulate webhook neu simulateAuto=true (dev mode). Con lai chi poll status.
   useEffect(() => {
     if (phase !== 'PENDING') {
       if (autoCheckRef.current) clearInterval(autoCheckRef.current)
       return
     }
-    const orderId = order?.orderId || order?.OrderId
+    const currentId = order?.orderId || order?.OrderId || booking?.bookingId || booking?.BookingId
     const doCheck = async () => {
-      const currentOrderId = orderId || orderIdFromUrl
-      if (!currentOrderId) return
+      const id = currentId || orderIdFromUrl || bookingIdFromUrl
+      if (!id) return
       const paymentCode = payment?.content || payment?.code || payment?.paymentCode
-      const amt = order?.finalAmount || Number(amount) || 0
-      if (paymentCode) {
+      const amt = order?.finalAmount || booking?.totalPrice || Number(amount) || 0
+      if (paymentCode && simulateAuto) {
         await simulateSepayWebhook({
           code: paymentCode,
           content: payment?.content || paymentCode,
@@ -117,24 +134,38 @@ function Checkout() {
           transactionDate: new Date().toISOString(),
           gateway: 'SePay',
           transferType: 'in',
-          description: `Thanh toan don hang ${paymentCode}`,
+          description: `Thanh toan ${paymentCode}`,
         })
       }
       await new Promise(r => setTimeout(r, 500))
-      const res = await getOrderById(currentOrderId)
-      if (res.success) {
-        const payStatus = res.data?.paymentStatus ?? res.data?.PaymentStatus
-        if (payStatus === 2 || payStatus === 'PAID' || String(payStatus ?? '').toUpperCase() === 'PAID') {
-          clearInterval(autoCheckRef.current)
-          setPhase('COMPLETED')
-          showToast('Thanh toán thành công!', 'success')
-          setTimeout(() => navigateRef.current?.('/purchases'), 5000)
+      // Sau webhook, re-fetch entity (order hoac booking) de lay status moi
+      if (orderIdFromUrl) {
+        const res = await getOrderById(orderIdFromUrl)
+        if (res.success) {
+          const payStatus = res.data?.paymentStatus ?? res.data?.PaymentStatus
+          if (payStatus === 2 || payStatus === 'PAID' || String(payStatus ?? '').toUpperCase() === 'PAID') {
+            clearInterval(autoCheckRef.current)
+            setPhase('COMPLETED')
+            showToast('Thanh toán thành công!', 'success')
+            setTimeout(() => navigateRef.current?.('/purchases'), 5000)
+          }
+        }
+      } else if (bookingIdFromUrl) {
+        const res = await getBookingById(bookingIdFromUrl)
+        if (res.success) {
+          const bStatus = res.data?.status ?? res.data?.Status
+          if (bStatus === 2 || bStatus === 'CONFIRMED') {
+            clearInterval(autoCheckRef.current)
+            setPhase('COMPLETED')
+            showToast('Thanh toán thành công! Booking đã được xác nhận.', 'success')
+            setTimeout(() => navigateRef.current?.('/purchases'), 5000)
+          }
         }
       }
     }
     autoCheckRef.current = setInterval(doCheck, 10000)
     return () => clearInterval(autoCheckRef.current)
-  }, [phase, orderIdFromUrl, payment?.content, payment?.code, payment?.paymentCode, amount])
+  }, [phase, orderIdFromUrl, bookingIdFromUrl, payment?.content, payment?.code, payment?.paymentCode, amount, simulateAuto])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -176,24 +207,24 @@ function Checkout() {
 
   const handleCheckStatus = async () => {
     const currentOrderId = order?.orderId || order?.OrderId || orderIdFromUrl
-    if (!currentOrderId) return
+    const currentBookingId = booking?.bookingId || booking?.BookingId || bookingIdFromUrl
+    if (!currentOrderId && !currentBookingId) return
     setCheckingPayment(true)
     setError('')
 
-    // Thu tu kiem tra: 1) goi webhook kich hoat SePay, 2) lay lai order
+    // Thu tu kiem tra: 1) goi webhook kich hoat SePay, 2) lay lai entity (order hoac booking)
     const paymentCode = payment?.content || payment?.code || payment?.paymentCode
     let webhookOk = false
     if (paymentCode) {
-      // Day đủ payload theo schema SePay webhook
       const webhookPayload = {
         code: paymentCode,
         content: payment?.content || paymentCode,
-        transferAmount: order?.finalAmount || Number(amount) || 0,
+        transferAmount: order?.finalAmount || booking?.totalPrice || Number(amount) || 0,
         accountNumber: payment?.accountNumber || '',
         transactionDate: new Date().toISOString(),
         gateway: 'SePay',
         transferType: 'in',
-        description: `Thanh toan don hang ${paymentCode}`,
+        description: `Thanh toan ${paymentCode}`,
       }
       const webhookRes = await simulateSepayWebhook(webhookPayload)
       webhookOk = webhookRes.success
@@ -202,20 +233,36 @@ function Checkout() {
       showToast('Không có mã thanh toán để kiểm tra.', 'error')
     }
 
-    // Buoc 2: lay lai trang thai order tu backend
     await new Promise(r => setTimeout(r, 1000)) // cho SePay xu ly
-    const res = await getOrderById(currentOrderId)
-    if (res.success) {
-      const payStatus = res.data?.paymentStatus ?? res.data?.PaymentStatus
-      if (payStatus === 2 || payStatus === 'PAID' || String(payStatus ?? '').toUpperCase() === 'PAID') {
-        setPhase('COMPLETED')
-        showToast('Thanh toán thành công!', 'success')
-        setTimeout(() => navigate('/purchases'), 1500)
+
+    if (currentOrderId) {
+      const res = await getOrderById(currentOrderId)
+      if (res.success) {
+        const payStatus = res.data?.paymentStatus ?? res.data?.PaymentStatus
+        if (payStatus === 2 || payStatus === 'PAID' || String(payStatus ?? '').toUpperCase() === 'PAID') {
+          setPhase('COMPLETED')
+          showToast('Thanh toán thành công!', 'success')
+          setTimeout(() => navigate('/purchases'), 1500)
+        } else {
+          showToast('Chưa nhận được thanh toán. Vui lòng chờ SePay xác nhận (1-5 phút) hoặc kiểm tra lại sau.', 'info')
+        }
       } else {
-        showToast('Chưa nhận được thanh toán. Vui lòng chờ SePay xác nhận (1-5 phút) hoặc kiểm tra lại sau.', 'info')
+        setError(res.message || 'Không kiểm tra được trạng thái thanh toán')
       }
-    } else {
-      setError(res.message || 'Không kiểm tra được trạng thái thanh toán')
+    } else if (currentBookingId) {
+      const res = await getBookingById(currentBookingId)
+      if (res.success) {
+        const bStatus = res.data?.status ?? res.data?.Status
+        if (bStatus === 2 || String(bStatus ?? '').toUpperCase() === 'CONFIRMED') {
+          setPhase('COMPLETED')
+          showToast('Thanh toán thành công! Booking đã được xác nhận.', 'success')
+          setTimeout(() => navigate('/purchases'), 1500)
+        } else {
+          showToast('Chưa nhận được thanh toán. Vui lòng chờ SePay xác nhận (1-5 phút) hoặc kiểm tra lại sau.', 'info')
+        }
+      } else {
+        setError(res.message || 'Không kiểm tra được trạng thái thanh toán')
+      }
     }
     setCheckingPayment(false)
   }
@@ -245,6 +292,39 @@ function Checkout() {
     if (typeof status === 'string') return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
     return getPaymentStatusLabel(status ?? 1)
   }
+
+  // ===== RENDER: BOOKING SUMMARY =====
+  const renderBookingSummary = () => (
+    <div className="order-summary">
+      <div className="order-summary-header">
+        <h3>Lịch hẹn {booking?.bookingCode}</h3>
+        <span className="order-id">#{booking?.bookingId}</span>
+      </div>
+      <div className="order-items">
+        {(booking?.services || []).map((s) => (
+          <div key={s.bookingDetailId || s.serviceId} className="order-item">
+            <div className="item-info">
+              <span className="item-name">{s.serviceName}</span>
+              <span className="item-qty">{formatMoney(s.unitPrice)} × {s.quantity || 1}</span>
+            </div>
+            <span className="item-price">{formatMoney(s.subTotal)}</span>
+          </div>
+        ))}
+      </div>
+      <div className="order-totals">
+        <div className="total-row final">
+          <span>Thành tiền</span>
+          <span>{formatMoney(booking?.totalPrice || 0)}</span>
+        </div>
+      </div>
+      <div className="order-meta">
+        <div><strong>Thú cưng:</strong> {booking?.petName || '—'}</div>
+        <div><strong>Ngày hẹn:</strong> {booking?.bookingDate || '—'}</div>
+        <div><strong>Giờ bắt đầu:</strong> {booking?.startTime ? new Date(booking.startTime).toLocaleString('vi-VN') : '—'}</div>
+        {booking?.note && <div><strong>Ghi chú:</strong> {booking.note}</div>}
+      </div>
+    </div>
+  )
 
   // ===== RENDER: ORDER SUMMARY =====
   const renderOrderSummary = () => (
@@ -301,7 +381,14 @@ function Checkout() {
   // ===== STATE: IDLE =====
   const renderIdle = () => (
     <div className="checkout-form">
-      {order && renderOrderSummary()}
+      {bookingIdFromUrl && booking && renderBookingSummary()}
+      {orderIdFromUrl && order && renderOrderSummary()}
+      {(!orderIdFromUrl || !bookingIdFromUrl) && !order && !booking && (
+        <>
+          {order && renderOrderSummary()}
+          {booking && renderBookingSummary()}
+        </>
+      )}
 
       <div className="form-group">
         <label>Order ID</label>
@@ -376,16 +463,16 @@ function Checkout() {
           </div>
         </div>
 
-        {order && (
+        {(booking || order) && (
           <div className="order-summary-mini">
             <div className="order-summary-mini__row">
-              <span>Đơn hàng</span>
-              <span className="order-summary-mini__val">#{order?.orderCode || order?.orderId}</span>
+              <span>{bookingIdFromUrl ? 'Lịch hẹn' : 'Đơn hàng'}</span>
+              <span className="order-summary-mini__val">#{booking?.bookingCode || order?.orderCode || booking?.bookingId || order?.orderId}</span>
             </div>
             <div className="order-summary-mini__row">
               <span>Tổng tiền</span>
               <span className="order-summary-mini__val order-summary-mini__val--green">
-                {formatMoney(order?.finalAmount || Number(amount))}
+                {formatMoney(order?.finalAmount || booking?.totalPrice || Number(amount))}
               </span>
             </div>
           </div>
@@ -430,8 +517,8 @@ function Checkout() {
     <div className="checkout-success">
       <div className="success-icon">✓</div>
       <h2>Thanh toán thành công!</h2>
-      <p>Giao dịch đã được xác nhận.</p>
-      <p className="success-amount">{formatMoney(order?.finalAmount || Number(amount))}</p>
+      <p>{bookingIdFromUrl ? 'Booking đã được xác nhận. Cảm ơn bạn!' : 'Giao dịch đã được xác nhận.'}</p>
+      <p className="success-amount">{formatMoney(order?.finalAmount || booking?.totalPrice || Number(amount))}</p>
 
       <div className="success-actions">
         <button className="btn btn-primary" onClick={() => navigate('/purchases')}>

@@ -850,16 +850,16 @@ function PetHealth() {
             </p>
             <div className="booking-modal-actions">
               <button
+                className="modal-btn-pay"
+                onClick={() => navigate(`/booking-confirmation?bookingId=${bookingResult.bookingId}`)}
+              >
+                Thanh toán ngay
+              </button>
+              <button
                 className="modal-btn-home"
                 onClick={() => { setShowSuccessModal(false); navigate('/home') }}
               >
-                Go to Home
-              </button>
-              <button
-                className="modal-btn-close"
-                onClick={() => setShowSuccessModal(false)}
-              >
-                Close
+                Về trang chủ
               </button>
             </div>
           </div>

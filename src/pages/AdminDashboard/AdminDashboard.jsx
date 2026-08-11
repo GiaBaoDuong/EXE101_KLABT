@@ -1,9 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import Analytics from '../Analytics/Analytics'
 import './AdminDashboard.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5166'
+
+const IconChart = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="20" x2="12" y2="10"/>
+    <line x1="18" y1="20" x2="18" y2="4"/>
+    <line x1="6" y1="20" x2="6" y2="16"/>
+  </svg>
+)
 
 const IconUsers = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -87,7 +96,7 @@ const IconArrowLeft = () => (
 function AdminDashboard() {
   const navigate = useNavigate()
   const { token } = useAuth()
-  const [activeTab, setActiveTab] = useState('accounts')
+  const [activeTab, setActiveTab] = useState('analytics')
   const getToken = () => token || sessionStorage.getItem('token')
 
   useEffect(() => {
@@ -140,6 +149,7 @@ function AdminDashboard() {
     else if (activeTab === 'products') fetchProducts()
     else if (activeTab === 'services') fetchServices()
     else if (activeTab === 'promembership') fetchProMembership()
+    // Analytics tab self-loads via its own useEffect
   }, [activeTab])
 
   const showSuccess = (msg) => {
@@ -702,6 +712,9 @@ function AdminDashboard() {
           {/* Sidebar */}
           <aside className="adm-sidebar">
             <nav className="adm-sidebar__nav">
+              <button className={`adm-sidebar__btn ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
+                <IconChart /> <span>Dashboard</span>
+              </button>
               <button className={`adm-sidebar__btn ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
                 <IconUsers /> <span>Accounts</span>
               </button>
@@ -724,6 +737,11 @@ function AdminDashboard() {
 
           {/* Content */}
           <div className="adm-content">
+
+            {/* ANALYTICS */}
+            {activeTab === 'analytics' && (
+              <Analytics />
+            )}
 
             {/* ACCOUNTS */}
             {activeTab === 'accounts' && (

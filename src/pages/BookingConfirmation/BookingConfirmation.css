@@ -1,0 +1,458 @@
+/* ============================================================
+   BookingConfirmation — same design language as OrderConfirmation
+   Prefix: bc-
+   ============================================================ */
+
+.bc-page {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.bc-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 18px;
+}
+
+.bc-hero {
+  background: #111111;
+  padding: 56px 0 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.bc-hero__check-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #007d48;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.bc-hero__check {
+  width: 34px;
+  height: 34px;
+}
+
+.bc-hero__title {
+  font-family: 'Helvetica Now Display Medium', Helvetica, Arial, sans-serif;
+  font-size: 40px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0;
+  line-height: 1.1;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.bc-hero__subtitle {
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: #9e9ea0;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.bc-booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 28px 0;
+  border-bottom: 2px solid #111111;
+  gap: 16px;
+}
+
+.bc-booking-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bc-booking-header__label {
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #707072;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.bc-booking-header__code {
+  font-family: 'Helvetica Now Display Medium', Helvetica, Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: 0;
+  line-height: 1.1;
+}
+
+.bc-booking-header__date {
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #707072;
+  letter-spacing: 0;
+  margin-top: 4px;
+}
+
+.bc-booking-header__badges {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.bc-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 18px;
+  border-radius: 9999px;
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.bc-badge--pending { background: #111111; color: #ffffff; }
+.bc-badge--confirmed { background: #007d48; color: #ffffff; }
+.bc-badge--inprogress { background: #111111; color: #ffffff; }
+.bc-badge--completed { background: #007d48; color: #ffffff; }
+.bc-badge--cancelled { background: #d30005; color: #ffffff; }
+
+.bc-body {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 0;
+}
+
+.bc-services-section {
+  padding: 28px 36px 28px 0;
+  border-right: 2px solid #111111;
+}
+
+.bc-section-label {
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.bc-service-card {
+  display: flex;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid #e5e5e5;
+  align-items: center;
+}
+
+.bc-service-card:last-child {
+  border-bottom: none;
+}
+
+.bc-service-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bc-service-card__name {
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: 0;
+  line-height: 1.3;
+  margin: 0 0 6px;
+}
+
+.bc-service-card__meta {
+  font-family: 'Helvetica Now Text', Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #707072;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.bc-service-card__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.bc-service-card__price {
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: 0;
+}
+
+.bc-summary {
+  padding: 28px 0 28px 36px;
+  border-top: 2px solid #111111;
+  border-left: 2px solid #111111;
+}
+
+.bc-summary-card {
+  background: #f5f5f5;
+  border-radius: 0;
+  padding: 24px;
+}
+
+.bc-summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.bc-summary-total__label {
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: 0;
+}
+
+.bc-summary-total__amount {
+  font-family: 'Helvetica Now Display Medium', Helvetica, Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: 0;
+}
+
+.bc-info-rows {
+  padding: 20px 0;
+  border-top: 1px solid #e5e5e5;
+}
+
+.bc-info-section {
+  padding: 0 0 16px;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 16px;
+}
+
+.bc-info-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.bc-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  gap: 16px;
+}
+
+.bc-info-row__label {
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111111;
+  letter-spacing: 0;
+  flex-shrink: 0;
+}
+
+.bc-info-row__value {
+  font-family: 'Helvetica Now Text', Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #707072;
+  letter-spacing: 0;
+  text-align: right;
+}
+
+.bc-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 28px 0 56px;
+}
+
+.bc-btn {
+  width: 100%;
+  height: 54px;
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s;
+}
+
+.bc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bc-btn-primary {
+  background: #111111;
+  color: #ffffff;
+}
+
+.bc-btn-primary:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.bc-btn-secondary {
+  background: #f5f5f5;
+  color: #111111;
+  border: 2.5px solid #111111;
+}
+
+.bc-btn-secondary:hover:not(:disabled) {
+  background: #e5e5e5;
+}
+
+.bc-btn-ghost {
+  background: transparent;
+  color: #707072;
+  height: 44px;
+  font-size: 15px;
+}
+
+.bc-btn-ghost:hover:not(:disabled) {
+  color: #111111;
+}
+
+.bc-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 96px 0;
+  color: #707072;
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.bc-spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid #e5e5e5;
+  border-top-color: #111111;
+  border-radius: 50%;
+  animation: bc-spin 0.7s linear infinite;
+}
+
+@keyframes bc-spin {
+  to { transform: rotate(360deg); }
+}
+
+.bc-error-card {
+  background: #f5f5f5;
+  border-radius: 0;
+  padding: 56px 32px;
+  text-align: center;
+  margin: 56px 0;
+}
+
+.bc-error-text {
+  font-family: 'Helvetica Now Text Medium', Helvetica, Arial, sans-serif;
+  color: #d30005;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 28px;
+  letter-spacing: 0;
+}
+
+.bc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 18px;
+}
+
+.bc-modal {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 40px 36px 36px;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.bc-modal__icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.bc-modal__title {
+  font-family: 'Helvetica Now Display Medium', Helvetica, Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: 0;
+  line-height: 1.2;
+  margin: 0 0 12px;
+}
+
+.bc-modal__body {
+  font-family: 'Helvetica Now Text', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #39393b;
+  letter-spacing: 0;
+  line-height: 1.6;
+  margin: 0 0 32px;
+}
+
+.bc-modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .bc-hero__title { font-size: 28px; }
+  .bc-hero { padding: 40px 0 44px; }
+  .bc-body { grid-template-columns: 1fr; }
+  .bc-services-section {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 2px solid #111111;
+  }
+  .bc-summary { padding: 24px 0 0; }
+  .bc-booking-header { flex-direction: column; }
+  .bc-summary-total__amount { font-size: 24px; }
+}

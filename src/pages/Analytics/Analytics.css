@@ -1,0 +1,852 @@
+/* ============================================================
+   ANALYTICS — Nike commerce design system
+   - Pure ink/canvas/soft-cloud palette
+   - Extreme typographic contrast (96px hero -> 11px label)
+   - Pills for CTAs, no shadows, 1px hairlines
+   ============================================================ */
+
+.ana {
+  background: #ffffff;
+  color: #111111;
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  padding: 48px 0 80px;
+  width: 100%;
+  min-height: 100vh;
+  border: none;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Full-width inner wrapper */
+.ana-inner {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 48px;
+  box-sizing: border-box;
+}
+
+.ana-metrics,
+.ana-block,
+.ana-debug,
+.ana-error {
+  width: 100%;
+}
+
+@media (max-width: 1199px) {
+  .ana { padding: 40px 0 64px; }
+  .ana-inner { padding: 0 32px; }
+}
+@media (max-width: 1023px) {
+  .ana { padding: 32px 0 48px; }
+  .ana-inner { padding: 0 24px; }
+}
+@media (max-width: 767px) {
+  .ana { padding: 24px 0 40px; }
+  .ana-inner { padding: 0 16px; }
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.ana-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding: 16px 0 40px;
+  border-bottom: 2px solid #111111;
+  margin-bottom: 32px;
+}
+
+.ana-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #707072;
+  margin: 0 0 12px;
+}
+
+.ana-title {
+  font-family: 'Bebas Neue', 'Helvetica Neue', Impact, sans-serif;
+  font-size: clamp(48px, 7vw, 72px);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #111111;
+  margin: 0 0 12px;
+}
+
+.ana-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #707072;
+  margin: 0;
+}
+
+.ana-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   PERIOD TOGGLE (filter-chip pattern)
+   ============================================================ */
+.ana-period {
+  display: inline-flex;
+  background: #f5f5f5;
+  padding: 4px;
+  border-radius: 9999px;
+}
+
+.ana-period__btn {
+  background: transparent;
+  border: none;
+  padding: 8px 20px;
+  height: 36px;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #707072;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ana-period__btn:hover { color: #111111; }
+
+.ana-period__btn.active {
+  background: #111111;
+  color: #ffffff;
+}
+
+.ana-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f5f5;
+  color: #111111;
+  border: none;
+  padding: 8px 18px;
+  height: 40px;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ana-refresh:hover:not(:disabled) { background: #e5e5e5; }
+.ana-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ============================================================
+   METRICS — 5 summary cards
+   ============================================================ */
+.ana-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 56px;
+}
+
+.ana-metric {
+  background: #f5f5f5;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+  position: relative;
+}
+
+.ana-metric__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #9e9ea0;
+  line-height: 1.5;
+}
+
+.ana-metric__value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #111111;
+  letter-spacing: -0.5px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  word-break: break-word;
+}
+
+.ana-metric__growth {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: auto;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ana-metric__growth.is-up {
+  background: #e8f5e9;
+  color: #007d48;
+}
+
+.ana-metric__growth.is-down {
+  background: #fce4ec;
+  color: #d30005;
+}
+
+.ana-metric__growth.is-flat {
+  background: #f5f5f5;
+  color: #707072;
+}
+
+.ana-metric__growth-sub {
+  font-weight: 500;
+  color: inherit;
+  opacity: 0.7;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+/* ============================================================
+   BLOCK & SECTION HEADER
+   ============================================================ */
+.ana-block {
+  margin-bottom: 56px;
+}
+
+.ana-section__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #111111;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.ana-section__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #707072;
+  margin: 0 0 8px;
+}
+
+.ana-section__title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111111;
+  letter-spacing: -0.3px;
+  margin: 0 0 8px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.ana-section__sub {
+  font-size: 13px;
+  font-weight: 500;
+  color: #707072;
+  margin: 0;
+}
+
+/* ============================================================
+   CARD (flat, 1px hairline, no shadow)
+   ============================================================ */
+.ana-card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  padding: 24px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.ana-card--center {
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================
+   LEGEND
+   ============================================================ */
+.ana-legend {
+  display: inline-flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ana-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #707072;
+}
+
+.ana-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   2-COL GRID (for donut + status list)
+   ============================================================ */
+.ana-grid-2 {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.ana-grid-2 .ana-card:first-child {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+}
+
+.ana-grid-2 .ana-card:first-child .ana-donut {
+  margin: auto;
+}
+
+/* ============================================================
+   DONUT
+   ============================================================ */
+.ana-donut {
+  position: relative;
+  margin: 8px auto;
+  width: fit-content;
+  height: fit-content;
+}
+
+.ana-donut svg {
+  display: block;
+  overflow: visible;
+}
+
+.ana-donut__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  gap: 4px;
+}
+
+.ana-donut__num {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  color: #111111;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.ana-donut__lbl {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #111111;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.ana-donut__sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: #707072;
+}
+
+/* ============================================================
+   STATUS LIST
+   ============================================================ */
+.ana-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 100%;
+  justify-content: center;
+}
+
+.ana-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  border-bottom: 1px solid #e5e5e5;
+  gap: 16px;
+}
+.ana-status-list .ana-status-row:last-child { border-bottom: none; }
+
+.ana-status-row__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ana-status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.ana-status-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111111;
+  letter-spacing: 0;
+}
+
+.ana-status-row__right {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.ana-status-count {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111111;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.ana-status-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: #707072;
+  min-width: 48px;
+  text-align: right;
+}
+
+/* ============================================================
+   HORIZONTAL BAR CHART (top services)
+   ============================================================ */
+.ana-hbchart {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.ana-hbchart__row {
+  display: grid;
+  grid-template-columns: 200px 1fr 120px;
+  gap: 16px;
+  align-items: center;
+}
+
+.ana-hbchart__label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ana-hbchart__rank {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: #cacacb;
+  width: 32px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.ana-hbchart__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ana-hbchart__barWrap {
+  background: #f5f5f5;
+  height: 32px;
+  position: relative;
+}
+
+.ana-hbchart__bar {
+  height: 100%;
+  background: #111111;
+  transition: width 0.4s ease;
+}
+
+.ana-hbchart__value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111111;
+  text-align: right;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+.ana-table-wrap {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  overflow-x: auto;
+}
+
+.ana-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: inherit;
+}
+
+.ana-table thead {
+  background: #f5f5f5;
+}
+
+.ana-table th {
+  text-align: left;
+  padding: 16px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #707072;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.ana-th--num { text-align: right; }
+
+.ana-table td {
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 14px;
+  color: #111111;
+}
+.ana-table tbody tr:last-child td { border-bottom: none; }
+.ana-table tbody tr:hover { background: #f5f5f5; }
+
+.ana-rank {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: #cacacb;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.ana-td-name {
+  font-weight: 600;
+}
+
+.ana-td-num {
+  text-align: right;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.ana-td--bold {
+  font-weight: 700;
+}
+
+/* ============================================================
+   EMPTY / CHART EMPTY
+   ============================================================ */
+.ana-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: #9e9ea0;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.ana-chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #9e9ea0;
+}
+
+.ana-chart-empty__line {
+  width: 80%;
+  height: 1px;
+  background: #e5e5e5;
+  border-top: 1px dashed #cacacb;
+}
+
+.ana-chart-empty p {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ana-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+.ana-error {
+  background: #fce4ec;
+  color: #b71c1c;
+  padding: 16px 24px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-radius: 0;
+  font-weight: 500;
+}
+
+.ana-error p { margin: 0; }
+
+/* ============================================================
+   BUTTON (pill)
+   ============================================================ */
+.ana-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  height: 40px;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.ana-btn-primary {
+  background: #111111;
+  color: #ffffff;
+}
+.ana-btn-primary:hover { background: #39393b; }
+.ana-btn-primary:active { transform: scale(0.98); }
+
+/* ============================================================
+   DEBUG PANEL — collapsible raw API responses
+   ============================================================ */
+.ana-debug {
+  background: #f5f5f5;
+  border: 1px solid #cacacb;
+  margin-bottom: 32px;
+}
+
+.ana-debug__toggle {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 16px 20px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #111111;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ana-debug__toggle:hover { background: #e5e5e5; }
+
+.ana-debug__body {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ana-debug__row {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-left: 3px solid #cacacb;
+  padding: 12px 16px;
+}
+.ana-debug__row.is-ok { border-left-color: #007d48; }
+.ana-debug__row.is-fail { border-left-color: #d30005; }
+
+.ana-debug__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.ana-debug__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #cacacb;
+  flex-shrink: 0;
+}
+.ana-debug__dot.is-ok { background: #007d48; }
+.ana-debug__dot.is-fail { background: #d30005; }
+
+.ana-debug__url {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.ana-debug__type {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #707072;
+  padding: 4px 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.ana-debug__json {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 11px;
+  color: #39393b;
+  background: #f5f5f5;
+  padding: 12px;
+  margin: 0;
+  overflow-x: auto;
+  max-height: 280px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.ana-debug__hint {
+  margin: 0;
+  font-size: 12px;
+  color: #707072;
+  font-weight: 500;
+  text-align: center;
+  padding-top: 4px;
+}
+
+/* ============================================================
+   LOADING OVERLAY
+   ============================================================ */
+.ana-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.ana-spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e5e5e5;
+  border-top-color: #111111;
+  border-radius: 50%;
+  animation: ana-spin 0.8s linear infinite;
+}
+
+@keyframes ana-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1199px) {
+  .ana-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1023px) {
+  .ana-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .ana-grid-2 .ana-card:first-child {
+    padding: 24px;
+  }
+  .ana-card--center {
+    padding: 32px;
+  }
+}
+
+@media (max-width: 767px) {
+  .ana-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ana-hbchart__row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .ana-hbchart__barWrap {
+    height: 16px;
+  }
+  .ana-hbchart__value {
+    text-align: left;
+  }
+  .ana-table {
+    font-size: 12px;
+  }
+  .ana-table th, .ana-table td {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 599px) {
+  .ana-metrics {
+    grid-template-columns: 1fr;
+  }
+  .ana-title {
+    font-size: 48px;
+  }
+  .ana-header {
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+  }
+  .ana-block {
+    margin-bottom: 40px;
+  }
+}

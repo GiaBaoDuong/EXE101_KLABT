@@ -20,7 +20,9 @@ import Notifications from './pages/Notifications/Notifications'
 import Checkout from './pages/Checkout/Checkout'
 import MyOrders from './pages/MyOrders/MyOrders'
 import OrderDetail from './pages/OrderDetail/OrderDetail'
+import BookingDetail from './pages/BookingDetail/BookingDetail'
 import OrderConfirmation from './pages/OrderConfirmation/OrderConfirmation'
+import BookingConfirmation from './pages/BookingConfirmation/BookingConfirmation'
 import SharedNav from './components/SharedNav/SharedNav'
 import Footer from './components/Footer/Footer'
 import { useAuth } from './context/AuthContext'
@@ -158,12 +160,20 @@ function App() {
           element={<RequireAuth><PageLayout><OrderConfirmation /></PageLayout></RequireAuth>}
         />
         <Route
+          path="/booking-confirmation"
+          element={<RequireAuth><PageLayout><BookingConfirmation /></PageLayout></RequireAuth>}
+        />
+        <Route
           path="/my-orders"
           element={isAuthenticated ? <PageLayout><MyOrders /></PageLayout> : <Navigate to="/login" />}
         />
         <Route
           path="/order/:id"
           element={isAuthenticated ? <PageLayout><OrderDetail /></PageLayout> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/booking/:id"
+          element={isAuthenticated ? <PageLayout><BookingDetail /></PageLayout> : <Navigate to="/login" />}
         />
         {/* Standalone — no footer */}
         <Route path="/login" element={<Login />} />

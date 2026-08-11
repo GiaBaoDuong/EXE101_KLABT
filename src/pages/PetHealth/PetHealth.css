@@ -1,1 +1,17 @@
 /* Pet Health Page - inherits from PetGrooming styles */
+
+.modal-btn-pay {
+  flex: 1;
+  height: 52px;
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  border: none;
+  border-radius: var(--rounded-full);
+  font-family: var(--font-body-medium);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.modal-btn-pay:hover { opacity: 0.85; }

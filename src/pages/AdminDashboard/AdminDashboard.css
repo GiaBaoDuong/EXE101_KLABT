@@ -105,9 +105,10 @@
 /* ---- Content ---- */
 .adm-content {
   flex: 1;
-  padding: var(--spacing-section, 40px);
+  padding: 0;
   overflow-y: auto;
   min-width: 0;
+  background: var(--color-canvas, #fff);
 }
 
 /* ---- Header ---- */
@@ -183,6 +184,19 @@
 /* ---- Panel ---- */
 .adm-panel {
   animation: admFade 0.2s ease;
+  padding: 48px 0 80px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.adm-panel > * {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 48px;
+  box-sizing: border-box;
 }
 
 @keyframes admFade {
@@ -193,16 +207,37 @@
 .adm-panel__header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding-bottom: 24px;
   margin-bottom: var(--spacing-xl, 24px);
+  border-bottom: 2px solid #111111;
 }
 
 .adm-panel__header h2 {
-  font-size: 22px;
-  font-weight: 700;
+  font-family: 'Bebas Neue', 'Helvetica Neue', Impact, sans-serif;
+  font-size: clamp(48px, 7vw, 72px);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-transform: uppercase;
   color: var(--color-ink, #111);
   margin: 0;
-  letter-spacing: -0.3px;
+}
+
+@media (max-width: 1199px) {
+  .adm-panel { padding: 40px 0 64px; }
+  .adm-panel > * { padding: 0 32px; }
+}
+@media (max-width: 1023px) {
+  .adm-panel { padding: 32px 0 48px; }
+  .adm-panel > * { padding: 0 24px; }
+}
+@media (max-width: 767px) {
+  .adm-panel { padding: 24px 0 40px; }
+  .adm-panel > * { padding: 0 16px; }
+  .adm-panel__header { gap: 16px; padding-bottom: 16px; }
 }
 
 /* ---- Add Button ---- */
@@ -235,7 +270,7 @@
 .adm-table-wrap {
   background: var(--color-canvas, #fff);
   border-radius: var(--rounded-none, 0);
-  overflow: hidden;
+  overflow-x: auto;
   border: 1px solid var(--color-hairline, #e0e0e0);
 }
 
@@ -1032,7 +1067,7 @@
   }
 
   .adm-content {
-    padding: var(--spacing-xl, 24px);
+    padding: 0;
   }
 }
 
@@ -1078,7 +1113,7 @@
   }
 
   .adm-content {
-    padding: var(--spacing-lg, 16px);
+    padding: 0;
     overflow: visible;
   }
 
